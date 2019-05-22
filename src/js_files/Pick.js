@@ -1,25 +1,12 @@
 import React from 'react';
-import '../css_files/Pick.css';
+import '../css_files/App.css';
 import Button from 'react-bootstrap/Button'
 import ButtonToolbar from 'react-bootstrap/ButtonToolbar'
-import DTree from './DTree'
+import  {Link} from 'react-router-dom'
 
 
 
 class Pick extends React.Component {
-
-
-  constructor(props) {
-    super(props)
-    this.PageEnums = {
-      DTREE: 0
-    }
-
-  }
-
-  goToAlgorithimPage(id) {
-    console.log(id)
-  }
 
   render() {
     return (
@@ -29,7 +16,7 @@ class Pick extends React.Component {
             Pick an algorithim
           </p>
           <ButtonToolbar>
-            <Button onClick={(e) => this.goToAlgorithimPage(this.PageEnums.DTREE, e)} variant="primary">Decision Tree</Button>
+            <Link to="/DecisionTree"><Button variant="primary">Decision Tree</Button></Link>
           </ButtonToolbar>
         </header>
       </div>
