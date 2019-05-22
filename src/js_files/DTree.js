@@ -1,39 +1,29 @@
 import React from "react"
-import Tree from "react-d3-tree"
+import Tree from 'react-tree-graph'
 import '../css_files/App.css'
 
 
 class DTree extends React.Component {
     constructor(props) {
         super(props)
-        this.myTreeData = [
+        this.myTreeData = {
+          name: 'Root',
+          children: [
             {
-              name: 'Top Level',
-              attributes: {
-                keyA: 'val A',
-                keyB: 'val B',
-                keyC: 'val C',
-              },
-              children: [
-                {
-                  name: 'Level 2: A',
-                  attributes: {
-                    keyA: 'val A',
-                    keyB: 'val B',
-                    keyC: 'val C',
-                  },
-                },
-                {
-                  name: 'Level 2: B',
-                },
-              ],
+              name: "First"
             },
+            {
+              name: "Second"
+            }
           ]
+        }
     }
     render() {
         return(
-            <div className="tree-container">
-                <Tree data={this.myTreeData} />
+            <div className="App">
+              <div className="App-header">
+                <Tree height = {200} width = {300} data={this.myTreeData}  />
+              </div>
             </div>
                 
         )

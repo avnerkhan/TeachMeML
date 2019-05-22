@@ -16,13 +16,6 @@
   color: white;
 }
 
-
-.tree-container {
-  min-width: 100%;
-  min-height: 100vh;
-  background-color: #282c34;
-}
-
 .graph-container {
   min-width: 100vh;
   min-height: 100vh;
