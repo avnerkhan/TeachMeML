@@ -10,30 +10,78 @@ class DTree extends React.Component {
         // State contains data. features are categorical, and label is last
         // Feature keys are ints so they are easily indexable
         this.state = {
+          dataLabels: ["Passed", "GPA", "Language"],
           data: [
-            {0: "A", 1: "B", 2: "C", 3: "Python", label: 1},
-            {0: "B", 1: "C", 2: "D", 3: "Python", label: 0},
-            {0: "B", 1: "C", 2: "D", 3: "C++", label: 1},
-            {0: "B", 1: "C", 2: "D", 3: "Java", label: 1},
-            {0: "B", 1: "C", 2: "D", 3: "Python", label: 0},
-            {0: "B", 1: "C", 2: "D", 3: "C++", label: 0},
-            {0: "B", 1: "C", 2: "D", 3: "Java", label: 1}
-          ],
-          treeState: {
-            name: 'Root',
-            children: [
-              {
-                name: "First"
-              },
-              {
-                name: "Second"
-              }
-            ]
-          }
+            {0: "No", 1: "4.0", 2: "Python", label: 1},
+            {0: "No", 1: "2.0", 2: "Python", label: 0},
+            {0: "Yes", 1: "4.0", 2: "C++", label: 1},
+            {0: "Yes", 1: "2.0", 2: "Java", label: 1},
+            {0: "Yes", 1: "4.0", 2: "Python", label: 0},
+            {0: "No", 1: "2.0", 2: "C++", label: 0},
+            {0: "Yes", 1: "4.0", 2: "Java", label: 1}
+          ]
         }
 
   
 
+    }
+
+
+
+    // Builds decision tree, with entropy as 0 as base case
+    buildTree(dataLabels, data, currTree) {
+
+      let entropy = this.calculateGiniValue(data)
+
+      if (entropy === 0) {
+        let dataClass = data[0].label
+        currTree.children.push({name:dataClass})
+        return currTree
+      }
+
+      let splitDict = {}
+
+      const bestSplit = this.determineBestSplit(dataLabels, data)
+
+      const splitIndex = dataLabels.indexOf(bestSplit)
+
+      const classArr = this.getGiniMap(splitIndex, data, true)
+
+      for (const classVal in classArr) {
+        splitDict[classVal] = this.filteredData(classVal, splitIndex, data)
+        
+      }
+
+      
+
+      for (const classVal in splitDict) {
+        const newNode = {name: classVal, children: []}
+        this.buildTree(dataLabels, splitDict[classVal], newNode)
+        currTree.children.push(newNode)
+      }
+
+      return currTree
+
+
+
+    }
+
+    // Determines best split based on comparing gain ratios of all entries
+    determineBestSplit(dataLabels, data) {
+      let currentHighestGainLabel = ""
+      let currentHighestGain = 0.0
+      for (let i = 0; i < dataLabels.length; i++) {
+        
+        const currGain = this.calculateGainRatio(i, data)
+
+        if (currGain > currentHighestGain) {
+          currentHighestGain = currGain
+          currentHighestGainLabel = dataLabels[i]
+        }
+
+      }
+
+      return currentHighestGainLabel
     }
 
 
@@ -50,18 +98,24 @@ class DTree extends React.Component {
 
     calculateSplitInfo(feature, data) {
 
+      const giniMap = this.getGiniMap(feature, data, false)
+      let totalSplit = 0.0
 
+      for (const entry in giniMap) {
+        const fraction = giniMap[entry].totalNum/data.length
+        totalSplit += -fraction * Math.log2(fraction)
+      }
 
-
+      return totalSplit
       
     }
 
     // Calculates information gain from splitting on feature
     calculateGain(feature, data) {
       
-      let overallEntropy = this.calculatGiniValue(data)
+      const overallEntropy = this.calculateGiniValue(data)
 
-      let splitValue = this.calculateSplitGini(data)
+      const splitValue = this.calculateSplitGini(feature, data)
 
       return overallEntropy - splitValue
 
@@ -71,10 +125,10 @@ class DTree extends React.Component {
     // counts. Can be used to calculate overall entropy of dataset or gini
     // of specific features
     calculateGiniValue(data) {
-      let posNegCount = this.countPositiveAndNegative(data)
+      const posNegCount = this.countPositiveAndNegative(data)
 
-      let posSquared = this.getSquaredNumber(posNegCount.pos, data.length)
-      let negSquared = this.getSquaredNumber(posNegCount.neg, data.length)
+      const posSquared = this.getSquaredNumber(posNegCount.pos, data.length)
+      const negSquared = this.getSquaredNumber(posNegCount.neg, data.length)
 
       return 1 - posSquared - negSquared
     }
@@ -82,7 +136,7 @@ class DTree extends React.Component {
 
     // Returns a number divided by total dataset length and squares it
     getSquaredNumber(number, dataLength) {
-      let ratio = number/dataLength
+      const ratio = number/dataLength
       return ratio * ratio
     }
 
@@ -91,25 +145,29 @@ class DTree extends React.Component {
     // and the value is the total count of that class and the positive count
     // The function then creates another map that has classes as keys and
     // has the values as the calculated gini of that class and the total count
-    getGiniMap(feature, data) {
+    getGiniMap(feature, data, returnOnlyClassMap) {
       
       let classMap = {}
       let returnMap = {}
 
-      for (let entry of data) {
-        let currentFeature = entry[feature]
-        let positiveCount = entry.label
+      for (const entry of data) {
+        const currentFeature = entry[feature]
+        const positiveCount = entry.label
         if (classMap[currentFeature] == null) {
           classMap[currentFeature] = {totalCount: 1, posCount:positiveCount}
         } else {
-          let currentTotalCount = classMap[currentFeature].totalCount
-          let currentPositiveCount = classMap[currentFeature].posCount
+          const currentTotalCount = classMap[currentFeature].totalCount
+          const currentPositiveCount = classMap[currentFeature].posCount
           classMap[currentFeature] = {totalCount: currentTotalCount + 1, posCount:currentPositiveCount + positiveCount}
         }
       }
 
-      for (let classVal in classMap) {
-        let mapEntry = {giniValue: this.calculateGiniValue(this.filteredData(classVal, feature, data)), totalNum: classMap[classVal].totalCount}
+      if (returnOnlyClassMap) {
+        return classMap
+      }
+
+      for (const classVal in classMap) {
+        const mapEntry = {giniValue: this.calculateGiniValue(this.filteredData(classVal, feature, data)), totalNum: classMap[classVal].totalCount}
         returnMap[classVal] = mapEntry
       }
 
@@ -123,7 +181,7 @@ class DTree extends React.Component {
     filteredData(classVal, feature, data) {
       let dataToReturn = []
 
-      for (let entry of data) {
+      for (const entry of data) {
         if(entry[feature] === classVal) {
           dataToReturn.push(entry)
         }
@@ -136,11 +194,11 @@ class DTree extends React.Component {
     // Calculates split gini for feature
     calculateSplitGini(feature, data) {
 
-      let giniMap = this.getGiniMap(feature, data)
+      const giniMap = this.getGiniMap(feature, data, false)
       let totalSplit = 0.0
 
       for (let entry in giniMap) {
-        let fractionValue = giniMap[entry].totalNum/data.length
+        const fractionValue = giniMap[entry].totalNum/data.length
         totalSplit += fractionValue * giniMap[entry].giniValue
       }
 
@@ -155,7 +213,7 @@ class DTree extends React.Component {
       let negativeCount = 0
 
       for (let entry of data) {
-        let label = entry.label
+        const label = entry.label
         if (label === 1) {
           positiveCount++
         }
@@ -174,7 +232,7 @@ class DTree extends React.Component {
         return(
             <div className="App">
               <div className="App-header">
-                <Tree height = {200} width = {300} data={this.state.treeState} svgProps={{className: 'custom'}} />
+                <Tree height = {200} width = {300} data={this.buildTree(this.state.dataLabels, this.state.data, {name: "Start", children:[]})} svgProps={{className: 'custom'}} />
               </div>
             </div>
                 
