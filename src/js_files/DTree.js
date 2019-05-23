@@ -1,6 +1,8 @@
 import React from "react"
 import Tree from 'react-tree-graph'
+import ReactTable from 'react-table'
 import '../css_files/App.css'
+import 'react-table/react-table.css'
 
 
 class DTree extends React.Component {
@@ -10,6 +12,7 @@ class DTree extends React.Component {
         // State contains data. features are categorical, and label is last
         // Feature keys are ints so they are easily indexable
         this.state = {
+          treeState: {},
           dataLabels: ["Passed", "GPA", "Language"],
           data: [
             {0: "No", 1: "4.0", 2: "Python", label: 1},
@@ -19,14 +22,83 @@ class DTree extends React.Component {
             {0: "Yes", 1: "4.0", 2: "Python", label: 0},
             {0: "No", 1: "2.0", 2: "C++", label: 0},
             {0: "Yes", 1: "4.0", 2: "Java", label: 1}
+          ],
+          columns: [
+            {
+              Header: "Passed",
+              accessor: "passed",
+              Cell: row => (
+                <div onClick={() => this.handleEdit(row.index, 0)} contentEditable>
+                  {row.original.passed}
+                </div>
+            )
+            },
+            {
+              Header: "GPA",
+              accessor: "gpa",
+              Cell: row => (
+                <div onClick={() => this.handleEdit(row.index, 1)} contentEditable>
+                  {row.original.gpa}
+                </div>
+            )
+            },
+            {
+              Header: "Language",
+              accessor: "language",
+              Cell: row => (
+                <div onClick={() => this.handleEdit(row.index, 2)} contentEditable>
+                  {row.original.language}
+                </div>
+            )
+            },
+            {
+              Header: "Label",
+              accessor: "label",
+              Cell: row => (
+                <div onClick={() => this.handleEdit(row.index, 'label')} contentEditable>
+                    {row.original.label}
+                </div>
+            )
+            }
           ]
         }
 
-  
 
     }
 
+    handleEdit(row, feature) {
+      let copyState = this.state.data
+      copyState[row][feature] = 0
+      this.setState({
+        data: copyState,
+        treeState: this.buildTree(this.state.dataLabels, copyState, {name: "Start", children:[]})
+      })
+    }
 
+
+
+
+
+    createTableReadableData() {
+
+      const dataLabels = this.state.dataLabels
+
+      const data = this.state.data
+
+      let newData = []
+
+      for (let entry of data) {
+        let newEntry = {}
+        for (let i = 0; i < dataLabels.length ; i++) {
+          newEntry[dataLabels[i].toLowerCase()] = entry[i]
+        }
+        newEntry["label"] = entry.label
+        newData.push(newEntry)
+      }
+
+      return newData
+
+    }
 
     // Builds decision tree, with entropy as 0 as base case
     buildTree(dataLabels, data, currTree) {
@@ -229,10 +301,12 @@ class DTree extends React.Component {
 
 
     render() {
+
         return(
             <div className="App">
               <div className="App-header">
-                <Tree height = {200} width = {300} data={this.buildTree(this.state.dataLabels, this.state.data, {name: "Start", children:[]})} svgProps={{className: 'custom'}} />
+                <Tree height = {200} width = {300} data={this.state.treeState} svgProps={{className: 'custom'}} />
+                <ReactTable data={this.createTableReadableData()} columns={this.state.columns} defaultPageSize={this.state.data.length} className="-striped -highlight"/>
               </div>
             </div>
                 
