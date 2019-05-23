@@ -20,3 +20,19 @@
   min-width: 100vh;
   min-height: 100vh;
 }
+
+
+svg.custom .node text{
+  font-size: 13px;
+  fill: #F4F4F4;
+}
+
+svg.custom .node circle{
+  fill: #F4F4F4;
+}
+
+svg.custom path.link{
+  fill: none;
+  stroke: #2593B8;
+  stroke-width: 1.5px;
+}
