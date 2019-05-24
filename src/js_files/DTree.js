@@ -2,6 +2,13 @@ import React from "react"
 import Tree from 'react-tree-graph'
 import ReactTable from 'react-table'
 import Button from 'react-bootstrap/Button'
+import Card from 'react-bootstrap/Card'
+import ListGroup from 'react-bootstrap/ListGroup'
+import Container from 'react-bootstrap/Container'
+import Row from 'react-bootstrap/Row'
+import Col from 'react-bootstrap/Col'
+import FormControl from 'react-bootstrap/FormControl'
+import InputGroup from 'react-bootstrap/InputGroup'
 import ButtonToolbar from 'react-bootstrap/ButtonToolbar'
 import '../css_files/App.css'
 import 'react-table/react-table.css'
@@ -15,6 +22,7 @@ class DTree extends React.Component {
         // Feature keys are ints so they are easily indexable
         this.state = {
           renderTree: false,
+          renderTable:true,
           treeState: {},
           dataLabels: ["Passed", "GPA", "Language"],
           data: [
@@ -26,43 +34,11 @@ class DTree extends React.Component {
             {0: "No", 1: "2.0", 2: "C++", label: 0},
             {0: "Yes", 1: "4.0", 2: "Java", label: 1}
           ],
-          columns: [
-            {
-              Header: "Passed",
-              accessor: "passed",
-              Cell: row => (
-                <div onClick={() => this.handleEdit(row.index, 0)}>
-                  {row.original.passed}
-                </div>
-            )
-            },
-            {
-              Header: "GPA",
-              accessor: "gpa",
-              Cell: row => (
-                <div onClick={() => this.handleEdit(row.index, 1)}>
-                  {row.original.gpa}
-                </div>
-            )
-            },
-            {
-              Header: "Language",
-              accessor: "language",
-              Cell: row => (
-                <div onClick={() => this.handleEdit(row.index, 2)}>
-                  {row.original.language}
-                </div>
-            )
-            },
-            {
-              Header: "Label",
-              accessor: "label",
-              Cell: row => (
-                <div onClick={() => this.handleEdit(row.index, 'label')}>
-                    {row.original.label}
-                </div>
-            )
-            }
+          labelClasses:[
+            ["Yes", "No"],
+            ["4.0", "2.0"],
+            ["Python", "Java", "C++"],
+            [0, 1]
           ]
         }
 
@@ -74,19 +50,13 @@ class DTree extends React.Component {
     handleEdit(row, feature) {
 
       let copyState = this.state.data
-      const labelArray = [
-        ["Yes", "No"],
-        ["4.0", "2.0"],
-        ["Python", "Java", "C++"],
-        [1, 0]
-      ]
 
       let index = feature === "label" ? 3 : feature
 
       const currentValue = copyState[row][feature]
-      const currentIndex = labelArray[index].indexOf(currentValue)
-      const newIndex = (currentIndex + 1) % labelArray[index].length 
-      copyState[row][feature] = labelArray[index][newIndex]
+      const currentIndex = this.state.labelClasses[index].indexOf(currentValue)
+      const newIndex = (currentIndex + 1) % this.state.labelClasses[index].length 
+      copyState[row][feature] = this.state.labelClasses[index][newIndex]
       this.setState({
         renderTree: false,
         data: copyState,
@@ -354,14 +324,105 @@ class DTree extends React.Component {
       })
     }
 
+    generateColumns(dataLabels) {
+
+      let columnsToReturn = []
+      let copiedLabels = [...dataLabels]
+      copiedLabels.push("Label")
+
+      for (let i = 0; i < copiedLabels.length; i++) {
+
+        let lastIndex = i === copiedLabels.length - 1 ? copiedLabels[i].toLowerCase() : i
+
+        let entry = {
+          Header: copiedLabels[i],
+          accessor: copiedLabels[i].toLowerCase(),
+          Cell: row => (
+            <div onClick={() => this.handleEdit(row.index, lastIndex)}>
+              {row.original[copiedLabels[i].toLowerCase()]}
+            </div>
+        )
+        }
+
+        columnsToReturn.push(entry)
+      }
+
+      return columnsToReturn
+
+    }
+
     addRow() {
-      const newData = {0: "No", 1: "4.0", 2: "Python", label: 1}
+      const newData = this.state.data[0]
       let newState = this.state.data
       newState.push(newData)
 
       this.setState({
         data:newState
       })
+    }
+
+    editTable() {
+      this.setState({
+        renderTree: false,
+        renderTable:false
+      })
+    }
+
+    showCurrentLayout() {
+      console.log(this.state.dataLabels)
+      return(
+        <Container>
+          <Row>
+            <Col>
+            <Card className="black-text" style={{ width: '32rem'}}>
+            <Card.Header>Featured</Card.Header>
+                <ListGroup>
+                  <ListGroup.Item>Cras justo odio</ListGroup.Item>
+                  <ListGroup.Item>Dapibus ac facilisis in</ListGroup.Item>
+                  <ListGroup.Item>Vestibulum at eros</ListGroup.Item>
+                  <ListGroup.Item>Vestibulum at eros</ListGroup.Item>
+                  <ListGroup.Item>Vestibulum at eros</ListGroup.Item>
+                  <InputGroup>
+                    <FormControl></FormControl>
+                    <InputGroup.Append>
+                      <Button>Add New Class</Button>
+                    </InputGroup.Append>
+                  </InputGroup>
+                </ListGroup>
+            </Card>
+            </Col>
+            <Col>
+            <Card style={{ width: '32rem' }}>
+            <Card.Header>Featured</Card.Header>
+                <ListGroup variant="flush">
+                  <ListGroup.Item>Cras justo odio</ListGroup.Item>
+                  <ListGroup.Item>Dapibus ac facilisis in</ListGroup.Item>
+                  <ListGroup.Item>Vestibulum at eros</ListGroup.Item>
+                </ListGroup>
+            </Card>
+            </Col>
+            <Col>
+            <Card style={{ width: '32rem' }}>
+            <Card.Header>Featured</Card.Header>
+                <ListGroup variant="flush">
+                  <ListGroup.Item>Cras justo odio</ListGroup.Item>
+                  <ListGroup.Item>Dapibus ac facilisis in</ListGroup.Item>
+                  <ListGroup.Item>Vestibulum at eros</ListGroup.Item>
+
+                </ListGroup>
+            </Card>
+            </Col>
+            <Col>
+            <InputGroup>
+                    <FormControl></FormControl>
+                    <InputGroup.Append>
+                      <Button>Add New Feature</Button>
+                    </InputGroup.Append>
+            </InputGroup>
+            </Col>
+          </Row>
+        </Container>
+      )
     }
 
 
@@ -371,11 +432,11 @@ class DTree extends React.Component {
             <div className="App">
               <div className="App-header">
                 {this.state.renderTree ? <Tree height = {400} width = {800} data={this.state.treeState} animated svgProps={{className: 'custom'}} /> : null}
-                <ReactTable data={this.createTableReadableData()} columns={this.state.columns} defaultPageSize={this.state.data.length} className="-striped -highlight"/>
+                {this.state.renderTable ? <ReactTable data={this.createTableReadableData()} columns={this.generateColumns(this.state.dataLabels)} defaultPageSize={this.state.data.length} className="-striped -highlight"/> : this.showCurrentLayout()}
                 <ButtonToolbar>
                   {this.state.renderTree ? null : <Button onClick={() => this.showTree()}>Display</Button>}
                   <Button onClick={() => this.addRow()}>Add Row</Button>
-                  <Button>Edit Table Layout</Button>
+                  <Button onClick={() => this.editTable()}>Edit Table Layout</Button>
                   {this.state.renderTree ? <Button>Show Steps</Button> : null}
                 </ButtonToolbar>
               </div>

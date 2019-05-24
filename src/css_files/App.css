@@ -21,9 +21,13 @@
   min-height: 100vh;
 }
 
+.black-text {
+  color: #282c34;
+}
+
 
 svg.custom .node text{
-  font-size: 7px;
+  font-size: 14px;
   fill: #F4F4F4;
 }
 

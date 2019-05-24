@@ -45,7 +45,7 @@ class KNN extends React.Component {
         return (
             <div className="App">
                 <div className="App-header">
-                     <ScatterChart width={300} height={200} >
+                     <ScatterChart width={800} height={400} >
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="x" name="stature" unit="cm" />
                         <YAxis dataKey="y" name="weight" unit="kg" />
