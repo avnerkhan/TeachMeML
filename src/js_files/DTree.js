@@ -425,6 +425,14 @@ class DTree extends React.Component {
       )
     }
 
+    saveEditState() {
+
+      this.setState({
+        renderTable: true
+      })
+
+    }
+
 
     render() {
 
@@ -434,9 +442,9 @@ class DTree extends React.Component {
                 {this.state.renderTree ? <Tree height = {400} width = {800} data={this.state.treeState} animated svgProps={{className: 'custom'}} /> : null}
                 {this.state.renderTable ? <ReactTable data={this.createTableReadableData()} columns={this.generateColumns(this.state.dataLabels)} defaultPageSize={this.state.data.length} className="-striped -highlight"/> : this.showCurrentLayout()}
                 <ButtonToolbar>
-                  {this.state.renderTree ? null : <Button onClick={() => this.showTree()}>Display</Button>}
-                  <Button onClick={() => this.addRow()}>Add Row</Button>
-                  <Button onClick={() => this.editTable()}>Edit Table Layout</Button>
+                  {this.state.renderTree || !this.state.renderTable ? null : <Button onClick={() => this.showTree()}>Display</Button>}
+                  {this.state.renderTable ? <Button onClick={() => this.addRow()}>Add Row</Button> : null}
+                  {this.state.renderTable ? <Button onClick={() => this.editTable()}>Edit Table Layout</Button> :  <Button onClick={() => this.saveEditState()}>Save State</Button>}
                   {this.state.renderTree ? <Button>Show Steps</Button> : null}
                 </ButtonToolbar>
               </div>
