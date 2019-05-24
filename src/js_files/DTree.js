@@ -124,7 +124,11 @@ class DTree extends React.Component {
     }
 
     // Builds decision tree, with entropy as 0 as base case. 
-    buildTree(dataLabels, data, currTree) {
+    buildTree(dataLabels, data, currTree, maxDepth=null, currDepth=0) {
+
+      if(maxDepth != null && currDepth >= maxDepth) {
+        return currTree
+      }
 
       let entropy = this.calculateGiniValue(data)
 
@@ -157,7 +161,7 @@ class DTree extends React.Component {
         let name = classVal === "undefined" ? this.determineMostLikelyLabel(data) : classVal
         let newNode = {name: name, children: []}
 
-        this.buildTree(dataLabels, splitDict[classVal], newNode)
+        this.buildTree(dataLabels, splitDict[classVal], newNode, maxDepth, currDepth + 1)
         currTree.children.push(newNode)
       }
 
@@ -369,7 +373,7 @@ class DTree extends React.Component {
                 {this.state.renderTree ? <Tree height = {400} width = {800} data={this.state.treeState} animated svgProps={{className: 'custom'}} /> : null}
                 <ReactTable data={this.createTableReadableData()} columns={this.state.columns} defaultPageSize={this.state.data.length} className="-striped -highlight"/>
                 <ButtonToolbar>
-                  <Button onClick={() => this.showTree()}>Display</Button>
+                  {this.state.renderTree ? null : <Button onClick={() => this.showTree()}>Display</Button>}
                   <Button onClick={() => this.addRow()}>Add Row</Button>
                   <Button>Edit Table Layout</Button>
                   {this.state.renderTree ? <Button>Show Steps</Button> : null}
