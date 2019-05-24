@@ -2,6 +2,7 @@ import React from "react"
 import Tree from 'react-tree-graph'
 import ReactTable from 'react-table'
 import Button from 'react-bootstrap/Button'
+import ButtonToolbar from 'react-bootstrap/ButtonToolbar'
 import '../css_files/App.css'
 import 'react-table/react-table.css'
 
@@ -80,12 +81,7 @@ class DTree extends React.Component {
         [1, 0]
       ]
 
-      let index
-      if (feature === "label") {
-        index = 3
-      } else {
-        index = feature
-      }
+      let index = feature === "label" ? 3 : feature
 
       const currentValue = copyState[row][feature]
       const currentIndex = labelArray[index].indexOf(currentValue)
@@ -142,7 +138,10 @@ class DTree extends React.Component {
 
       const bestSplit = this.determineBestSplit(dataLabels, data)
 
+
+
       const splitIndex = dataLabels.indexOf(bestSplit)
+
 
       const classArr = this.getGiniMap(splitIndex, data, true)
 
@@ -154,13 +153,10 @@ class DTree extends React.Component {
       
 
       for (const classVal in splitDict) {
-        let newNode
 
-        if (classVal === "undefined") {
-          newNode = {name: "1 or 0", children: []}
-        } else {
-          newNode = {name: classVal, children: []}
-        }
+        let name = classVal === "undefined" ? this.determineMostLikelyLabel(data) : classVal
+        let newNode = {name: name, children: []}
+
         this.buildTree(dataLabels, splitDict[classVal], newNode)
         currTree.children.push(newNode)
       }
@@ -169,6 +165,16 @@ class DTree extends React.Component {
 
 
 
+    }
+
+    determineMostLikelyLabel(data) {
+      let posLabelCount = 0
+
+      for (let entry of data) {
+        posLabelCount += entry.label === 1 ? 1 : 0
+      }
+
+      return posLabelCount/data.length >= 0.5 ? 1 : 0 
     }
 
     // Determines best split based on comparing gain ratios of all entries
@@ -185,6 +191,8 @@ class DTree extends React.Component {
         }
 
       }
+
+
 
       return currentHighestGainLabel
     }
@@ -255,6 +263,7 @@ class DTree extends React.Component {
       let classMap = {}
       let returnMap = {}
 
+      console.log("Starts here")
       for (const entry of data) {
         const currentFeature = entry[feature]
         const positiveCount = entry.label
@@ -266,6 +275,9 @@ class DTree extends React.Component {
           classMap[currentFeature] = {totalCount: currentTotalCount + 1, posCount:currentPositiveCount + positiveCount}
         }
       }
+
+      console.log(data)
+      console.log(classMap)
 
       if (returnOnlyClassMap) {
         return classMap
@@ -338,6 +350,16 @@ class DTree extends React.Component {
       })
     }
 
+    addRow() {
+      const newData = {0: "No", 1: "4.0", 2: "Python", label: 1}
+      let newState = this.state.data
+      newState.push(newData)
+
+      this.setState({
+        data:newState
+      })
+    }
+
 
     render() {
 
@@ -346,7 +368,12 @@ class DTree extends React.Component {
               <div className="App-header">
                 {this.state.renderTree ? <Tree height = {400} width = {800} data={this.state.treeState} animated svgProps={{className: 'custom'}} /> : null}
                 <ReactTable data={this.createTableReadableData()} columns={this.state.columns} defaultPageSize={this.state.data.length} className="-striped -highlight"/>
-                <Button onClick={() => this.showTree()} />
+                <ButtonToolbar>
+                  <Button onClick={() => this.showTree()}>Display</Button>
+                  <Button onClick={() => this.addRow()}>Add Row</Button>
+                  <Button>Edit Table Layout</Button>
+                  {this.state.renderTree ? <Button>Show Steps</Button> : null}
+                </ButtonToolbar>
               </div>
             </div>
                 
