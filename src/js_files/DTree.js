@@ -30,9 +30,7 @@ class DTree extends React.Component {
             {0: "No", 1: "2.0", 2: "Python", label: 0},
             {0: "Yes", 1: "4.0", 2: "C++", label: 1},
             {0: "Yes", 1: "2.0", 2: "Java", label: 1},
-            {0: "Yes", 1: "4.0", 2: "Python", label: 0},
-            {0: "No", 1: "2.0", 2: "C++", label: 0},
-            {0: "Yes", 1: "4.0", 2: "Java", label: 1}
+            {0: "Yes", 1: "4.0", 2: "Python", label: 0}
           ],
           labelClasses: {
             "passed": ["Yes", "No"],
@@ -373,28 +371,43 @@ class DTree extends React.Component {
       })
     }
 
-    // Deletes a class for a specific feature on click
-    deleteClassForFeature(className, feature) {
-        console.log(className)
-        console.log(feature)
+    // Either deletes a class from feature or adds one
+    changeClassFeatureState(modify, feature, isAdd) {
+
+        let featureLowerCase = feature.toLowerCase()
+        let copyArr = this.state.labelClasses[featureLowerCase]
+        if (isAdd) {
+          copyArr.push(modify)
+        } else {
+          copyArr.splice(copyArr.indexOf(modify), 1)
+        }
+        let copyDict = this.state.labelClasses
+        copyDict[featureLowerCase] = copyArr
+        this.setState({
+          labelClasses: copyDict
+        })
+
     }
 
-    // Deletes an entire feature on click
-    deleteFeature(feature) {
-      console.log(feature)
-    }
+    // Either adds a new feature or deletes a current one
+    changeFeatureState(feature, isAdd) {
 
-    // Adds a new class for a specific feature based on the input
-    addNewClassForFeature(currInput, feature) {
-      console.log(feature)
-      console.log(currInput)
-    }
+      let copyArr = this.state.dataLabels
+      let copyClasses = this.state.labelClasses
+      if (isAdd) {
+        copyArr.push(feature)
+        copyClasses[feature.toLowerCase()] = ["Sample"]
+      } else {
+        delete copyClasses[feature.toLowerCase()]
+        copyArr.splice(copyArr.indexOf(feature), 1)
+      }
+      
+      this.setState({
+        dataLabels:copyArr,
+        labelClasses: copyClasses
+      })
 
-    // Adds a new feature 
-    addNewFeature(newFeature) {
-      console.log(newFeature)
     }
-
 
 
     // Demonstrates current layout of table by dynamically generating JSX for state
@@ -406,17 +419,17 @@ class DTree extends React.Component {
                 return(
                   <Col>
                     <Card className="black-text" style={{ width: '32rem'}}>
-                    <Card.Header onClick={() => this.deleteFeature(feature)}>{feature}</Card.Header>
+                    <Card.Header onClick={() => this.changeFeatureState(feature, false)}>{feature}</Card.Header>
                         <ListGroup>
                           {this.state.labelClasses[feature.toLowerCase()].map((className) => {
                             return(
-                              <ListGroup.Item onClick={() => this.deleteClassForFeature(className, feature)}>{className}</ListGroup.Item>
+                              <ListGroup.Item onClick={() => this.changeClassFeatureState(className, feature, false)}>{className}</ListGroup.Item>
                             )
                           })}
                           <InputGroup>
                             <FormControl ref={feature} ></FormControl>
                             <InputGroup.Append>
-                              <Button onClick={() => this.addNewClassForFeature(this.refs[feature].value, feature)}>Add New Class</Button>
+                              <Button onClick={() => this.changeClassFeatureState(this.refs[feature].value, feature, true)}>Add New Class</Button>
                             </InputGroup.Append>
                           </InputGroup>
                         </ListGroup>
@@ -428,7 +441,7 @@ class DTree extends React.Component {
             <InputGroup>
                     <FormControl ref="newFeature"></FormControl>
                     <InputGroup.Append>
-                      <Button onClick={() => this.addNewFeature(this.refs["newFeature"].value)}>Add New Feature</Button>
+                      <Button onClick={() => this.changeFeatureState(this.refs["newFeature"].value, true)}>Add New Feature</Button>
                     </InputGroup.Append>
             </InputGroup>
             </Col>
@@ -437,9 +450,30 @@ class DTree extends React.Component {
       )
     }
 
+    generateRandomDataState() {
+      let dataState = []
+
+      for (let count = 0; count < 10; count++) {
+        let entry = {}
+        for (let i = 0; i < this.state.dataLabels.length; i++) {
+          let currentClassLabels = this.state.labelClasses[this.state.dataLabels[i].toLowerCase()]
+          let randomEntry = currentClassLabels[Math.floor(Math.random()*currentClassLabels.length)]
+          entry[i] = randomEntry
+        }
+        entry["label"] = count % 2
+        dataState.push(entry)
+      }
+
+      this.setState({
+        data: dataState
+      })
+
+      
+    }
+
     // Exit out of edit table page and go back to the tree generator page
     saveEditState() {
-
+      this.generateRandomDataState()
       this.setState({
         renderTable: true
       })
@@ -457,6 +491,7 @@ class DTree extends React.Component {
                 <ButtonToolbar>
                   {this.state.renderTree || !this.state.renderTable ? null : <Button onClick={() => this.showTree()}>Display</Button>}
                   {this.state.renderTable ? <Button onClick={() => this.addRow()}>Add Row</Button> : null}
+                  {this.state.renderTable ? <Button onClick={() => this.generateRandomDataState()}>Generate Data</Button> : null}
                   {this.state.renderTable ? <Button onClick={() => this.editTable()}>Edit Table Layout</Button> :  <Button onClick={() => this.saveEditState()}>Save State</Button>}
                   {this.state.renderTree ? <Button>Show Steps</Button> : null}
                 </ButtonToolbar>
