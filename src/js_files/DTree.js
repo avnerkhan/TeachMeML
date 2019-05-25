@@ -34,29 +34,30 @@ class DTree extends React.Component {
             {0: "No", 1: "2.0", 2: "C++", label: 0},
             {0: "Yes", 1: "4.0", 2: "Java", label: 1}
           ],
-          labelClasses:[
-            ["Yes", "No"],
-            ["4.0", "2.0"],
-            ["Python", "Java", "C++"],
-            [0, 1]
-          ]
+          labelClasses: {
+            "passed": ["Yes", "No"],
+            "gpa": ["4.0", "2.0"],
+            "language": ["Python", "Java", "C++"],
+            "label": [0, 1]
+          }
         }
+
 
 
     }
 
     // Whenever an entry is clicked, we change the entry by iterating through
     // label array and set state to corresponding, as well as erasing the tree
-    handleEdit(row, feature) {
+    handleEdit(row, feature, index) {
 
       let copyState = this.state.data
 
-      let index = feature === "label" ? 3 : feature
+      let indexer = feature === "label" ? feature : index
 
-      const currentValue = copyState[row][feature]
-      const currentIndex = this.state.labelClasses[index].indexOf(currentValue)
-      const newIndex = (currentIndex + 1) % this.state.labelClasses[index].length 
-      copyState[row][feature] = this.state.labelClasses[index][newIndex]
+      const currentValue = copyState[row][indexer]
+      const currentIndex = this.state.labelClasses[feature].indexOf(currentValue)
+      const newIndex = (currentIndex + 1) % this.state.labelClasses[feature].length 
+      copyState[row][indexer] = this.state.labelClasses[feature][newIndex]
       this.setState({
         renderTree: false,
         data: copyState,
@@ -141,6 +142,7 @@ class DTree extends React.Component {
 
     }
 
+    // For determing ties when a node has multiple labels in its dataset
     determineMostLikelyLabel(data) {
       let posLabelCount = 0
 
@@ -237,7 +239,6 @@ class DTree extends React.Component {
       let classMap = {}
       let returnMap = {}
 
-      console.log("Starts here")
       for (const entry of data) {
         const currentFeature = entry[feature]
         const positiveCount = entry.label
@@ -250,8 +251,6 @@ class DTree extends React.Component {
         }
       }
 
-      console.log(data)
-      console.log(classMap)
 
       if (returnOnlyClassMap) {
         return classMap
@@ -317,6 +316,7 @@ class DTree extends React.Component {
 
     }
 
+    // Method that allows the tree to be show and initializes/resets its state
     showTree() {
       this.setState({
         renderTree: true,
@@ -324,6 +324,8 @@ class DTree extends React.Component {
       })
     }
 
+
+    // Dynamically generates columns for data table based on data labels in state
     generateColumns(dataLabels) {
 
       let columnsToReturn = []
@@ -332,13 +334,14 @@ class DTree extends React.Component {
 
       for (let i = 0; i < copiedLabels.length; i++) {
 
-        let lastIndex = i === copiedLabels.length - 1 ? copiedLabels[i].toLowerCase() : i
+        let lastIndex = i 
+        let featureName = copiedLabels[i].toLowerCase() 
 
         let entry = {
           Header: copiedLabels[i],
           accessor: copiedLabels[i].toLowerCase(),
           Cell: row => (
-            <div onClick={() => this.handleEdit(row.index, lastIndex)}>
+            <div onClick={() => this.handleEdit(row.index, featureName, lastIndex)}>
               {row.original[copiedLabels[i].toLowerCase()]}
             </div>
         )
@@ -351,6 +354,7 @@ class DTree extends React.Component {
 
     }
 
+    // Adds a row to the dataset, copy of first row
     addRow() {
       const newData = this.state.data[0]
       let newState = this.state.data
@@ -361,6 +365,7 @@ class DTree extends React.Component {
       })
     }
 
+    // Takes the user to the editing page
     editTable() {
       this.setState({
         renderTree: false,
@@ -368,55 +373,62 @@ class DTree extends React.Component {
       })
     }
 
+    // Deletes a class for a specific feature on click
+    deleteClassForFeature(className, feature) {
+        console.log(className)
+        console.log(feature)
+    }
+
+    // Deletes an entire feature on click
+    deleteFeature(feature) {
+      console.log(feature)
+    }
+
+    // Adds a new class for a specific feature based on the input
+    addNewClassForFeature(currInput, feature) {
+      console.log(feature)
+      console.log(currInput)
+    }
+
+    // Adds a new feature 
+    addNewFeature(newFeature) {
+      console.log(newFeature)
+    }
+
+
+
+    // Demonstrates current layout of table by dynamically generating JSX for state
     showCurrentLayout() {
-      console.log(this.state.dataLabels)
       return(
         <Container>
           <Row>
-            <Col>
-            <Card className="black-text" style={{ width: '32rem'}}>
-            <Card.Header>Featured</Card.Header>
-                <ListGroup>
-                  <ListGroup.Item>Cras justo odio</ListGroup.Item>
-                  <ListGroup.Item>Dapibus ac facilisis in</ListGroup.Item>
-                  <ListGroup.Item>Vestibulum at eros</ListGroup.Item>
-                  <ListGroup.Item>Vestibulum at eros</ListGroup.Item>
-                  <ListGroup.Item>Vestibulum at eros</ListGroup.Item>
-                  <InputGroup>
-                    <FormControl></FormControl>
-                    <InputGroup.Append>
-                      <Button>Add New Class</Button>
-                    </InputGroup.Append>
-                  </InputGroup>
-                </ListGroup>
-            </Card>
-            </Col>
-            <Col>
-            <Card style={{ width: '32rem' }}>
-            <Card.Header>Featured</Card.Header>
-                <ListGroup variant="flush">
-                  <ListGroup.Item>Cras justo odio</ListGroup.Item>
-                  <ListGroup.Item>Dapibus ac facilisis in</ListGroup.Item>
-                  <ListGroup.Item>Vestibulum at eros</ListGroup.Item>
-                </ListGroup>
-            </Card>
-            </Col>
-            <Col>
-            <Card style={{ width: '32rem' }}>
-            <Card.Header>Featured</Card.Header>
-                <ListGroup variant="flush">
-                  <ListGroup.Item>Cras justo odio</ListGroup.Item>
-                  <ListGroup.Item>Dapibus ac facilisis in</ListGroup.Item>
-                  <ListGroup.Item>Vestibulum at eros</ListGroup.Item>
-
-                </ListGroup>
-            </Card>
-            </Col>
+          {this.state.dataLabels.map((feature) => {
+                return(
+                  <Col>
+                    <Card className="black-text" style={{ width: '32rem'}}>
+                    <Card.Header onClick={() => this.deleteFeature(feature)}>{feature}</Card.Header>
+                        <ListGroup>
+                          {this.state.labelClasses[feature.toLowerCase()].map((className) => {
+                            return(
+                              <ListGroup.Item onClick={() => this.deleteClassForFeature(className, feature)}>{className}</ListGroup.Item>
+                            )
+                          })}
+                          <InputGroup>
+                            <FormControl ref={feature} ></FormControl>
+                            <InputGroup.Append>
+                              <Button onClick={() => this.addNewClassForFeature(this.refs[feature].value, feature)}>Add New Class</Button>
+                            </InputGroup.Append>
+                          </InputGroup>
+                        </ListGroup>
+                    </Card>
+                    </Col>
+                )
+              })}
             <Col>
             <InputGroup>
-                    <FormControl></FormControl>
+                    <FormControl ref="newFeature"></FormControl>
                     <InputGroup.Append>
-                      <Button>Add New Feature</Button>
+                      <Button onClick={() => this.addNewFeature(this.refs["newFeature"].value)}>Add New Feature</Button>
                     </InputGroup.Append>
             </InputGroup>
             </Col>
@@ -425,6 +437,7 @@ class DTree extends React.Component {
       )
     }
 
+    // Exit out of edit table page and go back to the tree generator page
     saveEditState() {
 
       this.setState({
