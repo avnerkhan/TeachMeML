@@ -21,10 +21,14 @@ class DTree extends React.Component {
         // State contains data. features are categorical, and label is last
         // Feature keys are ints so they are easily indexable
         this.state = {
+          showMode: false,
           renderTree: false,
           renderTable:true,
           treeState: {},
           dataLabels: ["Passed", "GPA", "Language"],
+          shownData: [
+
+          ],
           data: [
             {0: "No", 1: "4.0", 2: "Python", label: 1},
             {0: "No", 1: "2.0", 2: "Python", label: 0},
@@ -59,7 +63,8 @@ class DTree extends React.Component {
       this.setState({
         renderTree: false,
         data: copyState,
-        treeState:[]
+        treeState:[],
+        showMode:false
       })
 
       
@@ -71,11 +76,11 @@ class DTree extends React.Component {
 
     // Converts data so that table creating library can read. Creates it into 
     // lowercase versions of data labels instead of indexes
-    createTableReadableData() {
+    createTableReadableData(isOnShowMode) {
 
       const dataLabels = this.state.dataLabels
 
-      const data = this.state.data
+      const data = isOnShowMode ? this.state.shownData : this.state.data
 
       let newData = []
 
@@ -92,6 +97,24 @@ class DTree extends React.Component {
 
     }
 
+    presentData(name, data) {
+      let toShowArr = []
+
+      for (let entry of data) {
+        for (let key in entry) {
+          if(entry[key] === name) {
+            toShowArr.push(entry)
+          }
+        }
+      }
+
+      this.setState({
+        shownData: toShowArr,
+        showMode:true
+      })
+      
+    }
+
     // Builds decision tree, with entropy as 0 as base case. 
     buildTree(dataLabels, data, currTree, maxDepth=null, currDepth=0) {
 
@@ -103,7 +126,7 @@ class DTree extends React.Component {
 
       if (entropy === 0) {
         let dataClass = data[0].label
-        currTree.children.push({name:dataClass})
+        currTree.children.push({name:dataClass, gProps:{}})
         return currTree
       }
 
@@ -128,7 +151,7 @@ class DTree extends React.Component {
       for (const classVal in splitDict) {
 
         let name = classVal === "undefined" ? this.determineMostLikelyLabel(data) : classVal
-        let newNode = {name: name, children: []}
+        let newNode = {name: name, gProps: {className: 'custom', onMouseOver:() => this.presentData(name, data)}, children: []}
 
         this.buildTree(dataLabels, splitDict[classVal], newNode, maxDepth, currDepth + 1)
         currTree.children.push(newNode)
@@ -165,9 +188,6 @@ class DTree extends React.Component {
         }
 
       }
-
-
-
       return currentHighestGainLabel
     }
 
@@ -314,11 +334,17 @@ class DTree extends React.Component {
 
     }
 
+    showAllData() {
+      this.setState({
+        showMode: false
+      })
+    }
+
     // Method that allows the tree to be show and initializes/resets its state
     showTree() {
       this.setState({
         renderTree: true,
-        treeState: this.buildTree(this.state.dataLabels, this.state.data, {name: "Start", children:[]})
+        treeState: this.buildTree(this.state.dataLabels, this.state.data, {name: "Start", gProps:{onMouseOver:() => this.showAllData()} ,children:[]})
       })
     }
 
@@ -486,14 +512,13 @@ class DTree extends React.Component {
         return(
             <div className="App">
               <div className="App-header">
-                {this.state.renderTree ? <Tree height = {400} width = {800} data={this.state.treeState} animated svgProps={{className: 'custom'}} /> : null}
-                {this.state.renderTable ? <ReactTable data={this.createTableReadableData()} columns={this.generateColumns(this.state.dataLabels)} defaultPageSize={this.state.data.length} className="-striped -highlight"/> : this.showCurrentLayout()}
+                {this.state.renderTree ? <Tree height = {400} width = {800} data={this.state.treeState}  svgProps={{className: 'custom'}} /> : null}
+                {this.state.renderTable ? <ReactTable data={this.createTableReadableData(this.state.showMode)} columns={this.generateColumns(this.state.dataLabels)} defaultPageSize={this.state.data.length} className="-striped -highlight"/> : this.showCurrentLayout()}
                 <ButtonToolbar>
                   {this.state.renderTree || !this.state.renderTable ? null : <Button onClick={() => this.showTree()}>Display</Button>}
-                  {this.state.renderTable ? <Button onClick={() => this.addRow()}>Add Row</Button> : null}
-                  {this.state.renderTable ? <Button onClick={() => this.generateRandomDataState()}>Generate Data</Button> : null}
+                  {this.state.renderTable && !this.state.renderTree ? <Button onClick={() => this.addRow()}>Add Row</Button> : null}
+                  {this.state.renderTable && !this.state.renderTree ? <Button onClick={() => this.generateRandomDataState()}>Generate Data</Button> : null}
                   {this.state.renderTable ? <Button onClick={() => this.editTable()}>Edit Table Layout</Button> :  <Button onClick={() => this.saveEditState()}>Save State</Button>}
-                  {this.state.renderTree ? <Button>Show Steps</Button> : null}
                 </ButtonToolbar>
               </div>
             </div>
