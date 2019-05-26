@@ -26,9 +26,7 @@ class DTree extends React.Component {
           renderTable:true,
           treeState: {},
           dataLabels: ["Passed", "GPA", "Language"],
-          shownData: [
-
-          ],
+          shownData: [],
           data: [
             {0: "No", 1: "4.0", 2: "Python", label: 1},
             {0: "No", 1: "2.0", 2: "Python", label: 0},
@@ -53,13 +51,12 @@ class DTree extends React.Component {
     handleEdit(row, feature, index) {
 
       let copyState = this.state.data
-
       let indexer = feature === "label" ? feature : index
-
       const currentValue = copyState[row][indexer]
       const currentIndex = this.state.labelClasses[feature].indexOf(currentValue)
       const newIndex = (currentIndex + 1) % this.state.labelClasses[feature].length 
       copyState[row][indexer] = this.state.labelClasses[feature][newIndex]
+
       this.setState({
         renderTree: false,
         data: copyState,
@@ -79,9 +76,7 @@ class DTree extends React.Component {
     createTableReadableData(isOnShowMode) {
 
       const dataLabels = this.state.dataLabels
-
       const data = isOnShowMode ? this.state.shownData : this.state.data
-
       let newData = []
 
       for (let entry of data) {
@@ -98,6 +93,7 @@ class DTree extends React.Component {
     }
 
     presentData(name, data) {
+
       let toShowArr = []
 
       for (let entry of data) {
@@ -131,40 +127,28 @@ class DTree extends React.Component {
       }
 
       let splitDict = {}
-
       const bestSplit = this.determineBestSplit(dataLabels, data)
-
-
-
       const splitIndex = dataLabels.indexOf(bestSplit)
-
-
       const classArr = this.getGiniMap(splitIndex, data, true)
 
       for (const classVal in classArr) {
         splitDict[classVal] = this.filteredData(classVal, splitIndex, data)
-        
       }
 
-      
-
       for (const classVal in splitDict) {
-
         let name = classVal === "undefined" ? this.determineMostLikelyLabel(data) : classVal
         let newNode = {name: name, gProps: {className: 'custom', onMouseOver:() => this.presentData(name, data)}, children: []}
-
         this.buildTree(dataLabels, splitDict[classVal], newNode, maxDepth, currDepth + 1)
         currTree.children.push(newNode)
       }
 
       return currTree
 
-
-
     }
 
     // For determing ties when a node has multiple labels in its dataset
     determineMostLikelyLabel(data) {
+
       let posLabelCount = 0
 
       for (let entry of data) {
@@ -172,23 +156,24 @@ class DTree extends React.Component {
       }
 
       return posLabelCount/data.length >= 0.5 ? 1 : 0 
+
     }
 
     // Determines best split based on comparing gain ratios of all entries
     determineBestSplit(dataLabels, data) {
       let currentHighestGainLabel = ""
       let currentHighestGain = 0.0
+
       for (let i = 0; i < dataLabels.length; i++) {
-        
         const currGain = this.calculateGainRatio(i, data)
 
         if (currGain > currentHighestGain) {
           currentHighestGain = currGain
           currentHighestGainLabel = dataLabels[i]
         }
-
       }
       return currentHighestGainLabel
+
     }
 
 
@@ -199,7 +184,6 @@ class DTree extends React.Component {
 
       const gain = this.calculateGain(feature, data)
       const splitInfo = this.calculateSplitInfo(feature, data)
-
       return gain/splitInfo
     }
 
@@ -221,9 +205,7 @@ class DTree extends React.Component {
     calculateGain(feature, data) {
       
       const overallEntropy = this.calculateGiniValue(data)
-
       const splitValue = this.calculateSplitGini(feature, data)
-
       return overallEntropy - splitValue
 
     }
@@ -232,8 +214,8 @@ class DTree extends React.Component {
     // counts. Can be used to calculate overall entropy of dataset or gini
     // of specific features
     calculateGiniValue(data) {
-      const posNegCount = this.countPositiveAndNegative(data)
 
+      const posNegCount = this.countPositiveAndNegative(data)
       const posSquared = this.getSquaredNumber(posNegCount.pos, data.length)
       const negSquared = this.getSquaredNumber(posNegCount.neg, data.length)
 
@@ -243,6 +225,7 @@ class DTree extends React.Component {
 
     // Returns a number divided by total dataset length and squares it
     getSquaredNumber(number, dataLength) {
+
       const ratio = number/dataLength
       return ratio * ratio
     }
@@ -335,6 +318,7 @@ class DTree extends React.Component {
     }
 
     showAllData() {
+
       this.setState({
         showMode: false
       })

@@ -2,34 +2,59 @@ import React from 'react'
 import {XYPlot, XAxis, YAxis, VerticalGridLines, HorizontalGridLines, MarkSeries} from 'react-vis'
 import Button from 'react-bootstrap/Button'
 import ButtonToolbar from 'react-bootstrap/ButtonToolbar'
+import FormControl from 'react-bootstrap/FormControl'
+import InputGroup from 'react-bootstrap/InputGroup'
 import '../css_files/App.css'
 
 class KNN extends React.Component {
     constructor(props) {
         super(props)
 
+        this.colorEnum = {
+          RED: 0,
+          ORANGE: 50
+        }
+
         this.state = {
-          positiveData: [],
-          negativeData: []
+          data: [],
+          undeterminedData: []
         }
 
     }
 
+    // Generates random points to put on plot, and clears undetermined points
     generateRandomData(length=100, max=50) {
 
         let newData = []
 
+
         for(let i = 0; i < length; i++) {
           let randomX = Math.floor(Math.random() * max)
           let randomY = Math.floor(Math.random() * max)
-          let color = i % 2 === 0 ? 0 : 50
+          let color = i % 2 === 0 ? this.colorEnum.RED : this.colorEnum.ORANGE
           let entry = {x:randomX, y:randomY, color: color}
           newData.push(entry)
         }
 
         this.setState({
-          data: newData
+          data: newData,
+          undeterminedData: []
         })
+    }
+
+    // Adds an undetermined point to the grid
+    addPoint(xCoord, yCoord) {
+
+      let updatedData = this.state.data
+      let updatedDataUndetermined = this.state.undeterminedData
+      updatedData.push({x: xCoord, y: yCoord})
+      updatedDataUndetermined.push({x: xCoord, y: yCoord})
+
+      this.setState({
+        data: updatedData,
+        undeterminedData: updatedDataUndetermined
+      })
+
     }
 
     render() {
@@ -51,9 +76,13 @@ class KNN extends React.Component {
                     </XYPlot>
                     <ButtonToolbar>
                       <Button onClick={() => this.generateRandomData()}>Generate Random Data</Button>
-                      <Button>Add Point</Button>
+                      <Button onClick={() => this.addPoint(this.refs["xCoord"].value, this.refs["yCoord"].value)}>Add Point</Button>
                       <Button>Run Algorithim</Button>
                     </ButtonToolbar>
+                    <InputGroup>
+                            <FormControl ref="xCoord" placeholder="Enter X Coordinate"></FormControl>
+                            <FormControl ref="yCoord" placeholder="Enter Y Coordinate"></FormControl>
+                    </InputGroup>
                 </div>
             </div>
         )
