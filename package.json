@@ -12,8 +12,7 @@
     "react-scripts": "3.0.1",
     "react-table": "^6.10.0",
     "react-tree-graph": "^4.0.0",
-    "react-vis": "^1.11.7",
-    "recharts": "^1.6.1"
+    "react-vis": "^1.11.7"
   },
   "scripts": {
     "start": "react-scripts start",
