@@ -1,5 +1,5 @@
 import React from 'react'
-import {ScatterChart, Scatter, CartesianGrid, XAxis, YAxis, Tooltip, Legend} from 'recharts'
+import {XYPlot, XAxis, YAxis, VerticalGridLines, HorizontalGridLines, MarkSeries} from 'react-vis'
 import Button from 'react-bootstrap/Button'
 import ButtonToolbar from 'react-bootstrap/ButtonToolbar'
 import '../css_files/App.css'
@@ -15,27 +15,20 @@ class KNN extends React.Component {
 
     }
 
-    generateRandomData(length=100, max=100) {
+    generateRandomData(length=100, max=50) {
 
-      let positiveDataNew = []
-      let negativeDataNew = []
+        let newData = []
 
-        for(let i =0; i < length; i++) {
+        for(let i = 0; i < length; i++) {
           let randomX = Math.floor(Math.random() * max)
           let randomY = Math.floor(Math.random() * max)
-          let randomZ = Math.floor(Math.random() * max)
-          let entry = {x: randomX, y:randomY, z: randomZ}
-           if(i % 2 === 0) {
-              positiveDataNew.push(entry)
-           } else {
-              negativeDataNew.push(entry)
-           }
+          let color = i % 2 === 0 ? 0 : 50
+          let entry = {x:randomX, y:randomY, color: color}
+          newData.push(entry)
         }
 
         this.setState({
-          positiveData: positiveDataNew,
-          negativeData: negativeDataNew,
-          unlabeledData:[]
+          data: newData
         })
     }
 
@@ -43,15 +36,19 @@ class KNN extends React.Component {
         return (
             <div className="App">
                 <div className="App-header">
-                     <ScatterChart width={1000} height={400} margin={{top: 20, right: 20, bottom: 20, left: 20}} >
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="x" name="x" domain={[0,100]}  />
-                        <YAxis dataKey="y" name="y" />
-                        <Tooltip cursor={{ strokeDasharray: '3 3' }} />
-                        <Legend />
-                        <Scatter name="Positive" data={this.state.positiveData} fill="#32CD32" />
-                        <Scatter name="Negative" data={this.state.negativeData} fill="#FF0000" />
-                    </ScatterChart>
+                      <XYPlot width={1000} height={500}>
+                          <VerticalGridLines />
+                          <HorizontalGridLines />
+                          <XAxis />
+                          <YAxis />
+                          <MarkSeries
+                            className="mark-series-example"
+                            strokeWidth={2}
+                            opacity="0.8"
+                            sizeRange={[0, 100]}
+                            data={this.state.data}
+                          />
+                    </XYPlot>
                     <ButtonToolbar>
                       <Button onClick={() => this.generateRandomData()}>Generate Random Data</Button>
                       <Button>Add Point</Button>
