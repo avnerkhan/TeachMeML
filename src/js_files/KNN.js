@@ -4,6 +4,7 @@ import Button from 'react-bootstrap/Button'
 import ButtonToolbar from 'react-bootstrap/ButtonToolbar'
 import FormControl from 'react-bootstrap/FormControl'
 import InputGroup from 'react-bootstrap/InputGroup'
+import Form from 'react-bootstrap/Form'
 import '../css_files/App.css'
 
 class KNN extends React.Component {
@@ -16,6 +17,7 @@ class KNN extends React.Component {
         }
 
         this.state = {
+          k: 3,
           data: [],
           undeterminedData: []
         }
@@ -47,15 +49,26 @@ class KNN extends React.Component {
     // Adds an undetermined point to the grid
     addPoint(xCoord, yCoord) {
 
-      let updatedData = this.state.data
-      let updatedDataUndetermined = this.state.undeterminedData
-      updatedData.push({x: xCoord, y: yCoord})
-      updatedDataUndetermined.push({x: xCoord, y: yCoord})
+      xCoord = parseInt(xCoord)
+      yCoord = parseInt(yCoord)
 
-      this.setState({
-        data: updatedData,
-        undeterminedData: updatedDataUndetermined
-      })
+      if(!isNaN(xCoord) && !isNaN(yCoord)) {
+        let updatedData = this.state.data
+        let updatedDataUndetermined = this.state.undeterminedData
+        updatedData.push({x: xCoord, y: yCoord})
+        updatedDataUndetermined.push({x: xCoord, y: yCoord})
+
+        this.setState({
+          data: updatedData,
+          undeterminedData: updatedDataUndetermined
+        })
+      } else {
+        alert("Please enter valid coordinates")
+      }
+      
+
+      this.refs["xCoord"].value = ""
+      this.refs["yCoord"].value = ""
 
     }
 
@@ -87,7 +100,7 @@ class KNN extends React.Component {
 
     // Runs algorithim for k-nearest, and adds new determined points to data
     // while clearing out undefined data
-    runAlgorithim(k=3) {
+    runAlgorithim() {
 
       let newEntries =[]
 
@@ -102,11 +115,11 @@ class KNN extends React.Component {
 
         let positiveCount = 0
 
-        for(let i = 0; i < k; i++) {
+        for(let i = 0; i < this.state.k; i++) {
           positiveCount += euclidMap[i].orginalPoint.color === this.stateEnum.POSITIVE ? 1 : 0
         }
 
-        let newLabel = positiveCount >= (k/2) ? this.stateEnum.POSITIVE : this.stateEnum.NEGATIVE
+        let newLabel = positiveCount >= (this.state.k/2) ? this.stateEnum.POSITIVE : this.stateEnum.NEGATIVE
         let newEntry = {x: undetermined.x, y: undetermined.y, color: newLabel}
         newEntries.push(newEntry)
 
@@ -125,16 +138,47 @@ class KNN extends React.Component {
 
     }
 
+    // Returns JSX for showing the input for x and y
+    showXandYInput() {
+      return(
+        <InputGroup>
+          <FormControl ref="xCoord" placeholder="Enter X Coordinate"></FormControl>
+          <FormControl ref="yCoord" placeholder="Enter Y Coordinate"></FormControl>
+        </InputGroup>
+      )
+    }
+
+
+
+    // Shows selectable values for K
+    showKSelect() {
+        return(
+          <Form>
+            <Form.Group>
+              <Form.Label>Select K value</Form.Label>
+              <Form.Control as="select" onChange={(e) => this.setState({k: e.target.value})}>
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => {
+                  return(
+                    <option value={num}>{num}</option>
+                  )
+                })}
+              </Form.Control>
+            </Form.Group>
+          </Form>
+        )
+    }
+
     render() {
         return (
             <div className="App">
                 <div className="App-header">
-                      <XYPlot width={1000} height={500}>
+                      <XYPlot  width={1000} height={500}>
                           <VerticalGridLines />
                           <HorizontalGridLines />
                           <XAxis />
                           <YAxis />
                           <MarkSeries
+                            onNearestXY={(datapoint, e) => console.log(datapoint)}
                             className="mark-series-example"
                             strokeWidth={2}
                             opacity="0.8"
@@ -147,10 +191,8 @@ class KNN extends React.Component {
                       {this.state.data.length > 0 ? <Button onClick={() => this.addPoint(this.refs["xCoord"].value, this.refs["yCoord"].value)}>Add Point</Button> : null}
                       {this.state.undeterminedData.length > 0 ? <Button onClick={() => this.runAlgorithim()}>Run Algorithim</Button> : null}
                     </ButtonToolbar>
-                    <InputGroup>
-                            <FormControl ref="xCoord" placeholder="Enter X Coordinate"></FormControl>
-                            <FormControl ref="yCoord" placeholder="Enter Y Coordinate"></FormControl>
-                    </InputGroup>
+                    {this.state.data.length > 0 ? this.showXandYInput() : null}
+                    {this.state.undeterminedData.length > 0 ? this.showKSelect() : null}
                 </div>
             </div>
         )
