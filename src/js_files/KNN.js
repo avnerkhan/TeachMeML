@@ -10,9 +10,9 @@ class KNN extends React.Component {
     constructor(props) {
         super(props)
 
-        this.colorEnum = {
-          RED: 0,
-          ORANGE: 50
+        this.stateEnum = {
+          POSITIVE: 0,
+          NEGATIVE: 50
         }
 
         this.state = {
@@ -31,7 +31,7 @@ class KNN extends React.Component {
         for(let i = 0; i < length; i++) {
           let randomX = Math.floor(Math.random() * max)
           let randomY = Math.floor(Math.random() * max)
-          let color = i % 2 === 0 ? this.colorEnum.RED : this.colorEnum.ORANGE
+          let color = i % 2 === 0 ? this.stateEnum.POSITIVE : this.stateEnum.NEGATIVE
           let entry = {x:randomX, y:randomY, color: color}
           newData.push(entry)
         }
@@ -41,6 +41,8 @@ class KNN extends React.Component {
           undeterminedData: []
         })
     }
+
+
 
     // Adds an undetermined point to the grid
     addPoint(xCoord, yCoord) {
@@ -54,6 +56,72 @@ class KNN extends React.Component {
         data: updatedData,
         undeterminedData: updatedDataUndetermined
       })
+
+    }
+
+    // Euclidean distance function that returns orginal point and distance
+    euclidFunction(pointOne, pointTwo) {
+
+      let xDistance = pointOne.x - pointTwo.x 
+      let yDistance = pointOne.y - pointTwo.y
+      xDistance *= xDistance
+      yDistance *= yDistance
+      let totalDistance = Math.sqrt(xDistance + yDistance)
+      return {orginalPoint: pointOne, distance: totalDistance}
+
+    }
+
+    // Comparator for KNN
+    comparator(entryOne, entryTwo) {
+
+      if(entryOne.distance < entryTwo.distance) {
+        return -1 
+      }
+      if (entryOne.distance > entryTwo.distance) {
+        return 1
+      }
+
+      return 0
+
+    }
+
+    // Runs algorithim for k-nearest, and adds new determined points to data
+    // while clearing out undefined data
+    runAlgorithim(k=3) {
+
+      let newEntries =[]
+
+      for(let undetermined of this.state.undeterminedData) {
+
+        let euclidMap = this.state.data.map(point => this.euclidFunction(point, undetermined))
+        euclidMap.sort(this.comparator)
+
+        while(euclidMap[0].orginalPoint.color === undefined) {
+          euclidMap.shift()
+        }
+
+        let positiveCount = 0
+
+        for(let i = 0; i < k; i++) {
+          positiveCount += euclidMap[i].orginalPoint.color === this.stateEnum.POSITIVE ? 1 : 0
+        }
+
+        let newLabel = positiveCount >= (k/2) ? this.stateEnum.POSITIVE : this.stateEnum.NEGATIVE
+        let newEntry = {x: undetermined.x, y: undetermined.y, color: newLabel}
+        newEntries.push(newEntry)
+
+      }
+
+      let newData = this.state.data.concat(newEntries)
+
+      this.setState({
+        data: newData,
+        undeterminedData: []
+      })
+
+
+
+
 
     }
 
@@ -76,8 +144,8 @@ class KNN extends React.Component {
                     </XYPlot>
                     <ButtonToolbar>
                       <Button onClick={() => this.generateRandomData()}>Generate Random Data</Button>
-                      <Button onClick={() => this.addPoint(this.refs["xCoord"].value, this.refs["yCoord"].value)}>Add Point</Button>
-                      <Button>Run Algorithim</Button>
+                      {this.state.data.length > 0 ? <Button onClick={() => this.addPoint(this.refs["xCoord"].value, this.refs["yCoord"].value)}>Add Point</Button> : null}
+                      {this.state.undeterminedData.length > 0 ? <Button onClick={() => this.runAlgorithim()}>Run Algorithim</Button> : null}
                     </ButtonToolbar>
                     <InputGroup>
                             <FormControl ref="xCoord" placeholder="Enter X Coordinate"></FormControl>
