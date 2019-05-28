@@ -12,14 +12,18 @@ class KNN extends React.Component {
         super(props)
 
         this.stateEnum = {
-          POSITIVE: 0,
-          NEGATIVE: 50
+          POSITIVE: "#32CD32",
+          NEGATIVE: "#FF6347",
+          UNLABELED: "#000000",
+          HIGHLIGHT: "#FFFF00"
         }
 
         this.state = {
-          k: 3,
-          data: [],
-          undeterminedData: []
+          k: 1,
+          positiveData: [],
+          negativeData: [],
+          undeterminedData: [],
+          currentHighlightData: []
         }
 
     }
@@ -27,19 +31,26 @@ class KNN extends React.Component {
     // Generates random points to put on plot, and clears undetermined points
     generateRandomData(length=100, max=50) {
 
-        let newData = []
+        let newDataPositive = []
+        let newDataNegative = []
 
 
         for(let i = 0; i < length; i++) {
           let randomX = Math.floor(Math.random() * max)
           let randomY = Math.floor(Math.random() * max)
-          let color = i % 2 === 0 ? this.stateEnum.POSITIVE : this.stateEnum.NEGATIVE
-          let entry = {x:randomX, y:randomY, color: color}
-          newData.push(entry)
+          let entry = {x:randomX, y:randomY}
+
+          if(i % 2 === 0) {
+            newDataPositive.push(entry)
+          } else {
+            newDataNegative.push(entry)
+          }
+          
         }
 
         this.setState({
-          data: newData,
+          positiveData: newDataPositive,
+          negativeData: newDataNegative,
           undeterminedData: []
         })
     }
@@ -53,13 +64,10 @@ class KNN extends React.Component {
       yCoord = parseInt(yCoord)
 
       if(!isNaN(xCoord) && !isNaN(yCoord)) {
-        let updatedData = this.state.data
         let updatedDataUndetermined = this.state.undeterminedData
-        updatedData.push({x: xCoord, y: yCoord})
         updatedDataUndetermined.push({x: xCoord, y: yCoord})
 
         this.setState({
-          data: updatedData,
           undeterminedData: updatedDataUndetermined
         })
       } else {
@@ -98,44 +106,11 @@ class KNN extends React.Component {
 
     }
 
-    // Runs algorithim for k-nearest, and adds new determined points to data
-    // while clearing out undefined data
-    runAlgorithim() {
-
-      let newEntries =[]
-
-      for(let undetermined of this.state.undeterminedData) {
-
-        let euclidMap = this.state.data.map(point => this.euclidFunction(point, undetermined))
-        euclidMap.sort(this.comparator)
-
-        while(euclidMap[0].orginalPoint.color === undefined) {
-          euclidMap.shift()
-        }
-
-        let positiveCount = 0
-
-        for(let i = 0; i < this.state.k; i++) {
-          positiveCount += euclidMap[i].orginalPoint.color === this.stateEnum.POSITIVE ? 1 : 0
-        }
-
-        let newLabel = positiveCount >= (this.state.k/2) ? this.stateEnum.POSITIVE : this.stateEnum.NEGATIVE
-        let newEntry = {x: undetermined.x, y: undetermined.y, color: newLabel}
-        newEntries.push(newEntry)
-
-      }
-
-      let newData = this.state.data.concat(newEntries)
-
-      this.setState({
-        data: newData,
-        undeterminedData: []
-      })
-
-
-
-
-
+    // Labels data as either positive or negative based on the state array that
+    // it orginally belongs to
+    relabelData(point) {
+      point["class"] = this.state.positiveData.includes(point) ? this.stateEnum.POSITIVE : this.stateEnum.NEGATIVE
+      return point
     }
 
     // Returns JSX for showing the input for x and y
@@ -168,30 +143,95 @@ class KNN extends React.Component {
         )
     }
 
+
+    // Highlights K on mouse over or determines point on click
+    highlightK(datapoint, isChange) {
+
+      let highlightPoints = []
+      let newPositive = this.state.positiveData
+      let newNegative = this.state.negativeData
+      let newUnlabeled = this.state.undeterminedData
+      let allData = this.state.positiveData.concat(this.state.negativeData)
+      allData = allData.map(point => this.relabelData(point))
+      let euclidMap = allData.map(point => this.euclidFunction(point, datapoint))
+      euclidMap.sort(this.comparator)
+
+      let positiveCount = 0
+      for(let i = 0; i < this.state.k; i++) {
+        highlightPoints.push(euclidMap[i].orginalPoint)
+        positiveCount += euclidMap[i].orginalPoint.class === this.stateEnum.POSITIVE ? 1 : 0
+      }
+
+      if(isChange) {
+        if(positiveCount >= (this.state.k/2)) {
+          newPositive.push(datapoint)
+        } else {
+          newNegative.push(datapoint)
+        }
+        newUnlabeled.splice(newUnlabeled.indexOf(datapoint), 1)
+        highlightPoints = []
+      }
+
+      this.setState({
+        positiveData: newPositive,
+        negativeData: newNegative,
+        undeterminedData: newUnlabeled,
+        currentHighlightData: highlightPoints
+      })
+
+    }
+
+
     render() {
         return (
             <div className="App">
                 <div className="App-header">
-                      <XYPlot  width={1000} height={500}>
+                    <XYPlot  width={600} height={600}>
                           <VerticalGridLines />
                           <HorizontalGridLines />
                           <XAxis />
                           <YAxis />
                           <MarkSeries
-                            onNearestXY={(datapoint, e) => console.log(datapoint)}
                             className="mark-series-example"
                             strokeWidth={2}
                             opacity="0.8"
                             sizeRange={[0, 100]}
-                            data={this.state.data}
+                            color={this.stateEnum.POSITIVE}
+                            data={this.state.positiveData}
+                          />
+                          <MarkSeries
+                            className="mark-series-example"
+                            strokeWidth={2}
+                            opacity="0.8"
+                            sizeRange={[0, 100]}
+                            color={this.stateEnum.NEGATIVE}
+                            data={this.state.negativeData}
+                          />
+                          <MarkSeries
+                            className="mark-series-example"
+                            strokeWidth={2}
+                            opacity="0.8"
+                            sizeRange={[0, 100]}
+                            onValueMouseOut={() => this.setState({currentHighlightData: []})}
+                            onValueMouseOver={(datapoint) => this.highlightK(datapoint, false)}
+                            onValueClick={(datapoint) => this.highlightK(datapoint, true)}
+                            color={this.stateEnum.UNLABELED}
+                            data={this.state.undeterminedData}
+                          />
+                          <MarkSeries
+                            className="mark-series-example"
+                            strokeWidth={2}
+                            opacity="0.8"
+                            sizeRange={[0, 100]}
+                            color={this.stateEnum.HIGHLIGHT}
+                            data={this.state.currentHighlightData}
                           />
                     </XYPlot>
                     <ButtonToolbar>
                       <Button onClick={() => this.generateRandomData()}>Generate Random Data</Button>
-                      {this.state.data.length > 0 ? <Button onClick={() => this.addPoint(this.refs["xCoord"].value, this.refs["yCoord"].value)}>Add Point</Button> : null}
-                      {this.state.undeterminedData.length > 0 ? <Button onClick={() => this.runAlgorithim()}>Run Algorithim</Button> : null}
+                      {this.state.positiveData.length > 0 ? <Button onClick={() => this.addPoint(this.refs["xCoord"].value, this.refs["yCoord"].value)}>Add Point</Button> : null}
                     </ButtonToolbar>
-                    {this.state.data.length > 0 ? this.showXandYInput() : null}
+                    {this.state.positiveData.length > 0 ? this.showXandYInput() : null}
                     {this.state.undeterminedData.length > 0 ? this.showKSelect() : null}
                 </div>
             </div>
