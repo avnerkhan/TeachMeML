@@ -18,6 +18,7 @@ class Pick extends React.Component {
           <ButtonToolbar>
             <Link to="/DecisionTree"><Button variant="primary">Decision Tree</Button></Link>
             <Link to="/KNearestNeighbors"><Button variant="primary">K-Nearest-Neighbors</Button></Link>
+            <Link to="/KMeans"><Button variant="primary">K-Means</Button></Link>
           </ButtonToolbar>
         </header>
       </div>
