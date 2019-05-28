@@ -29,7 +29,7 @@ class KNN extends React.Component {
     }
 
     // Generates random points to put on plot, and clears undetermined points
-    generateRandomData(length=100, max=50) {
+    generateRandomData(length=100, max=100) {
 
         let newDataPositive = []
         let newDataNegative = []
@@ -181,6 +181,16 @@ class KNN extends React.Component {
 
     }
 
+    generateRandomUndetermined(length=20, max=100) {
+
+      for(let i = 0; i < length; i++) {
+        let randomX = Math.floor(Math.random() * max)
+        let randomY = Math.floor(Math.random() * max)
+        this.addPoint(randomX, randomY)
+      }
+
+    }
+
 
     render() {
         return (
@@ -230,6 +240,7 @@ class KNN extends React.Component {
                     <ButtonToolbar>
                       <Button onClick={() => this.generateRandomData()}>Generate Random Data</Button>
                       {this.state.positiveData.length > 0 ? <Button onClick={() => this.addPoint(this.refs["xCoord"].value, this.refs["yCoord"].value)}>Add Point</Button> : null}
+                      {this.state.positiveData.length > 0 ? <Button onClick={() => this.generateRandomUndetermined()}>Generate Random Undetermined data</Button> : null}
                     </ButtonToolbar>
                     {this.state.positiveData.length > 0 ? this.showXandYInput() : null}
                     {this.state.undeterminedData.length > 0 ? this.showKSelect() : null}
