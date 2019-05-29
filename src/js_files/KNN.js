@@ -14,7 +14,7 @@ class KNN extends React.Component {
         this.stateEnum = {
           POSITIVE: "#32CD32",
           NEGATIVE: "#FF6347",
-          UNLABELED: "#000000",
+          UNLABELED: "#FFFFFF",
           HIGHLIGHT: "#FFFF00"
         }
 

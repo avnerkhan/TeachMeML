@@ -4,6 +4,7 @@ import './index.css';
 import Pick from './js_files/Pick';
 import DTree from './js_files/DTree'
 import KNN from './js_files/KNN'
+import KMeans from './js_files/KMeans'
 import * as serviceWorker from './serviceWorker';
 import {BrowserRouter, Route} from 'react-router-dom'
 
@@ -13,6 +14,7 @@ const webroutes = (
             <Route exact path="/" component={Pick} />
             <Route exact path="/DecisionTree" component={DTree} />
             <Route exact path='/KNearestNeighbors' component={KNN} />
+            <Route exact path="/KMeans" component={KMeans} />
         </div>
     </BrowserRouter>
 )
