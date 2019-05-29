@@ -62,26 +62,57 @@ class KMeans extends React.Component {
 
     runIteration() {
 
-        let unlabeledData = this.state.unlabeledData
         let centroidData = this.state.centroidData
         let clusterData = this.state.clusteredData
+        let unlabeledData = this.state.unlabeledData
 
-        for(let point of this.state.unlabeledData) {
-            if(point !== undefined && !isNaN(point.x)) {
-                let nearestMap = centroidData.map(centroid => euclidFunction(centroid, point))
-                nearestMap.sort(comparator)
-                let nearestCentroid = nearestMap[0].orginalPoint
-                clusterData[centroidData.indexOf(nearestCentroid)].push(point)
-                delete unlabeledData[unlabeledData.indexOf(point)]
+
+        if(unlabeledData.length > 0) {
+            for(let point of this.state.unlabeledData) {
+                if(point !== undefined && !isNaN(point.x)) {
+                    let nearestMap = centroidData.map(centroid => euclidFunction(centroid, point))
+                    nearestMap.sort(comparator)
+                    let nearestCentroid = nearestMap[0].orginalPoint
+                    clusterData[centroidData.indexOf(nearestCentroid)].push(point)
+                }
             }
+
+            this.setState({
+                unlabeledData: [],
+                clusteredData: clusterData
+            })
+        } else {
+            
+
+            for(let count = 0; count < clusterData.length; count++) {
+                let cluster = clusterData[count]
+                let xAvg = 0.0
+                let yAvg = 0.0
+
+                for(let point of cluster) {
+                    xAvg += point.x
+                    yAvg += point.y
+                    unlabeledData.push(point)
+                }
+
+                xAvg = xAvg/cluster.length
+                yAvg = yAvg/cluster.length
+
+                let newCentroid = {x: xAvg, y: yAvg}
+                centroidData[count] = newCentroid
+                clusterData[count] = []
+            }
+
+            this.setState({
+                centroidData: centroidData,
+                clusterData: clusterData,
+                unlabeledData: unlabeledData
+            })
+            
+
         }
 
-        console.log(clusterData)
-
-        this.setState({
-            unlabeledData: unlabeledData,
-            clusteredData: clusterData
-        })
+        
         
         
         
@@ -89,21 +120,26 @@ class KMeans extends React.Component {
 
     makeCentroid(datapoint) {
 
-        let newCentroidState = this.state.centroidData
-        let newUnlabeledData = this.state.unlabeledData
-        let newClusterData = this.state.clusteredData
-        newClusterData.push([])
+        if(this.state.centroidData.length < 5) {
+            let newCentroidState = this.state.centroidData
+            let newUnlabeledData = this.state.unlabeledData
+            let newClusterData = this.state.clusteredData
+            newClusterData.push([])
 
-        if(this.state.choosingCentroidState) {
-            newCentroidState.push(datapoint)
-            delete newUnlabeledData[newUnlabeledData.indexOf(datapoint)]
+            if(this.state.choosingCentroidState) {
+                newCentroidState.push(datapoint)
+                delete newUnlabeledData[newUnlabeledData.indexOf(datapoint)]
+            }
+
+            this.setState({
+                centroidData: newCentroidState,
+                unlabeledData: newUnlabeledData,
+                clusteredData: newClusterData
+            })
+        } else {
+            alert("Cannot have more than 5 clusters.")
         }
-
-        this.setState({
-            centroidData: newCentroidState,
-            unlabeledData: newUnlabeledData,
-            clusteredData: newClusterData
-        })
+        
 
 
     }
