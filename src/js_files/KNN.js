@@ -5,6 +5,7 @@ import ButtonToolbar from 'react-bootstrap/ButtonToolbar'
 import FormControl from 'react-bootstrap/FormControl'
 import InputGroup from 'react-bootstrap/InputGroup'
 import Form from 'react-bootstrap/Form'
+import {euclidFunction, comparator} from './Utility'
 import '../css_files/App.css'
 
 class KNN extends React.Component {
@@ -80,31 +81,6 @@ class KNN extends React.Component {
 
     }
 
-    // Euclidean distance function that returns orginal point and distance
-    euclidFunction(pointOne, pointTwo) {
-
-      let xDistance = pointOne.x - pointTwo.x 
-      let yDistance = pointOne.y - pointTwo.y
-      xDistance *= xDistance
-      yDistance *= yDistance
-      let totalDistance = Math.sqrt(xDistance + yDistance)
-      return {orginalPoint: pointOne, distance: totalDistance}
-
-    }
-
-    // Comparator for KNN
-    comparator(entryOne, entryTwo) {
-
-      if(entryOne.distance < entryTwo.distance) {
-        return -1 
-      }
-      if (entryOne.distance > entryTwo.distance) {
-        return 1
-      }
-
-      return 0
-
-    }
 
     // Labels data as either positive or negative based on the state array that
     // it orginally belongs to
@@ -153,8 +129,8 @@ class KNN extends React.Component {
       let newUnlabeled = this.state.undeterminedData
       let allData = this.state.positiveData.concat(this.state.negativeData)
       allData = allData.map(point => this.relabelData(point))
-      let euclidMap = allData.map(point => this.euclidFunction(point, datapoint))
-      euclidMap.sort(this.comparator)
+      let euclidMap = allData.map(point => euclidFunction(point, datapoint))
+      euclidMap.sort(comparator)
 
       let positiveCount = 0
       for(let i = 0; i < this.state.k; i++) {
