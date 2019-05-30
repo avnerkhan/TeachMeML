@@ -14,15 +14,19 @@ class KMeans extends React.Component {
         this.stateEnum = {
             UNLABELED:  "#FFFFFF",
             CENTROID: "#000000",
-            CLUSTER: ["#32CD32", "#FF6347", "#FFFF00", "#00FFFF", "#FFA500"]
+            CLUSTER: ["#32CD32", "#FF6347", "#FFFF00", "#00FFFF", "#FFA500"],
+            KMEANS: 0,
+            DBSCAN: 1
         }
 
         this.state = {
+            algorithim: this.stateEnum.KMEANS,
+            runningDBScan: false,
             spacing: 1,
             pointNum: 1,
             readyToStartState: false,
             choosingCentroidState: false,
-            runningAlgorithimState: false,
+            runningKMeans: false,
             unlabeledData: [{x: 0, y: 0}],
             clusteredData:[],
             centroidData: []
@@ -33,7 +37,7 @@ class KMeans extends React.Component {
     // Allows user to add a small cluster unlabeled points for later labeling
     smallClusterDrop(e) {
 
-        if(!this.state.choosingCentroidState && !this.state.runningAlgorithimState) {
+        if(!this.state.choosingCentroidState && !this.state.runningKMeans) {
 
 
             let factor = this.state.spacing
@@ -42,14 +46,17 @@ class KMeans extends React.Component {
             let yCoord = Math.floor(100 - (e.screenY - 209)/5.5)
             let newData = this.state.unlabeledData
 
-            if(newData.length === 1) newData.shift()
+            if(newData[0].x === 0 && newData[0].y === 0) newData.shift()
 
             let cardinal = [[0, 0], [-1, 0], [0, -1], [1, 0],
-                            [0, 1], [1, 1], [-1, -1], [1, -1]
+                            [0, 1], [1, 1], [-1, -1], [1, -1],
                             [-1, 1]]
+
+            console.log(numberPoints)
 
             for(let i = 0; i < numberPoints; i++) {
                 let direction = cardinal[i]
+                console.log(direction)
                 newData.push({x: xCoord + direction[0] * factor, y: yCoord + direction[1] * factor})
             }
 
@@ -155,15 +162,17 @@ class KMeans extends React.Component {
     // Clears data and state
     clearSlate() {
         this.setState({
+                runningDBScan: false,
                 readyToStartState: false,
                 choosingCentroidState: false,
-                runningAlgorithimState: false,
+                runningKMeans: false,
                 unlabeledData: [{x: 0, y: 0}],
                 clusteredData:[],
                 centroidData: []
             })
     }
 
+    // Shows options for cluster deployment, as well as algorithim selection
     showClusterDeploymentSelection() {
         return(
             <Form>
@@ -177,16 +186,37 @@ class KMeans extends React.Component {
                 })}
               </Form.Control>
               <Form.Label>Select Cluster Points</Form.Label>
-              <Form.Control as="select" onChange={(e) => this.setState({pointNum: e.target.value - 1})}>
+              <Form.Control as="select" onChange={(e) => this.setState({pointNum: e.target.value })}>
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => {
                   return(
                     <option value={num}>{num}</option>
                   )
                 })}
               </Form.Control>
+              <Form.Label>Select Cluster Points</Form.Label>
+              <Form.Control as="select" onChange={(e) => this.setState({algorithim: e.target.value})}>
+                <option value={this.stateEnum.KMEANS}>K Means</option>
+                <option value={this.stateEnum.DBSCAN}>DBScan</option>
+              </Form.Control>
             </Form.Group>
           </Form>
         )
+    }
+
+    runDBScan() {
+
+    }
+
+    // Checks which algorithim to start, based on selection
+    startRespectiveAlgorithim() {
+
+        console.log(this.state.algorithim)
+        if(this.state.algorithim === this.stateEnum.KMEANS) this.setState({choosingCentroidState: true, readyToStartState: false})
+        if(this.state.algorithim === this.stateEnum.DBSCAN) {
+            this.runDBScan()
+            this.setState({runningDBScan: true, readyToStartState: false})
+        }
+        
     }
 
     render() {
@@ -229,11 +259,11 @@ class KMeans extends React.Component {
                             })}
                 </XYPlot>
                 <ButtonToolbar>
-                    {!this.state.choosingCentroidState && !this.state.runningAlgorithimState ? this.showClusterDeploymentSelection() : null}
-                    {this.state.readyToStartState ? <Button onClick={() => this.setState({choosingCentroidState: true, readyToStartState: false})}>Start K Means</Button> : null}
-                    {this.state.choosingCentroidState ? <Button onClick={() => this.setState({choosingCentroidState: false, runningAlgorithimState: true})}>Done choosing centroids</Button> : null}
-                    {this.state.runningAlgorithimState ? <Button onClick={() => this.runIteration()}>Run Next Iteration</Button> : null}
-                    {this.state.runningAlgorithimState ? <Button onClick={() => this.clearSlate()}>Restart Algorithim</Button> : null}
+                    {!this.state.choosingCentroidState && !this.state.runningKMeans && !this.state.runningDBScan ? this.showClusterDeploymentSelection() : null}
+                    {this.state.readyToStartState ? <Button onClick={() => this.startRespectiveAlgorithim() }>Start Algorithim</Button> : null}
+                    {this.state.choosingCentroidState ? <Button onClick={() => this.setState({choosingCentroidState: false, runningKMeans: true})}>Done choosing centroids</Button> : null}
+                    {this.state.runningKMeans ? <Button onClick={() => this.runIteration()}>Run Next Iteration</Button> : null}
+                    {this.state.runningKMeans ? <Button onClick={() => this.clearSlate()}>Restart Algorithim</Button> : null}
                 </ButtonToolbar>
               </div>
             </div>
