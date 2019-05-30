@@ -2,13 +2,10 @@ import React from 'react'
 import {XYPlot, XAxis, YAxis, VerticalGridLines, HorizontalGridLines, MarkSeries} from 'react-vis'
 import Button from 'react-bootstrap/Button'
 import ButtonToolbar from 'react-bootstrap/ButtonToolbar'
-import FormControl from 'react-bootstrap/FormControl'
-import InputGroup from 'react-bootstrap/InputGroup'
 import Form from 'react-bootstrap/Form'
 import {euclidFunction, comparator} from './Utility'
 import '../css_files/App.css'
-import continuousColorLegend from 'react-vis/dist/legends/continuous-color-legend';
-import { isUndefined } from 'util';
+
 
 class KMeans extends React.Component {
     constructor(props) {
@@ -21,6 +18,8 @@ class KMeans extends React.Component {
         }
 
         this.state = {
+            spacing: 1,
+            pointNum: 1,
             readyToStartState: false,
             choosingCentroidState: false,
             runningAlgorithimState: false,
@@ -31,21 +30,26 @@ class KMeans extends React.Component {
 
     }
 
-    smallClusterDrop(e, factor=3) {
+    // Allows user to add a small cluster unlabeled points for later labeling
+    smallClusterDrop(e) {
 
         if(!this.state.choosingCentroidState && !this.state.runningAlgorithimState) {
 
+
+            let factor = this.state.spacing
+            let numberPoints = this.state.pointNum
             let xCoord = Math.floor((e.screenX - 460)/5.5)
             let yCoord = Math.floor(100 - (e.screenY - 209)/5.5)
             let newData = this.state.unlabeledData
 
-            if(newData.length == 1) newData.shift()
+            if(newData.length === 1) newData.shift()
 
             let cardinal = [[0, 0], [-1, 0], [0, -1], [1, 0],
-                                    [0, 1], [1, 1], [-1, -1], [1, -1]
-                                    [-1, 1]]
+                            [0, 1], [1, 1], [-1, -1], [1, -1]
+                            [-1, 1]]
 
-            for(let direction of cardinal) {
+            for(let i = 0; i < numberPoints; i++) {
+                let direction = cardinal[i]
                 newData.push({x: xCoord + direction[0] * factor, y: yCoord + direction[1] * factor})
             }
 
@@ -60,6 +64,8 @@ class KMeans extends React.Component {
     }
 
 
+    // Runs an iteration of K means. Either determines centroid or labels data
+    // based on current centroid
     runIteration() {
 
         let centroidData = this.state.centroidData
@@ -118,9 +124,10 @@ class KMeans extends React.Component {
         
     }
 
+    // Allows a user click on a point to become a centroid
     makeCentroid(datapoint) {
 
-        if(this.state.centroidData.length < 5) {
+        if(this.state.centroidData.length < 5 && this.state.choosingCentroidState) {
             let newCentroidState = this.state.centroidData
             let newUnlabeledData = this.state.unlabeledData
             let newClusterData = this.state.clusteredData
@@ -136,12 +143,50 @@ class KMeans extends React.Component {
                 unlabeledData: newUnlabeledData,
                 clusteredData: newClusterData
             })
-        } else {
+        } else if(!this.state.choosingCentroidState) {
+            alert("K Means not running, do not choose centroid")
+        }
+        else {
             alert("Cannot have more than 5 clusters.")
         }
-        
+    
+    }
 
+    // Clears data and state
+    clearSlate() {
+        this.setState({
+                readyToStartState: false,
+                choosingCentroidState: false,
+                runningAlgorithimState: false,
+                unlabeledData: [{x: 0, y: 0}],
+                clusteredData:[],
+                centroidData: []
+            })
+    }
 
+    showClusterDeploymentSelection() {
+        return(
+            <Form>
+            <Form.Group>
+              <Form.Label>Select Cluster Spacing value</Form.Label>
+              <Form.Control as="select" onChange={(e) => this.setState({spacing: e.target.value})}>
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => {
+                  return(
+                    <option value={num}>{num}</option>
+                  )
+                })}
+              </Form.Control>
+              <Form.Label>Select Cluster Points</Form.Label>
+              <Form.Control as="select" onChange={(e) => this.setState({pointNum: e.target.value - 1})}>
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => {
+                  return(
+                    <option value={num}>{num}</option>
+                  )
+                })}
+              </Form.Control>
+            </Form.Group>
+          </Form>
+        )
     }
 
     render() {
@@ -184,9 +229,11 @@ class KMeans extends React.Component {
                             })}
                 </XYPlot>
                 <ButtonToolbar>
+                    {!this.state.choosingCentroidState && !this.state.runningAlgorithimState ? this.showClusterDeploymentSelection() : null}
                     {this.state.readyToStartState ? <Button onClick={() => this.setState({choosingCentroidState: true, readyToStartState: false})}>Start K Means</Button> : null}
                     {this.state.choosingCentroidState ? <Button onClick={() => this.setState({choosingCentroidState: false, runningAlgorithimState: true})}>Done choosing centroids</Button> : null}
                     {this.state.runningAlgorithimState ? <Button onClick={() => this.runIteration()}>Run Next Iteration</Button> : null}
+                    {this.state.runningAlgorithimState ? <Button onClick={() => this.clearSlate()}>Restart Algorithim</Button> : null}
                 </ButtonToolbar>
               </div>
             </div>
