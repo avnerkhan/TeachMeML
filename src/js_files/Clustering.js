@@ -7,7 +7,7 @@ import {euclidFunction, comparator} from './Utility'
 import '../css_files/App.css'
 
 
-class KMeans extends React.Component {
+class Clustering extends React.Component {
     constructor(props) {
         super(props)
 
@@ -21,9 +21,11 @@ class KMeans extends React.Component {
 
         this.state = {
             algorithim: this.stateEnum.KMEANS,
-            runningDBScan: false,
             spacing: 1,
             pointNum: 1,
+            minEps: 3,
+            minPts: 3, 
+            runningDBScan: false,
             readyToStartState: false,
             choosingCentroidState: false,
             runningKMeans: false,
@@ -52,11 +54,9 @@ class KMeans extends React.Component {
                             [0, 1], [1, 1], [-1, -1], [1, -1],
                             [-1, 1]]
 
-            console.log(numberPoints)
 
             for(let i = 0; i < numberPoints; i++) {
                 let direction = cardinal[i]
-                console.log(direction)
                 newData.push({x: xCoord + direction[0] * factor, y: yCoord + direction[1] * factor})
             }
 
@@ -142,7 +142,6 @@ class KMeans extends React.Component {
 
             if(this.state.choosingCentroidState) {
                 newCentroidState.push(datapoint)
-                delete newUnlabeledData[newUnlabeledData.indexOf(datapoint)]
             }
 
             this.setState({
@@ -193,7 +192,23 @@ class KMeans extends React.Component {
                   )
                 })}
               </Form.Control>
-              <Form.Label>Select Cluster Points</Form.Label>
+              <Form.Label>Select MinEps (for DBSCAN)</Form.Label>
+              <Form.Control as="select" onChange={(e) => this.setState({minEps: e.target.value })}>
+                {[3, 4, 5, 6, 7, 8, 9, 10, 11].map((num) => {
+                  return(
+                    <option value={num}>{num}</option>
+                  )
+                })}
+              </Form.Control>
+              <Form.Label>Select MinPts (for DBSCAN</Form.Label>
+              <Form.Control as="select" onChange={(e) => this.setState({minPts: e.target.value })}>
+                {[3, 4, 5, 6, 7, 8, 9, 10, 11].map((num) => {
+                  return(
+                    <option value={num}>{num}</option>
+                  )
+                })}
+              </Form.Control>
+              <Form.Label>Select Algorithim</Form.Label>
               <Form.Control as="select" onChange={(e) => this.setState({algorithim: e.target.value})}>
                 <option value={this.stateEnum.KMEANS}>K Means</option>
                 <option value={this.stateEnum.DBSCAN}>DBScan</option>
@@ -203,18 +218,39 @@ class KMeans extends React.Component {
         )
     }
 
+    labelPoint(point, unlabeledData, minEps=8.0, minPts=4) {
+
+    }
+
+    // Runs db scan on unlabeled data
     runDBScan() {
+
+        let unlabeled = this.state.unlabeledData
+
+        let labeled = unlabeled.map(point => this.labelPoint(point, unlabeled))
+
+
 
     }
 
     // Checks which algorithim to start, based on selection
     startRespectiveAlgorithim() {
 
-        console.log(this.state.algorithim)
-        if(this.state.algorithim === this.stateEnum.KMEANS) this.setState({choosingCentroidState: true, readyToStartState: false})
-        if(this.state.algorithim === this.stateEnum.DBSCAN) {
+        if(this.state.algorithim == this.stateEnum.KMEANS) this.setState({choosingCentroidState: true, readyToStartState: false})
+        if(this.state.algorithim == this.stateEnum.DBSCAN) {
             this.runDBScan()
             this.setState({runningDBScan: true, readyToStartState: false})
+        }
+        
+    }
+
+    // Checks if user has picked at least two centroids
+    checkCentroidPick() {
+
+        if(this.state.centroidData.length > 1) {
+            this.setState({choosingCentroidState: false, runningKMeans: true})
+        } else {
+            alert("Please pick a valid number of centroids")
         }
         
     }
@@ -261,7 +297,7 @@ class KMeans extends React.Component {
                 <ButtonToolbar>
                     {!this.state.choosingCentroidState && !this.state.runningKMeans && !this.state.runningDBScan ? this.showClusterDeploymentSelection() : null}
                     {this.state.readyToStartState ? <Button onClick={() => this.startRespectiveAlgorithim() }>Start Algorithim</Button> : null}
-                    {this.state.choosingCentroidState ? <Button onClick={() => this.setState({choosingCentroidState: false, runningKMeans: true})}>Done choosing centroids</Button> : null}
+                    {this.state.choosingCentroidState ? <Button onClick={() => this.checkCentroidPick()}>Done choosing centroids</Button> : null}
                     {this.state.runningKMeans ? <Button onClick={() => this.runIteration()}>Run Next Iteration</Button> : null}
                     {this.state.runningKMeans ? <Button onClick={() => this.clearSlate()}>Restart Algorithim</Button> : null}
                 </ButtonToolbar>
@@ -273,4 +309,4 @@ class KMeans extends React.Component {
 }
 
 
-export default KMeans
+export default Clustering
