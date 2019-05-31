@@ -1,6 +1,7 @@
 // Euclidean distance function that returns orginal point and distance
 export function euclidFunction(pointOne, pointTwo) {
 
+
     let xDistance = pointOne.x - pointTwo.x 
     let yDistance = pointOne.y - pointTwo.y
     xDistance *= xDistance

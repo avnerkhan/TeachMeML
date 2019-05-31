@@ -14,9 +14,10 @@ class Clustering extends React.Component {
         this.stateEnum = {
             UNLABELED:  "#FFFFFF",
             CENTROID: "#000000",
-            CLUSTER: ["#32CD32", "#FF6347", "#FFFF00", "#00FFFF", "#FFA500"],
+            CLUSTER: this.generateRandomColors(),
             KMEANS: 0,
-            DBSCAN: 1
+            DBSCAN: 1,
+            OUTLIER: 0
         }
 
         this.state = {
@@ -30,10 +31,19 @@ class Clustering extends React.Component {
             choosingCentroidState: false,
             runningKMeans: false,
             unlabeledData: [{x: 0, y: 0}],
-            clusteredData:[],
+            clusteredData: this.generateEmptyCluster(),
             centroidData: []
         }
 
+    }
+
+    generateEmptyCluster() {
+
+      let emptyClusterHolder = []
+
+      for(let i = 0; i < 100; i++) emptyClusterHolder.push([])
+
+      return emptyClusterHolder
     }
 
     // Allows user to add a small cluster unlabeled points for later labeling
@@ -137,8 +147,6 @@ class Clustering extends React.Component {
         if(this.state.centroidData.length < 5 && this.state.choosingCentroidState) {
             let newCentroidState = this.state.centroidData
             let newUnlabeledData = this.state.unlabeledData
-            let newClusterData = this.state.clusteredData
-            newClusterData.push([])
 
             if(this.state.choosingCentroidState) {
                 newCentroidState.push(datapoint)
@@ -146,8 +154,7 @@ class Clustering extends React.Component {
 
             this.setState({
                 centroidData: newCentroidState,
-                unlabeledData: newUnlabeledData,
-                clusteredData: newClusterData
+                unlabeledData: newUnlabeledData
             })
         } else if(!this.state.choosingCentroidState) {
             alert("K Means not running, do not choose centroid")
@@ -171,6 +178,30 @@ class Clustering extends React.Component {
             })
     }
 
+    showDBScanSelection() {
+      
+      return(
+        <Form>
+        <Form.Label>Select MinEps (for DBSCAN)</Form.Label>
+              <Form.Control as="select" onChange={(e) => this.setState({minEps: e.target.value })}>
+                {[3, 4, 5, 6, 7, 8, 9, 10, 11].map((num) => {
+                  return(
+                    <option value={num}>{num}</option>
+                  )
+                })}
+              </Form.Control>
+              <Form.Label>Select MinPts (for DBSCAN</Form.Label>
+              <Form.Control as="select" onChange={(e) => this.setState({minPts: e.target.value })}>
+                {[3, 4, 5, 6, 7, 8, 9, 10, 11].map((num) => {
+                  return(
+                    <option value={num}>{num}</option>
+                  )
+                })}
+              </Form.Control>
+        </Form>
+      )
+    }
+
     // Shows options for cluster deployment, as well as algorithim selection
     showClusterDeploymentSelection() {
         return(
@@ -192,22 +223,7 @@ class Clustering extends React.Component {
                   )
                 })}
               </Form.Control>
-              <Form.Label>Select MinEps (for DBSCAN)</Form.Label>
-              <Form.Control as="select" onChange={(e) => this.setState({minEps: e.target.value })}>
-                {[3, 4, 5, 6, 7, 8, 9, 10, 11].map((num) => {
-                  return(
-                    <option value={num}>{num}</option>
-                  )
-                })}
-              </Form.Control>
-              <Form.Label>Select MinPts (for DBSCAN</Form.Label>
-              <Form.Control as="select" onChange={(e) => this.setState({minPts: e.target.value })}>
-                {[3, 4, 5, 6, 7, 8, 9, 10, 11].map((num) => {
-                  return(
-                    <option value={num}>{num}</option>
-                  )
-                })}
-              </Form.Control>
+              {this.showDBScanSelection()}
               <Form.Label>Select Algorithim</Form.Label>
               <Form.Control as="select" onChange={(e) => this.setState({algorithim: e.target.value})}>
                 <option value={this.stateEnum.KMEANS}>K Means</option>
@@ -218,18 +234,98 @@ class Clustering extends React.Component {
         )
     }
 
-    labelPoint(point, unlabeledData, minEps=8.0, minPts=4) {
-
-    }
 
     // Runs db scan on unlabeled data
     runDBScan() {
 
         let unlabeled = this.state.unlabeledData
+        let clusters = 0
 
-        let labeled = unlabeled.map(point => this.labelPoint(point, unlabeled))
+        for(let point of unlabeled) {
 
+          if(point.label == undefined) {
+            let neighbhors = unlabeled.filter(comparePoint => euclidFunction(point, comparePoint).distance <= this.state.minEps)
+            console.log(neighbhors)
 
+            if(neighbhors.length >= this.state.minPts) {
+              clusters++
+              point.label = clusters
+              console.log("GOT HERE TOO")
+              console.log(point.label)
+
+              for(let newPoint of neighbhors) {
+
+                if(newPoint.label == this.stateEnum.OUTLIER) newPoint.label = clusters
+
+                if(newPoint.label == undefined) {
+                  newPoint.label = clusters
+                  let newNeighbhors = unlabeled.filter(comparePoint => euclidFunction(newPoint, comparator).distance <= this.state.minEps)
+
+                  if(newNeighbhors.length >= this.state.minPts) {
+
+                    for(let nextDoor of newNeighbhors) neighbhors.add(nextDoor)
+
+                  }
+
+                }
+
+              }
+
+            } else {
+              point.label = this.stateEnum.OUTLIER
+            }
+          }
+        }
+
+        this.relabelData(unlabeled)
+    }
+
+    relabelData(newData) {
+
+      let clusterData = this.state.clusteredData
+      let outlierData = this.state.centroidData
+
+      for(let point of newData) {
+
+          if(point.label == 0) {
+            outlierData.push(point)
+          } else {
+            clusterData[point.label].push(point)
+          }
+
+      }
+
+      this.setState({
+        clusterData: clusterData,
+        centroidData: outlierData
+      })
+
+    }
+
+    generateRandomColors() {
+
+      let colorArr = []
+
+      for(let i = 0; i < 100; i++) {
+        
+        colorArr.push(this.newRandomColor())
+
+      }
+
+      return colorArr
+
+    }
+
+    newRandomColor() {
+      let potential = "ABCDEF0123456789"
+      let toReturn = "#"
+
+      for(let i = 0; i < 6; i++) {
+        let randomHexIndex = Math.floor(Math.random() * potential.length)
+        toReturn += potential.substring(randomHexIndex, randomHexIndex + 1)
+      }
+
+      return toReturn
 
     }
 
@@ -253,6 +349,10 @@ class Clustering extends React.Component {
             alert("Please pick a valid number of centroids")
         }
         
+    }
+
+    recomputeDBScan() {
+      
     }
 
     render() {
@@ -299,7 +399,9 @@ class Clustering extends React.Component {
                     {this.state.readyToStartState ? <Button onClick={() => this.startRespectiveAlgorithim() }>Start Algorithim</Button> : null}
                     {this.state.choosingCentroidState ? <Button onClick={() => this.checkCentroidPick()}>Done choosing centroids</Button> : null}
                     {this.state.runningKMeans ? <Button onClick={() => this.runIteration()}>Run Next Iteration</Button> : null}
-                    {this.state.runningKMeans ? <Button onClick={() => this.clearSlate()}>Restart Algorithim</Button> : null}
+                    {this.state.runningKMeans || this.state.runningDBScan ? <Button onClick={() => this.clearSlate()}>Clear Slate</Button> : null}
+                    {this.state.runningDBScan ? this.showDBScanSelection() : null}
+                    {this.state.runningDBScan ? <Button onClick={() => this.recomputeDBScan()}>Restart DBSCAN</Button> : null}
                 </ButtonToolbar>
               </div>
             </div>
