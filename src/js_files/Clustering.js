@@ -17,7 +17,8 @@ class Clustering extends React.Component {
             CLUSTER: this.generateRandomColors(),
             KMEANS: 0,
             DBSCAN: 1,
-            OUTLIER: 0
+            OUTLIER: 0,
+            MAX: 100
         }
 
         this.state = {
@@ -41,7 +42,7 @@ class Clustering extends React.Component {
 
       let emptyClusterHolder = []
 
-      for(let i = 0; i < 100; i++) emptyClusterHolder.push([])
+      for(let i = 0; i < this.stateEnum.MAX; i++) emptyClusterHolder.push([])
 
       return emptyClusterHolder
     }
@@ -105,7 +106,6 @@ class Clustering extends React.Component {
                 clusteredData: clusterData
             })
         } else {
-            
 
             for(let count = 0; count < clusterData.length; count++) {
                 let cluster = clusterData[count]
@@ -179,6 +179,7 @@ class Clustering extends React.Component {
     }
 
 
+    // Shows selection for MinEps and MinPts
     showDBScanSelection() {
       
       return(
@@ -278,6 +279,7 @@ class Clustering extends React.Component {
         this.relabelData(unlabeled)
     }
 
+    // Takes data and places into clusters based on label
     relabelData(newData) {
 
       let clusterData = this.state.clusteredData
@@ -300,11 +302,12 @@ class Clustering extends React.Component {
 
     }
 
+    // Generates Array of random colors
     generateRandomColors() {
 
       let colorArr = []
 
-      for(let i = 0; i < 100; i++) {
+      for(let i = 0; i < this.stateEnum.MAX; i++) {
         
         colorArr.push(this.newRandomColor())
 
@@ -314,6 +317,7 @@ class Clustering extends React.Component {
 
     }
 
+    // Generates a single random hex color
     newRandomColor() {
       let potential = "ABCDEF0123456789"
       let toReturn = "#"
@@ -349,6 +353,7 @@ class Clustering extends React.Component {
         
     }
 
+    // Restarts DBScan by making all points unlabeled again
     unclusterData() {
 
       let unlabeled = this.state.unlabeledData
