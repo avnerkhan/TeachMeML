@@ -41,7 +41,8 @@ class Apriori extends React.Component {
 
             for(let c = 0; c < transactionLength; c++) {
                 const item = Math.round(Math.random() * transaction.length)
-                transaction.push(transactionItems[item])
+                const pushedItem = transactionItems[item]
+                if(!transaction.includes(pushedItem)) transaction.push(pushedItem)
             }
 
             randomTransactions.push(transaction)
@@ -86,18 +87,24 @@ class Apriori extends React.Component {
 
     }
 
+    // Runs apriori by generating next itemset
     runAprioriAlgorithim() {
         const frequentItemSet = this.state.frequentItemSet
+        const transactionItems = this.state.transactionItems
         const transactions = this.state.transactions
         const minSup = this.state.minSup
+
+        console.log(frequentItemSet)
 
         if(frequentItemSet.length === 0) {
             let oneItemSet = {}
 
             for(let transaction of transactions) {
-                for(let item of transaction) {
-                    const currCount = oneItemSet[item] == undefined ? 0 : oneItemSet[item]
-                    oneItemSet[item] = currCount + 1
+                for(let item of transactionItems) {
+                    if(transaction.includes(item)) {
+                        const currCount = oneItemSet[item] == undefined ? 0 : oneItemSet[item]
+                        oneItemSet[item] = currCount + 1
+                    }
                 }
             }
 
@@ -110,21 +117,46 @@ class Apriori extends React.Component {
             })
 
         } else {
-            const oneItemSet = frequentItemSet[0]
             
+            let oneItemSet = Object.keys(frequentItemSet[0])
+            const lastFrequentSet = frequentItemSet[frequentItemSet.length - 1]
+            oneItemSet.sort()
+            let newFrequentSet = {}
+
+            for(let frequentSet in lastFrequentSet) {
+                const lastLetter = frequentSet.substring(frequentSet.length - 1)
+                let index = oneItemSet.indexOf(lastLetter) + 1
+
+                while(index < oneItemSet.length) {
+                    let newFrequentPattern = frequentSet
+                    newFrequentPattern += oneItemSet[index]
+                    newFrequentSet[newFrequentPattern] = 0
+                    index++
+                }
+
+            }
+
+            newFrequentSet = this.filterFreqSets(lastFrequentSet, newFrequentSet)
+
+            frequentItemSet.push(newFrequentSet)
+
+            this.setState({frequentItemSet: frequentItemSet})
+
+        }
+    }
+
+        // Prune apriori and counting transacitons here
+        filterFreqSets(lastFrequentSet, newFrequentSet) {
+
         }
 
         
-        
-        
-
-
-
-    }
+    
 
     // Displays the JSX for transaction table
     displayTransactionTable() {
         let transactions = this.state.transactions
+        
         return(
             <Table responsive="sm">
                 <tbody>
