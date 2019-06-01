@@ -5,7 +5,7 @@ import ButtonToolbar from 'react-bootstrap/ButtonToolbar'
 import FormControl from 'react-bootstrap/FormControl'
 import InputGroup from 'react-bootstrap/InputGroup'
 import Form from 'react-bootstrap/Form'
-import {euclidFunction, comparator} from './Utility'
+import {euclidFunction, comparator, arrayRange} from './Utility'
 import '../css_files/App.css'
 
 class KNN extends React.Component {
@@ -108,7 +108,7 @@ class KNN extends React.Component {
             <Form.Group>
               <Form.Label>Select K value</Form.Label>
               <Form.Control as="select" onChange={(e) => this.setState({k: e.target.value})}>
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => {
+                {arrayRange(1, 10).map((num) => {
                   return(
                     <option value={num}>{num}</option>
                   )

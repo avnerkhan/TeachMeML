@@ -3,7 +3,7 @@ import {XYPlot, XAxis, YAxis, VerticalGridLines, HorizontalGridLines, MarkSeries
 import Button from 'react-bootstrap/Button'
 import ButtonToolbar from 'react-bootstrap/ButtonToolbar'
 import Form from 'react-bootstrap/Form'
-import {euclidFunction, comparator} from './Utility'
+import {euclidFunction, comparator, arrayRange} from './Utility'
 import '../css_files/App.css'
 
 
@@ -178,13 +178,14 @@ class Clustering extends React.Component {
             })
     }
 
+
     showDBScanSelection() {
       
       return(
         <Form>
         <Form.Label>Select MinEps (for DBSCAN)</Form.Label>
               <Form.Control as="select" onChange={(e) => this.setState({minEps: e.target.value })}>
-                {[3, 4, 5, 6, 7, 8, 9, 10, 11].map((num) => {
+                {arrayRange(3, 30).map((num) => {
                   return(
                     <option value={num}>{num}</option>
                   )
@@ -192,7 +193,7 @@ class Clustering extends React.Component {
               </Form.Control>
               <Form.Label>Select MinPts (for DBSCAN</Form.Label>
               <Form.Control as="select" onChange={(e) => this.setState({minPts: e.target.value })}>
-                {[3, 4, 5, 6, 7, 8, 9, 10, 11].map((num) => {
+                {arrayRange(3, 20).map((num) => {
                   return(
                     <option value={num}>{num}</option>
                   )
@@ -209,7 +210,7 @@ class Clustering extends React.Component {
             <Form.Group>
               <Form.Label>Select Cluster Spacing value</Form.Label>
               <Form.Control as="select" onChange={(e) => this.setState({spacing: e.target.value})}>
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => {
+                {arrayRange(1, 10).map((num) => {
                   return(
                     <option value={num}>{num}</option>
                   )
@@ -217,7 +218,7 @@ class Clustering extends React.Component {
               </Form.Control>
               <Form.Label>Select Cluster Points</Form.Label>
               <Form.Control as="select" onChange={(e) => this.setState({pointNum: e.target.value })}>
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => {
+                {arrayRange(1, 9).map((num) => {
                   return(
                     <option value={num}>{num}</option>
                   )
@@ -245,13 +246,10 @@ class Clustering extends React.Component {
 
           if(point.label == undefined) {
             let neighbhors = unlabeled.filter(comparePoint => euclidFunction(point, comparePoint).distance <= this.state.minEps)
-            console.log(neighbhors)
 
             if(neighbhors.length >= this.state.minPts) {
               clusters++
               point.label = clusters
-              console.log("GOT HERE TOO")
-              console.log(point.label)
 
               for(let newPoint of neighbhors) {
 
@@ -259,11 +257,11 @@ class Clustering extends React.Component {
 
                 if(newPoint.label == undefined) {
                   newPoint.label = clusters
-                  let newNeighbhors = unlabeled.filter(comparePoint => euclidFunction(newPoint, comparator).distance <= this.state.minEps)
+                  let newNeighbhors = unlabeled.filter(comparePoint => euclidFunction(newPoint, comparePoint).distance <= this.state.minEps)
 
                   if(newNeighbhors.length >= this.state.minPts) {
 
-                    for(let nextDoor of newNeighbhors) neighbhors.add(nextDoor)
+                    for(let nextDoor of newNeighbhors) neighbhors.push(nextDoor)
 
                   }
 
@@ -351,8 +349,28 @@ class Clustering extends React.Component {
         
     }
 
-    recomputeDBScan() {
-      
+    unclusterData() {
+
+      let unlabeled = this.state.unlabeledData
+      let outliers = this.state.centroidData
+      let clusters = this.state.clusteredData
+
+      for(let cluster of clusters) {
+        for(let point of  cluster) {
+          unlabeled.push({x: point.x, y: point.y})
+        }
+      }
+
+      for(let outlier of outliers) {
+        unlabeled.push({x: outlier.x, y:outlier.y})
+      }
+
+      this.setState({
+        centroidData:[],
+        clusteredData: this.generateEmptyCluster(),
+        unlabeledData: unlabeled
+      })
+
     }
 
     render() {
@@ -399,9 +417,10 @@ class Clustering extends React.Component {
                     {this.state.readyToStartState ? <Button onClick={() => this.startRespectiveAlgorithim() }>Start Algorithim</Button> : null}
                     {this.state.choosingCentroidState ? <Button onClick={() => this.checkCentroidPick()}>Done choosing centroids</Button> : null}
                     {this.state.runningKMeans ? <Button onClick={() => this.runIteration()}>Run Next Iteration</Button> : null}
-                    {this.state.runningKMeans || this.state.runningDBScan ? <Button onClick={() => this.clearSlate()}>Clear Slate</Button> : null}
                     {this.state.runningDBScan ? this.showDBScanSelection() : null}
-                    {this.state.runningDBScan ? <Button onClick={() => this.recomputeDBScan()}>Restart DBSCAN</Button> : null}
+                    {this.state.runningKMeans || this.state.runningDBScan ? <Button onClick={() => this.clearSlate()}>Clear Slate</Button> : null}
+                    {this.state.runningDBScan ? <Button onClick={() => this.unclusterData()}>Reset clusters</Button> : null}
+                    {this.state.runningDBScan ? <Button onClick={() => this.runDBScan()}>Run K means again</Button> : null}
                 </ButtonToolbar>
               </div>
             </div>

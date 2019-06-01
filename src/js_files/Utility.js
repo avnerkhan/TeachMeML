@@ -24,3 +24,8 @@ export function euclidFunction(pointOne, pointTwo) {
     return 0
 
   }
+
+
+  export function arrayRange(lowerBound, upperBound) {
+    return Array.from(new Array(upperBound), (x,i) => i + lowerBound)
+  }
