@@ -341,8 +341,8 @@ class DTree extends React.Component {
 
       for (let i = 0; i < copiedLabels.length; i++) {
 
-        let lastIndex = i 
-        let featureName = copiedLabels[i].toLowerCase() 
+        const lastIndex = i 
+        const featureName = copiedLabels[i].toLowerCase() 
 
         let entry = {
           Header: copiedLabels[i],
@@ -377,8 +377,9 @@ class DTree extends React.Component {
     changeClassFeatureState(modify, feature, isAdd) {
 
       if(modify !== "") {
-        let featureLowerCase = feature.toLowerCase()
+        const featureLowerCase = feature.toLowerCase()
         let copyArr = this.state.labelClasses[featureLowerCase]
+
         if (isAdd) {
           copyArr.push(modify)
         } else {

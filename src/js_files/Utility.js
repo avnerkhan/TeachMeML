@@ -6,7 +6,7 @@ export function euclidFunction(pointOne, pointTwo) {
     let yDistance = pointOne.y - pointTwo.y
     xDistance *= xDistance
     yDistance *= yDistance
-    let totalDistance = Math.sqrt(xDistance + yDistance)
+    const totalDistance = Math.sqrt(xDistance + yDistance)
     return {orginalPoint: pointOne, distance: totalDistance}
 
   }

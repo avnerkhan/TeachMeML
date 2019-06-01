@@ -23,6 +23,8 @@ class Apriori extends React.Component {
         this.defaultTransactionSelection = ["A", "B", "C", "D", "E"]
         
         this.state = {
+            minSup: 2,
+            frequentItemSet: [],
             transactionItems: this.defaultTransactionSelection,
             transactions: this.generateRandomTransaction()
         }
@@ -31,14 +33,14 @@ class Apriori extends React.Component {
     // Random transaction generator for state
     generateRandomTransaction() {
         let randomTransactions = []
-        let transactionItems = this.state == undefined ? this.defaultTransactionSelection : this.state.transaction
+        const transactionItems = this.state == undefined ? this.defaultTransactionSelection : this.state.transaction
 
         for(let i = 0; i < 5; i++) {
             let transaction = []
-            let transactionLength = Math.floor(Math.random() * transactionItems.length) + 1
+            const transactionLength = Math.floor(Math.random() * transactionItems.length) + 1
 
             for(let c = 0; c < transactionLength; c++) {
-                let item = Math.floor(Math.random() * transaction.length)
+                const item = Math.round(Math.random() * transaction.length)
                 transaction.push(transactionItems[item])
             }
 
@@ -84,6 +86,42 @@ class Apriori extends React.Component {
 
     }
 
+    runAprioriAlgorithim() {
+        const frequentItemSet = this.state.frequentItemSet
+        const transactions = this.state.transactions
+        const minSup = this.state.minSup
+
+        if(frequentItemSet.length === 0) {
+            let oneItemSet = {}
+
+            for(let transaction of transactions) {
+                for(let item of transaction) {
+                    const currCount = oneItemSet[item] == undefined ? 0 : oneItemSet[item]
+                    oneItemSet[item] = currCount + 1
+                }
+            }
+
+            for(let item in oneItemSet) {
+                if(oneItemSet[item] < minSup) delete oneItemSet[item]
+            }
+
+            this.setState({
+                frequentItemSet: [oneItemSet]
+            })
+
+        } else {
+            const oneItemSet = frequentItemSet[0]
+            
+        }
+
+        
+        
+        
+
+
+
+    }
+
     // Displays the JSX for transaction table
     displayTransactionTable() {
         let transactions = this.state.transactions
@@ -114,6 +152,7 @@ class Apriori extends React.Component {
             <div className="App">
                 <header className="App-header">
                     {this.state != undefined ? this.displayTransactionTable() : null}
+                    <Button onClick={() => this.runAprioriAlgorithim()}>Generate Next Itemset</Button>
                 </header>
             </div>
         )

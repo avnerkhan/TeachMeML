@@ -40,9 +40,9 @@ class KNN extends React.Component {
 
 
         for(let i = 0; i < length; i++) {
-          let randomX = Math.floor(Math.random() * max)
-          let randomY = Math.floor(Math.random() * max)
-          let entry = {x:randomX, y:randomY}
+          const randomX = Math.floor(Math.random() * max)
+          const randomY = Math.floor(Math.random() * max)
+          const entry = {x:randomX, y:randomY}
 
           if(i % 2 === 0) {
             newDataPositive.push(entry)
@@ -131,8 +131,8 @@ class KNN extends React.Component {
       allData = allData.map(point => this.relabelData(point))
       let euclidMap = allData.map(point => euclidFunction(point, datapoint))
       euclidMap.sort(comparator)
-
       let positiveCount = 0
+
       for(let i = 0; i < this.state.k; i++) {
         highlightPoints.push(euclidMap[i].orginalPoint)
         positiveCount += euclidMap[i].orginalPoint.class === this.stateEnum.POSITIVE ? 1 : 0
@@ -160,15 +160,15 @@ class KNN extends React.Component {
     generateRandomUndetermined(length=20, max=100) {
 
       for(let i = 0; i < length; i++) {
-        let randomX = Math.floor(Math.random() * max)
-        let randomY = Math.floor(Math.random() * max)
+        const randomX = Math.floor(Math.random() * max)
+        const randomY = Math.floor(Math.random() * max)
         this.addPoint(randomX, randomY)
       }
 
     }
 
     randomizeData() {
-      let newRandomized = this.generateRandomData()
+      const newRandomized = this.generateRandomData()
 
       this.setState({
         positiveData: newRandomized.positive,
