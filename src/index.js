@@ -4,6 +4,7 @@ import './index.css';
 import Pick from './js_files/Pick';
 import DTree from './js_files/DTree'
 import KNN from './js_files/KNN'
+import Apriori from './js_files/Apriori'
 import * as serviceWorker from './serviceWorker';
 import {BrowserRouter, Route} from 'react-router-dom'
 import Clustering from './js_files/Clustering';
@@ -15,6 +16,7 @@ const webroutes = (
             <Route exact path="/DecisionTree" component={DTree} />
             <Route exact path='/KNearestNeighbors' component={KNN} />
             <Route exact path="/Clustering" component={Clustering} />
+            <Route exact path="/Apriori" component={Apriori} />
         </div>
     </BrowserRouter>
 )

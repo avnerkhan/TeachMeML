@@ -19,13 +19,16 @@ class KNN extends React.Component {
           HIGHLIGHT: "#FFFF00"
         }
 
+        let randomData = this.generateRandomData()
+
         this.state = {
           k: 1,
-          positiveData: [],
-          negativeData: [],
+          positiveData: randomData.positive,
+          negativeData: randomData.negative,
           undeterminedData: [],
           currentHighlightData: []
         }
+
 
     }
 
@@ -49,11 +52,8 @@ class KNN extends React.Component {
           
         }
 
-        this.setState({
-          positiveData: newDataPositive,
-          negativeData: newDataNegative,
-          undeterminedData: []
-        })
+        
+        return {positive: newDataPositive, negative: newDataNegative}
     }
 
 
@@ -167,6 +167,15 @@ class KNN extends React.Component {
 
     }
 
+    randomizeData() {
+      let newRandomized = this.generateRandomData()
+
+      this.setState({
+        positiveData: newRandomized.positive,
+        negativeData: newRandomized.negative
+      })
+    }
+
 
     render() {
         return (
@@ -214,7 +223,7 @@ class KNN extends React.Component {
                           />
                     </XYPlot>
                     <ButtonToolbar>
-                      <Button onClick={() => this.generateRandomData()}>Generate Random Data</Button>
+                      <Button onClick={() => this.randomizeData()}>Generate Random Data</Button>
                       {this.state.positiveData.length > 0 ? <Button onClick={() => this.addPoint(this.refs["xCoord"].value, this.refs["yCoord"].value)}>Add Point</Button> : null}
                       {this.state.positiveData.length > 0 ? <Button onClick={() => this.generateRandomUndetermined()}>Generate Random Undetermined data</Button> : null}
                     </ButtonToolbar>

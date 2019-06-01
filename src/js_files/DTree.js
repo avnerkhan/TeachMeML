@@ -18,6 +18,16 @@ class DTree extends React.Component {
     constructor(props) {
         super(props)
 
+
+        this.defaultLabels = ["Passed", "GPA", "Language"]
+        this.defaultLabelClasses = {
+          "passed": ["Yes", "No"],
+          "gpa": ["4.0", "2.0"],
+          "language": ["Python", "Java", "C++"],
+          "label": [0, 1]
+        }
+
+
         // State contains data. features are categorical, and label is last
         // Feature keys are ints so they are easily indexable
         this.state = {
@@ -25,21 +35,10 @@ class DTree extends React.Component {
           renderTree: false,
           renderTable:true,
           treeState: {},
-          dataLabels: ["Passed", "GPA", "Language"],
+          dataLabels: this.defaultLabels,
           shownData: [],
-          data: [
-            {0: "No", 1: "4.0", 2: "Python", label: 1},
-            {0: "No", 1: "2.0", 2: "Python", label: 0},
-            {0: "Yes", 1: "4.0", 2: "C++", label: 1},
-            {0: "Yes", 1: "2.0", 2: "Java", label: 1},
-            {0: "Yes", 1: "4.0", 2: "Python", label: 0}
-          ],
-          labelClasses: {
-            "passed": ["Yes", "No"],
-            "gpa": ["4.0", "2.0"],
-            "language": ["Python", "Java", "C++"],
-            "label": [0, 1]
-          }
+          data: this.generateRandomDataState(),
+          labelClasses: this.defaultLabelClasses
         }
 
 
@@ -78,6 +77,8 @@ class DTree extends React.Component {
       const dataLabels = this.state.dataLabels
       const data = isOnShowMode ? this.state.shownData : this.state.data
       let newData = []
+
+      console.log(data)
 
       for (let entry of data) {
         let newEntry = {}
@@ -467,11 +468,15 @@ class DTree extends React.Component {
 
     generateRandomDataState() {
       let dataState = []
+      let dataLabels = this.state == undefined ? this.defaultLabels : this.state.dataLabels
+      let labelClasses = this.state == undefined ? this.defaultLabelClasses : this.state.labelClasses
+      console.log(dataLabels)
+      console.log(labelClasses)
 
       for (let count = 0; count < 10; count++) {
         let entry = {}
-        for (let i = 0; i < this.state.dataLabels.length; i++) {
-          let currentClassLabels = this.state.labelClasses[this.state.dataLabels[i].toLowerCase()]
+        for (let i = 0; i < dataLabels.length; i++) {
+          let currentClassLabels = labelClasses[dataLabels[i].toLowerCase()]
           let randomEntry = currentClassLabels[Math.floor(Math.random()*currentClassLabels.length)]
           entry[i] = randomEntry
         }
@@ -479,17 +484,15 @@ class DTree extends React.Component {
         dataState.push(entry)
       }
 
-      this.setState({
-        data: dataState
-      })
+      return dataState
 
       
     }
 
     // Exit out of edit table page and go back to the tree generator page
     saveEditState() {
-      this.generateRandomDataState()
       this.setState({
+        data: this.generateRandomDataState(),
         renderTable: true
       })
 
@@ -506,7 +509,7 @@ class DTree extends React.Component {
                 <ButtonToolbar>
                   {this.state.renderTree || !this.state.renderTable ? null : <Button onClick={() => this.showTree()}>Display</Button>}
                   {this.state.renderTable && !this.state.renderTree ? <Button onClick={() => this.addRow()}>Add Row</Button> : null}
-                  {this.state.renderTable && !this.state.renderTree ? <Button onClick={() => this.generateRandomDataState()}>Randomize Data</Button> : null}
+                  {this.state.renderTable && !this.state.renderTree ? <Button onClick={() => this.setState({data: this.generateRandomDataState()})}>Randomize Data</Button> : null}
                   {this.state.renderTable ? <Button onClick={() => this.setState({renderTree: false, renderTable:false})}>Edit Table Layout</Button> :  <Button onClick={() => this.saveEditState()}>Save State</Button>}
                 </ButtonToolbar>
               </div>
