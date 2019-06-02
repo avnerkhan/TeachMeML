@@ -505,8 +505,10 @@ class DTree extends React.Component {
         return(
             <div className="App">
               <div className="App-header">
+                <Row>
                 {this.state.renderTree ? <Tree height = {400} width = {800} data={this.state.treeState}  svgProps={{className: 'custom'}} /> : null}
                 {this.state.renderTable ? <ReactTable data={this.createTableReadableData(this.state.showMode)} columns={this.generateColumns(this.state.dataLabels)} defaultPageSize={this.state.data.length} className="-striped -highlight"/> : this.showCurrentLayout()}
+                </Row>
                 <ButtonToolbar>
                   {this.state.renderTree || !this.state.renderTable ? null : <Button onClick={() => this.showTree()}>Display</Button>}
                   {this.state.renderTable && !this.state.renderTree ? <Button onClick={() => this.addRow()}>Add Row</Button> : null}

@@ -3,6 +3,7 @@ import {XYPlot, XAxis, YAxis, VerticalGridLines, HorizontalGridLines, MarkSeries
 import Button from 'react-bootstrap/Button'
 import ButtonToolbar from 'react-bootstrap/ButtonToolbar'
 import Form from 'react-bootstrap/Form'
+import Row from 'react-bootstrap/Row'
 import {euclidFunction, comparator, arrayRange} from './Utility'
 import '../css_files/App.css'
 
@@ -17,8 +18,7 @@ class Clustering extends React.Component {
             CLUSTER: this.generateRandomColors(),
             KMEANS: 0,
             DBSCAN: 1,
-            OUTLIER: 0,
-            MAX: 100
+            OUTLIER: 0
         }
 
         this.state = {
@@ -42,7 +42,7 @@ class Clustering extends React.Component {
 
       let emptyClusterHolder = []
 
-      for(let i = 0; i < this.stateEnum.MAX; i++) emptyClusterHolder.push([])
+      for(let i = 0; i < 100; i++) emptyClusterHolder.push([])
 
       return emptyClusterHolder
     }
@@ -55,8 +55,8 @@ class Clustering extends React.Component {
 
             let factor = this.state.spacing
             let numberPoints = this.state.pointNum
-            let xCoord = Math.floor((e.screenX - 460)/5.5)
-            let yCoord = Math.floor(100 - (e.screenY - 209)/5.5)
+            let xCoord = Math.floor((e.screenX - 315)/5.5)
+            let yCoord = Math.floor(100 - (e.screenY - 170)/5.5)
             let newData = this.state.unlabeledData
 
             if(newData[0].x === 0 && newData[0].y === 0) newData.shift()
@@ -290,7 +290,7 @@ class Clustering extends React.Component {
           if(point.label == 0) {
             outlierData.push(point)
           } else {
-            clusterData[point.label].push(point)
+            if(clusterData[point.label] != undefined) clusterData[point.label].push(point)
           }
 
       }
@@ -307,7 +307,7 @@ class Clustering extends React.Component {
 
       let colorArr = []
 
-      for(let i = 0; i < this.stateEnum.MAX; i++) {
+      for(let i = 0; i < 100; i++) {
         
         colorArr.push(this.newRandomColor())
 
@@ -382,6 +382,7 @@ class Clustering extends React.Component {
         return(
             <div className="App">
               <div className="App-header">
+              <Row>
               <XYPlot  width={600} height={600} onClick={(e) => this.smallClusterDrop(e)} xDomain={[0, 100]} yDomain={[0, 100]}>
                           <VerticalGridLines />
                           <HorizontalGridLines />
@@ -417,12 +418,13 @@ class Clustering extends React.Component {
                                 )
                             })}
                 </XYPlot>
+                {!this.state.choosingCentroidState && !this.state.runningKMeans && !this.state.runningDBScan ? this.showClusterDeploymentSelection() : null}
+                {this.state.runningDBScan ? this.showDBScanSelection() : null}
+              </Row>
                 <ButtonToolbar>
-                    {!this.state.choosingCentroidState && !this.state.runningKMeans && !this.state.runningDBScan ? this.showClusterDeploymentSelection() : null}
                     {this.state.readyToStartState ? <Button onClick={() => this.startRespectiveAlgorithim() }>Start Algorithim</Button> : null}
                     {this.state.choosingCentroidState ? <Button onClick={() => this.checkCentroidPick()}>Done choosing centroids</Button> : null}
                     {this.state.runningKMeans ? <Button onClick={() => this.runIteration()}>Run Next Iteration</Button> : null}
-                    {this.state.runningDBScan ? this.showDBScanSelection() : null}
                     {this.state.runningKMeans || this.state.runningDBScan ? <Button onClick={() => this.clearSlate()}>Clear Slate</Button> : null}
                     {this.state.runningDBScan ? <Button onClick={() => this.unclusterData()}>Reset clusters</Button> : null}
                     {this.state.runningDBScan ? <Button onClick={() => this.runDBScan()}>Run K means again</Button> : null}

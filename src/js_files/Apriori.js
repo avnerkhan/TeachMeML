@@ -94,8 +94,6 @@ class Apriori extends React.Component {
         const transactions = this.state.transactions
         const minSup = this.state.minSup
 
-        console.log(frequentItemSet)
-
         if(frequentItemSet.length === 0) {
             let oneItemSet = {}
 
@@ -136,7 +134,7 @@ class Apriori extends React.Component {
 
             }
 
-            newFrequentSet = this.filterFreqSets(lastFrequentSet, newFrequentSet)
+            newFrequentSet = this.filterFreqSets(newFrequentSet)
 
             frequentItemSet.push(newFrequentSet)
 
@@ -145,10 +143,42 @@ class Apriori extends React.Component {
         }
     }
 
-        // Prune apriori and counting transacitons here
-        filterFreqSets(lastFrequentSet, newFrequentSet) {
+        // Prune by counting transacitons here (Apriori principle later?)
+        filterFreqSets(newFrequentSet) {
+
+            const transactions = this.state.transactions
+            const minsup = this.state.minSup
+            let frequentSetCopy = newFrequentSet
+
+            for(let transaction of transactions) {
+                const compareSet = new Set(transaction)
+
+                for(let frequentSetCandidate in newFrequentSet) {
+                    const checkSet = new Set(frequentSetCandidate)
+
+                    if(this.isSuperset(compareSet, checkSet)) frequentSetCopy[frequentSetCandidate] += 1
+
+                }
+            }
+
+            for(let frequentSet in frequentSetCopy) {
+                if(frequentSetCopy[frequentSet] < minsup) delete frequentSetCopy[frequentSet]
+            }
+
+            return frequentSetCopy
 
         }
+
+        isSuperset(compareSet, checkSet) {
+            for (let elem of checkSet) {
+                if (!compareSet.has(elem)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+
 
         
     
@@ -179,12 +209,39 @@ class Apriori extends React.Component {
         )
     }
 
+    displayFrequentItemsets() {
+
+        let frequentSets = this.state.frequentItemSet
+
+        return(
+            <Row>
+                {frequentSets.map((frequentKSet, index) => {
+                    const frequentSetKeys = Object.keys(frequentKSet)
+                    if(frequentSetKeys.length > 0) {
+                        return(
+                            <Col>
+                                <div>Frequent {index + 1} itemsets</div>
+                                {frequentSetKeys.map((set) => {
+                                    return(
+                                        <div>{set} : {frequentKSet[set]}</div>
+                                    )
+                                })}
+                            </Col>
+                        )
+                    }
+                })}
+            </Row>
+        )
+
+    }
+
     render() {
         return(
             <div className="App">
                 <header className="App-header">
                     {this.state != undefined ? this.displayTransactionTable() : null}
                     <Button onClick={() => this.runAprioriAlgorithim()}>Generate Next Itemset</Button>
+                    {this.displayFrequentItemsets()}
                 </header>
             </div>
         )
