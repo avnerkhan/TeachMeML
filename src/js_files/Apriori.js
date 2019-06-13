@@ -101,9 +101,7 @@ class Apriori extends React.Component {
       if (oneItemSet[item] < minSup) delete oneItemSet[item];
     }
 
-    this.setState({
-      frequentItemSet: [oneItemSet]
-    });
+    return [oneItemSet];
   }
 
   // Runs apriori by generating next itemset
@@ -114,7 +112,13 @@ class Apriori extends React.Component {
     const minSup = this.state.minSup;
 
     if (frequentItemSet.length === 0) {
-      this.generateOneItemsets(transactions, transactionItems, minSup);
+      this.setState({
+        frequentItemSet: this.generateOneItemsets(
+          transactions,
+          transactionItems,
+          minSup
+        )
+      });
     } else {
       let oneItemSet = Object.keys(frequentItemSet[0]);
       const lastFrequentSet = frequentItemSet[frequentItemSet.length - 1];
@@ -240,14 +244,57 @@ class Apriori extends React.Component {
     );
   }
 
+  reorderDB(sortedArr) {
+    const order = sortedArr.map(entry => {
+      return entry[0];
+    });
+    let orderedDB = this.state.transactions;
+    return orderedDB.map(transaction => {
+      transaction.sort((firstEntry, secondEntry) => {
+        return order.indexOf(firstEntry) - order.indexOf(secondEntry);
+      });
+      return transaction;
+    });
+  }
+
+  buildTree(reorderedDB) {
+    let currTree = {};
+
+    for (let transaction of reorderedDB) {
+      for (let letter of transaction) {
+        this.addEntry(letter, currTree);
+      }
+    }
+
+    return currTree;
+  }
+
+  addEntry(letter, currTree) {}
+
   runFPTreeAlgorithim() {
-    this.generateOneItemsets(
+    let oneItemSet = this.generateOneItemsets(
       this.state.transactions,
       this.state.transactionItems,
       this.state.minSup
-    );
+    )[0];
+
+    let sortable = Object.keys(oneItemSet).map(key => {
+      return [key, oneItemSet[key]];
+    });
+
+    sortable.sort((firstPair, secondPair) => {
+      if (firstPair[0] != secondPair[0]) {
+        return secondPair[1] - firstPair[1];
+      }
+
+      return secondPair[0] - firstPair[0];
+    });
+
+    const reorderedDB = this.reorderDB(sortable);
+
     this.setState({
-      isFPTree: true
+      isFPTree: true,
+      treeState: this.buildTree(reorderedDB)
     });
   }
 
