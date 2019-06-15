@@ -249,27 +249,63 @@ class Apriori extends React.Component {
       return entry[0];
     });
     let orderedDB = this.state.transactions;
+
     return orderedDB.map(transaction => {
       transaction.sort((firstEntry, secondEntry) => {
         return order.indexOf(firstEntry) - order.indexOf(secondEntry);
       });
+      console.log(transaction);
+      transaction = transaction.filter(entry => {
+        return order.includes(entry);
+      });
+      console.log(transaction);
       return transaction;
     });
   }
 
   buildTree(reorderedDB) {
-    let currTree = {};
+    let currTree = {
+      name: "Root",
+      children: []
+    };
 
     for (let transaction of reorderedDB) {
-      for (let letter of transaction) {
-        this.addEntry(letter, currTree);
-      }
+      currTree = this.addBranch(transaction, currTree);
     }
 
+    console.log(currTree);
     return currTree;
   }
 
-  addEntry(letter, currTree) {}
+  addBranch(transaction, currTree) {
+    let root = currTree;
+    let curr = root;
+
+    for (let letter of transaction) {
+      if (curr != undefined) {
+        const names = curr.children.map(children => {
+          return children.name.split(":")[0];
+        });
+
+        if (names.includes(letter)) {
+          const index = names.indexOf(letter);
+          curr = curr.children[index];
+          const newCount = parseInt(curr.name.split(":")[1]) + 1;
+          curr.name = letter + ":" + newCount.toString();
+        } else {
+          console.log(letter);
+          const newEntry = {
+            name: letter + ":1",
+            children: []
+          };
+          curr.children.push(newEntry);
+          curr = newEntry;
+        }
+      }
+
+      return root;
+    }
+  }
 
   runFPTreeAlgorithim() {
     let oneItemSet = this.generateOneItemsets(
@@ -294,6 +330,7 @@ class Apriori extends React.Component {
 
     this.setState({
       isFPTree: true,
+      transactions: reorderedDB,
       treeState: this.buildTree(reorderedDB)
     });
   }
