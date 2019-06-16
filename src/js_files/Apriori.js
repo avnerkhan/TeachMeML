@@ -1,7 +1,7 @@
 import React from "react";
 import Table from "react-bootstrap/Table";
 import Button from "react-bootstrap/Button";
-import Tree from "react-d3-tree";
+import Tree from "react-tree-graph";
 import Card from "react-bootstrap/Card";
 import ListGroup from "react-bootstrap/ListGroup";
 import Container from "react-bootstrap/Container";
@@ -254,11 +254,10 @@ class Apriori extends React.Component {
       transaction.sort((firstEntry, secondEntry) => {
         return order.indexOf(firstEntry) - order.indexOf(secondEntry);
       });
-      console.log(transaction);
+
       transaction = transaction.filter(entry => {
         return order.includes(entry);
       });
-      console.log(transaction);
       return transaction;
     });
   }
@@ -293,7 +292,6 @@ class Apriori extends React.Component {
           const newCount = parseInt(curr.name.split(":")[1]) + 1;
           curr.name = letter + ":" + newCount.toString();
         } else {
-          console.log(letter);
           const newEntry = {
             name: letter + ":1",
             children: []
@@ -302,9 +300,9 @@ class Apriori extends React.Component {
           curr = newEntry;
         }
       }
-
-      return root;
     }
+
+    return root;
   }
 
   runFPTreeAlgorithim() {
@@ -339,6 +337,12 @@ class Apriori extends React.Component {
     return (
       <div className="App">
         <header className="App-header">
+          <Tree
+            height={400}
+            width={800}
+            data={this.state.treeState}
+            svgProps={{ className: "custom" }}
+          />
           {this.state != undefined ? this.displayTransactionTable() : null}
           <Row>
             <Button onClick={() => this.runFPTreeAlgorithim()}>
