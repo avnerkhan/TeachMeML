@@ -20,6 +20,7 @@ class Apriori extends React.Component {
 
     this.state = {
       treeState: {},
+      renderTree: false,
       isFPTree: false,
       minSup: 2,
       frequentItemSet: [],
@@ -264,7 +265,7 @@ class Apriori extends React.Component {
 
   buildTree(reorderedDB) {
     let currTree = {
-      name: "Root",
+      name: "R",
       children: []
     };
 
@@ -305,6 +306,34 @@ class Apriori extends React.Component {
     return root;
   }
 
+  findAllPaths(allPaths, currentPath, curr, toFind) {
+    if (curr.name.split(":")[0] === toFind) {
+      const count = curr.name.split(":")[1];
+      console.log(currentPath);
+      return [currentPath, count];
+    }
+
+    currentPath += curr.name.split(":")[0];
+    for (let child of curr.children) {
+      const elem = this.findAllPaths(allPaths, currentPath, child, toFind);
+      allPaths.push(elem);
+    }
+  }
+
+  mineFreqItemsets(treeState, sortedList) {
+    sortedList.reverse();
+    let currentPaths = {};
+
+    for (let entry of sortedList) {
+      let allPathsForTransactions = [];
+      let root = treeState;
+      this.findAllPaths(allPathsForTransactions, "", root, entry[0]);
+      currentPaths[entry[0]] = allPathsForTransactions;
+    }
+
+    console.log(currentPaths);
+  }
+
   runFPTreeAlgorithim() {
     let oneItemSet = this.generateOneItemsets(
       this.state.transactions,
@@ -325,11 +354,14 @@ class Apriori extends React.Component {
     });
 
     const reorderedDB = this.reorderDB(sortable);
+    const treeState = this.buildTree(reorderedDB);
+    const freqItemsets = this.mineFreqItemsets(treeState, sortable);
 
     this.setState({
       isFPTree: true,
       transactions: reorderedDB,
-      treeState: this.buildTree(reorderedDB)
+      treeState: treeState,
+      renderTree: true
     });
   }
 
@@ -337,12 +369,14 @@ class Apriori extends React.Component {
     return (
       <div className="App">
         <header className="App-header">
-          <Tree
-            height={400}
-            width={800}
-            data={this.state.treeState}
-            svgProps={{ className: "custom" }}
-          />
+          {this.state.renderTree ? (
+            <Tree
+              height={400}
+              width={800}
+              data={this.state.treeState}
+              svgProps={{ className: "custom" }}
+            />
+          ) : null}
           {this.state != undefined ? this.displayTransactionTable() : null}
           <Row>
             <Button onClick={() => this.runFPTreeAlgorithim()}>
