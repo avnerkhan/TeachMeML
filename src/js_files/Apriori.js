@@ -222,6 +222,7 @@ class Apriori extends React.Component {
   displayFrequentItemsets() {
     let frequentSets = this.state.frequentItemSet;
 
+    console.log(frequentSets);
     return (
       <Row>
         {frequentSets.map((frequentKSet, index) => {
@@ -273,7 +274,6 @@ class Apriori extends React.Component {
       currTree = this.addBranch(transaction, currTree);
     }
 
-    console.log(currTree);
     return currTree;
   }
 
@@ -307,17 +307,50 @@ class Apriori extends React.Component {
   }
 
   findAllPaths(allPaths, currentPath, curr, toFind) {
-    if (curr.name.split(":")[0] === toFind) {
-      const count = curr.name.split(":")[1];
-      console.log(currentPath);
+    const split = curr.name.split(":");
+    const transaction = split[0];
+    const count = split[1];
+
+    if (transaction === toFind) {
       return [currentPath, count];
     }
 
-    currentPath += curr.name.split(":")[0];
+    currentPath += transaction;
     for (let child of curr.children) {
       const elem = this.findAllPaths(allPaths, currentPath, child, toFind);
       allPaths.push(elem);
     }
+  }
+
+  getFrequentItemsets(currentPaths) {
+    let frequentItemsets = {};
+
+    for (let pathKey in currentPaths) {
+      let mappingForKey = {};
+      const currentPathsForKey = currentPaths[pathKey];
+      for (let pair of currentPathsForKey) {
+        if (pair != undefined) {
+          const actualPath = pair[0];
+          const count = pair[1];
+          let startString = pathKey;
+          for (let c of actualPath) {
+            if (c !== "R") {
+              startString = c + startString;
+              mappingForKey[startString] =
+                mappingForKey[startString] == undefined
+                  ? count
+                  : mappingForKey[startString] + count;
+            }
+          }
+        }
+      }
+      for (let key in mappingForKey) {
+        if (mappingForKey[key] >= this.state.minSup)
+          frequentItemsets[key] = mappingForKey[key];
+      }
+    }
+
+    return frequentItemsets;
   }
 
   mineFreqItemsets(treeState, sortedList) {
@@ -327,11 +360,12 @@ class Apriori extends React.Component {
     for (let entry of sortedList) {
       let allPathsForTransactions = [];
       let root = treeState;
-      this.findAllPaths(allPathsForTransactions, "", root, entry[0]);
-      currentPaths[entry[0]] = allPathsForTransactions;
+      const transaction = entry[0];
+      this.findAllPaths(allPathsForTransactions, "", root, transaction);
+      currentPaths[transaction] = allPathsForTransactions;
     }
 
-    console.log(currentPaths);
+    return this.getFrequentItemsets(currentPaths);
   }
 
   runFPTreeAlgorithim() {
@@ -361,7 +395,8 @@ class Apriori extends React.Component {
       isFPTree: true,
       transactions: reorderedDB,
       treeState: treeState,
-      renderTree: true
+      renderTree: true,
+      frequentItemSet: freqItemsets
     });
   }
 
