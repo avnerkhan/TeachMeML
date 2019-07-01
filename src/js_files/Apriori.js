@@ -2,13 +2,10 @@ import React from "react";
 import Table from "react-bootstrap/Table";
 import Button from "react-bootstrap/Button";
 import Tree from "react-tree-graph";
-import Card from "react-bootstrap/Card";
-import ListGroup from "react-bootstrap/ListGroup";
-import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import FormControl from "react-bootstrap/FormControl";
-import InputGroup from "react-bootstrap/InputGroup";
+import Form from "react-bootstrap/Form";
+import { arrayRange } from "./Utility";
 import "../css_files/App.css";
 import "react-table/react-table.css";
 
@@ -27,6 +24,24 @@ class Apriori extends React.Component {
       transactionItems: this.defaultTransactionSelection,
       transactions: this.generateRandomTransaction()
     };
+  }
+
+  showMinSupSelection() {
+    return (
+      <Form>
+        <Form.Group>
+          <Form.Label>Select MinSup value</Form.Label>
+          <Form.Control
+            as="select"
+            onChange={e => this.setState({ minSup: e.target.value })}
+          >
+            {arrayRange(2, 10).map(num => {
+              return <option value={num}>{num}</option>;
+            })}
+          </Form.Control>
+        </Form.Group>
+      </Form>
+    );
   }
 
   // Random transaction generator for state
@@ -215,8 +230,6 @@ class Apriori extends React.Component {
       </Table>
     );
   }
-
-  displayMinsupSelection() {}
 
   // Displays JSX of N frequent itemsets
   displayFrequentItemsets() {
@@ -433,7 +446,7 @@ class Apriori extends React.Component {
               </Button>
             ) : null}
           </Row>
-          {this.displayMinsupSelection()}
+          {this.showMinSupSelection()}
           {this.displayFrequentItemsets()}
         </header>
       </div>
