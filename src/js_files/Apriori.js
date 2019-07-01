@@ -368,6 +368,16 @@ class Apriori extends React.Component {
     return this.getFrequentItemsets(currentPaths);
   }
 
+  formatSets(freqItemsets, oneItemSet) {
+    let newFrequentSets = [oneItemSet, {}, {}, {}, {}];
+
+    for (const key in freqItemsets) {
+      newFrequentSets[key.length - 1][key] = freqItemsets[key];
+    }
+
+    return newFrequentSets;
+  }
+
   runFPTreeAlgorithim() {
     let oneItemSet = this.generateOneItemsets(
       this.state.transactions,
@@ -396,7 +406,7 @@ class Apriori extends React.Component {
       transactions: reorderedDB,
       treeState: treeState,
       renderTree: true,
-      frequentItemSet: freqItemsets
+      frequentItemSet: this.formatSets(freqItemsets, oneItemSet)
     });
   }
 
@@ -424,7 +434,7 @@ class Apriori extends React.Component {
             ) : null}
           </Row>
           {this.displayMinsupSelection()}
-          {!this.state.isFPTree ? this.displayFrequentItemsets() : null}
+          {this.displayFrequentItemsets()}
         </header>
       </div>
     );
