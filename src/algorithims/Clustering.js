@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import React from "react";
 import {
   XYPlot,
@@ -11,7 +13,7 @@ import Button from "react-bootstrap/Button";
 import ButtonToolbar from "react-bootstrap/ButtonToolbar";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
-import { euclidFunction, comparator, arrayRange } from "./Utility";
+import { euclidFunction, comparator, arrayRange } from "../Utility";
 import "../css_files/App.css";
 
 class Clustering extends React.Component {
@@ -256,7 +258,7 @@ class Clustering extends React.Component {
           point.label = clusters;
 
           for (let newPoint of neighbhors) {
-            if (newPoint.label == this.stateEnum.OUTLIER)
+            if (newPoint.label === this.stateEnum.OUTLIER)
               newPoint.label = clusters;
 
             if (newPoint.label == undefined) {
@@ -287,7 +289,7 @@ class Clustering extends React.Component {
     let outlierData = this.state.centroidData;
 
     for (let point of newData) {
-      if (point.label == 0) {
+      if (point.label === 0) {
         outlierData.push(point);
       } else {
         if (clusterData[point.label] != undefined)
@@ -327,9 +329,9 @@ class Clustering extends React.Component {
 
   // Checks which algorithim to start, based on selection
   startRespectiveAlgorithim() {
-    if (this.state.algorithim == this.stateEnum.KMEANS)
+    if (this.state.algorithim === this.stateEnum.KMEANS)
       this.setState({ choosingCentroidState: true, readyToStartState: false });
-    if (this.state.algorithim == this.stateEnum.DBSCAN) {
+    if (this.state.algorithim === this.stateEnum.DBSCAN) {
       this.runDBScan();
       this.setState({ runningDBScan: true, readyToStartState: false });
     }

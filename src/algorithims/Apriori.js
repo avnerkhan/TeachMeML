@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import React from "react";
 import Table from "react-bootstrap/Table";
 import Button from "react-bootstrap/Button";
@@ -5,7 +7,7 @@ import Tree from "react-tree-graph";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
-import { arrayRange } from "./Utility";
+import { arrayRange } from "../Utility";
 import "../css_files/App.css";
 import "react-table/react-table.css";
 

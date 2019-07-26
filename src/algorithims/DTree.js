@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React from "react";
 import Tree from "react-tree-graph";
 import Table from "react-bootstrap/Table";
@@ -12,14 +13,6 @@ import InputGroup from "react-bootstrap/InputGroup";
 import ButtonToolbar from "react-bootstrap/ButtonToolbar";
 import "../css_files/App.css";
 import "react-table/react-table.css";
-
-//TODO:
-// Delete data row
-// Have option on a settings icon
-// More intuitive layout
-// Instructions/Help
-// Move to custom table?
-// Clean up and moduralize
 
 class DTree extends React.Component {
   constructor(props) {

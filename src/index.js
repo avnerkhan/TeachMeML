@@ -1,13 +1,13 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
-import Pick from "./js_files/Pick";
-import DTree from "./js_files/DTree";
-import KNN from "./js_files/KNN";
-import Apriori from "./js_files/Apriori";
+import Pick from "./algorithims/Pick";
+import DTree from "./algorithims/DTree";
+import KNN from "./algorithims/KNN";
+import Apriori from "./algorithims/Apriori";
 import * as serviceWorker from "./serviceWorker";
 import { BrowserRouter, Route } from "react-router-dom";
-import Clustering from "./js_files/Clustering";
+import Clustering from "./algorithims/Clustering";
 
 const webroutes = (
   <BrowserRouter>

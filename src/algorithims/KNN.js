@@ -12,7 +12,7 @@ import ButtonToolbar from "react-bootstrap/ButtonToolbar";
 import FormControl from "react-bootstrap/FormControl";
 import InputGroup from "react-bootstrap/InputGroup";
 import Form from "react-bootstrap/Form";
-import { euclidFunction, comparator, arrayRange } from "./Utility";
+import { euclidFunction, comparator, arrayRange } from "../Utility";
 import "../css_files/App.css";
 
 class KNN extends React.Component {
