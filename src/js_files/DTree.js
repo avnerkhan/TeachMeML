@@ -1,6 +1,6 @@
 import React from "react";
 import Tree from "react-tree-graph";
-import ReactTable from "react-table";
+import Table from "react-bootstrap/Table";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import ListGroup from "react-bootstrap/ListGroup";
@@ -12,6 +12,14 @@ import InputGroup from "react-bootstrap/InputGroup";
 import ButtonToolbar from "react-bootstrap/ButtonToolbar";
 import "../css_files/App.css";
 import "react-table/react-table.css";
+
+//TODO:
+// Delete data row
+// Have option on a settings icon
+// More intuitive layout
+// Instructions/Help
+// Move to custom table?
+// Clean up and moduralize
 
 class DTree extends React.Component {
   constructor(props) {
@@ -64,8 +72,6 @@ class DTree extends React.Component {
     const dataLabels = this.state.dataLabels;
     const data = isOnShowMode ? this.state.shownData : this.state.data;
     let newData = [];
-
-    console.log(data);
 
     for (let entry of data) {
       let newEntry = {};
@@ -511,6 +517,34 @@ class DTree extends React.Component {
     return dataState;
   }
 
+  showCustomDataTable() {
+    console.log(this.state.data);
+    console.log(this.state.dataLabels);
+    return (
+      <Table>
+        <thead>
+          <tr>
+            {this.state.dataLabels.map(feature => {
+              return <th>{feature}</th>;
+            })}
+            <th>Label</th>
+          </tr>
+        </thead>
+        <tbody>
+          {this.state.data.map(dataRow => {
+            return (
+              <tr>
+                {Object.values(dataRow).map(value => {
+                  return <td>{value}</td>;
+                })}
+              </tr>
+            );
+          })}
+        </tbody>
+      </Table>
+    );
+  }
+
   // Exit out of edit table page and go back to the tree generator page
   saveEditState() {
     this.setState({
@@ -518,6 +552,7 @@ class DTree extends React.Component {
       renderTable: true
     });
   }
+
   render() {
     return (
       <div className="App">
@@ -531,16 +566,9 @@ class DTree extends React.Component {
                 svgProps={{ className: "custom" }}
               />
             ) : null}
-            {this.state.renderTable ? (
-              <ReactTable
-                data={this.createTableReadableData(this.state.showMode)}
-                columns={this.generateColumns(this.state.dataLabels)}
-                defaultPageSize={this.state.data.length}
-                className="-striped -highlight"
-              />
-            ) : (
-              this.showCurrentLayout()
-            )}
+            {this.state.renderTable
+              ? this.showCustomDataTable()
+              : this.showCurrentLayout()}
           </Row>
           <ButtonToolbar>
             {this.state.renderTree || !this.state.renderTable ? null : (
