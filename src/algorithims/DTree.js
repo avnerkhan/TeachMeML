@@ -40,44 +40,6 @@ class DTree extends React.Component {
     };
   }
 
-  // Whenever an entry is clicked, we change the entry by iterating through
-  // label array and set state to corresponding, as well as erasing the tree
-  handleEdit(row, feature, index) {
-    let copyState = this.state.data;
-    let indexer = feature === "label" ? feature : index;
-    const currentValue = copyState[row][indexer];
-    const currentIndex = this.state.labelClasses[feature].indexOf(currentValue);
-    const newIndex =
-      (currentIndex + 1) % this.state.labelClasses[feature].length;
-    copyState[row][indexer] = this.state.labelClasses[feature][newIndex];
-
-    this.setState({
-      renderTree: false,
-      data: copyState,
-      treeState: [],
-      showMode: false
-    });
-  }
-
-  // Converts data so that table creating library can read. Creates it into
-  // lowercase versions of data labels instead of indexes
-  createTableReadableData(isOnShowMode) {
-    const dataLabels = this.state.dataLabels;
-    const data = isOnShowMode ? this.state.shownData : this.state.data;
-    let newData = [];
-
-    for (let entry of data) {
-      let newEntry = {};
-      for (let i = 0; i < dataLabels.length; i++) {
-        newEntry[dataLabels[i].toLowerCase()] = entry[i];
-      }
-      newEntry["label"] = entry.label;
-      newData.push(newEntry);
-    }
-
-    return newData;
-  }
-
   // Filters data that is shown when the user presses a node on the tree
   presentData(name, data) {
     let toShowArr = [];
@@ -318,34 +280,6 @@ class DTree extends React.Component {
     });
   }
 
-  // Dynamically generates columns for data table based on data labels in state
-  generateColumns(dataLabels) {
-    let columnsToReturn = [];
-    let copiedLabels = [...dataLabels];
-    copiedLabels.push("Label");
-
-    for (let i = 0; i < copiedLabels.length; i++) {
-      const lastIndex = i;
-      const featureName = copiedLabels[i].toLowerCase();
-
-      let entry = {
-        Header: copiedLabels[i],
-        accessor: copiedLabels[i].toLowerCase(),
-        Cell: row => (
-          <div
-            onClick={() => this.handleEdit(row.index, featureName, lastIndex)}
-          >
-            {row.original[copiedLabels[i].toLowerCase()]}
-          </div>
-        )
-      };
-
-      columnsToReturn.push(entry);
-    }
-
-    return columnsToReturn;
-  }
-
   // Adds a row to the dataset, copy of first row
   addRow() {
     const newData = this.state.data[0];
@@ -490,8 +424,6 @@ class DTree extends React.Component {
       this.state == undefined
         ? this.defaultLabelClasses
         : this.state.labelClasses;
-    console.log(dataLabels);
-    console.log(labelClasses);
 
     for (let count = 0; count < 10; count++) {
       let entry = {};
@@ -510,9 +442,29 @@ class DTree extends React.Component {
     return dataState;
   }
 
+  changeDataRow(e, index, dataIndex) {
+    const data = this.state.data;
+    data[dataIndex][index] = e.target.value;
+    this.setState({
+      data: data
+    });
+  }
+
+  showSelectionForRow(value, index, dataIndex) {
+    const valueClasses = Object.values(this.state.labelClasses);
+    return (
+      <select
+        value={value}
+        onChange={e => this.changeDataRow(e, index, dataIndex)}
+      >
+        {valueClasses[index].map(entry => {
+          return <option value={entry}>{entry}</option>;
+        })}
+      </select>
+    );
+  }
+
   showCustomDataTable() {
-    console.log(this.state.data);
-    console.log(this.state.dataLabels);
     return (
       <Table>
         <thead>
@@ -524,11 +476,13 @@ class DTree extends React.Component {
           </tr>
         </thead>
         <tbody>
-          {this.state.data.map(dataRow => {
+          {this.state.data.map((dataRow, dataIndex) => {
             return (
               <tr>
-                {Object.values(dataRow).map(value => {
-                  return <td>{value}</td>;
+                {Object.values(dataRow).map((value, index) => {
+                  return (
+                    <td>{this.showSelectionForRow(value, index, dataIndex)}</td>
+                  );
                 })}
               </tr>
             );
