@@ -11,6 +11,13 @@ import Col from "react-bootstrap/Col";
 import FormControl from "react-bootstrap/FormControl";
 import InputGroup from "react-bootstrap/InputGroup";
 import ButtonToolbar from "react-bootstrap/ButtonToolbar";
+import {
+  determineBestSplit,
+  determineMostLikelyLabel,
+  getGiniMap,
+  filteredData,
+  calculateGiniValue
+} from "./algorithims/DTreeAlgo";
 import "../css_files/App.css";
 import "react-table/react-table.css";
 
@@ -64,7 +71,7 @@ class DTree extends React.Component {
       return currTree;
     }
 
-    let entropy = this.calculateGiniValue(data);
+    let entropy = calculateGiniValue(data);
 
     if (entropy === 0) {
       let dataClass = data[0].label;
@@ -73,19 +80,17 @@ class DTree extends React.Component {
     }
 
     let splitDict = {};
-    const bestSplit = this.determineBestSplit(dataLabels, data);
+    const bestSplit = determineBestSplit(dataLabels, data);
     const splitIndex = dataLabels.indexOf(bestSplit);
-    const classArr = this.getGiniMap(splitIndex, data, true);
+    const classArr = getGiniMap(splitIndex, data, true);
 
     for (const classVal in classArr) {
-      splitDict[classVal] = this.filteredData(classVal, splitIndex, data);
+      splitDict[classVal] = filteredData(classVal, splitIndex, data);
     }
 
     for (const classVal in splitDict) {
       let name =
-        classVal === "undefined"
-          ? this.determineMostLikelyLabel(data)
-          : classVal;
+        classVal === "undefined" ? determineMostLikelyLabel(data) : classVal;
       let newNode = {
         name: name,
         gProps: {
@@ -105,167 +110,6 @@ class DTree extends React.Component {
     }
 
     return currTree;
-  }
-
-  // For determing ties when a node has multiple labels in its dataset
-  determineMostLikelyLabel(data) {
-    let posLabelCount = 0;
-
-    for (let entry of data) {
-      posLabelCount += entry.label === 1 ? 1 : 0;
-    }
-
-    if (posLabelCount / data.length === 0.5) {
-      return "1/0";
-    }
-
-    return posLabelCount / data.length > 0.5 ? 1 : 0;
-  }
-
-  // Determines best split based on comparing gain ratios of all entries
-  determineBestSplit(dataLabels, data) {
-    let currentHighestGainLabel = "";
-    let currentHighestGain = 0.0;
-
-    for (let i = 0; i < dataLabels.length; i++) {
-      const currGain = this.calculateGainRatio(i, data);
-
-      if (currGain > currentHighestGain) {
-        currentHighestGain = currGain;
-        currentHighestGainLabel = dataLabels[i];
-      }
-    }
-    return currentHighestGainLabel;
-  }
-
-  // Refer to practice exam 1 decision tree for algorithim.
-
-  // Calculates gain ratio from splitting on feature
-  calculateGainRatio(feature, data) {
-    const gain = this.calculateGain(feature, data);
-    const splitInfo = this.calculateSplitInfo(feature, data);
-    return gain / splitInfo;
-  }
-
-  calculateSplitInfo(feature, data) {
-    const giniMap = this.getGiniMap(feature, data, false);
-    let totalSplit = 0.0;
-
-    for (const entry in giniMap) {
-      const fraction = giniMap[entry].totalNum / data.length;
-      totalSplit += -fraction * Math.log2(fraction);
-    }
-
-    return totalSplit;
-  }
-
-  // Calculates information gain from splitting on feature
-  calculateGain(feature, data) {
-    const overallEntropy = this.calculateGiniValue(data);
-    const splitValue = this.calculateSplitGini(feature, data);
-    return overallEntropy - splitValue;
-  }
-
-  // Based on the currently given dataset, calculate the positive and negative
-  // counts. Can be used to calculate overall entropy of dataset or gini
-  // of specific features
-  calculateGiniValue(data) {
-    const posNegCount = this.countPositiveAndNegative(data);
-    const posSquared = this.getSquaredNumber(posNegCount.pos, data.length);
-    const negSquared = this.getSquaredNumber(posNegCount.neg, data.length);
-
-    return 1 - posSquared - negSquared;
-  }
-
-  // Returns a number divided by total dataset length and squares it
-  getSquaredNumber(number, dataLength) {
-    const ratio = number / dataLength;
-    return ratio * ratio;
-  }
-
-  // Function that basically takes dataset, and creates one map that
-  // has all different classes for that feature, with class as a key,
-  // and the value is the total count of that class and the positive count
-  // The function then creates another map that has classes as keys and
-  // has the values as the calculated gini of that class and the total count
-  getGiniMap(feature, data, returnOnlyClassMap) {
-    let classMap = {};
-    let returnMap = {};
-
-    for (const entry of data) {
-      const currentFeature = entry[feature];
-      const positiveCount = entry.label;
-      if (classMap[currentFeature] == null) {
-        classMap[currentFeature] = { totalCount: 1, posCount: positiveCount };
-      } else {
-        const currentTotalCount = classMap[currentFeature].totalCount;
-        const currentPositiveCount = classMap[currentFeature].posCount;
-        classMap[currentFeature] = {
-          totalCount: currentTotalCount + 1,
-          posCount: currentPositiveCount + positiveCount
-        };
-      }
-    }
-
-    if (returnOnlyClassMap) {
-      return classMap;
-    }
-
-    for (const classVal in classMap) {
-      const mapEntry = {
-        giniValue: this.calculateGiniValue(
-          this.filteredData(classVal, feature, data)
-        ),
-        totalNum: classMap[classVal].totalCount
-      };
-      returnMap[classVal] = mapEntry;
-    }
-
-    return returnMap;
-  }
-
-  // Filters data so that a new dataset is created for only that class
-  // in a specific feature
-  filteredData(classVal, feature, data) {
-    let dataToReturn = [];
-
-    for (const entry of data) {
-      if (entry[feature] === classVal) {
-        dataToReturn.push(entry);
-      }
-    }
-
-    return dataToReturn;
-  }
-
-  // Calculates split gini for feature
-  calculateSplitGini(feature, data) {
-    const giniMap = this.getGiniMap(feature, data, false);
-    let totalSplit = 0.0;
-
-    for (let entry in giniMap) {
-      const fractionValue = giniMap[entry].totalNum / data.length;
-      totalSplit += fractionValue * giniMap[entry].giniValue;
-    }
-
-    return totalSplit;
-  }
-
-  // Counts number of negative and positive labels in a dataset
-  countPositiveAndNegative(data) {
-    let positiveCount = 0;
-    let negativeCount = 0;
-
-    for (let entry of data) {
-      const label = entry.label;
-      if (label === 1) {
-        positiveCount++;
-      } else {
-        negativeCount++;
-      }
-    }
-
-    return { pos: positiveCount, neg: negativeCount };
   }
 
   // Method that allows the tree to be show and initializes/resets its state
