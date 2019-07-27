@@ -464,9 +464,18 @@ class DTree extends React.Component {
     );
   }
 
+  deleteRow(dataIndex) {
+    const data = this.state.data.filter((row, index) => {
+      return index !== dataIndex;
+    });
+    this.setState({
+      data: data
+    });
+  }
+
   showCustomDataTable() {
     return (
-      <Table>
+      <Table size="sm">
         <thead>
           <tr>
             {this.state.dataLabels.map(feature => {
@@ -484,6 +493,7 @@ class DTree extends React.Component {
                     <td>{this.showSelectionForRow(value, index, dataIndex)}</td>
                   );
                 })}
+                <td onClick={() => this.deleteRow(dataIndex)}>Delete</td>
               </tr>
             );
           })}
