@@ -125,11 +125,13 @@ class DTree extends React.Component {
     for (let count = 0; count < 10; count++) {
       let entry = {};
       for (let i = 0; i < dataLabels.size; i++) {
-        let currentClassLabels = labelClasses.get(dataLabels.get(i));
-        let randomEntry = currentClassLabels.get(
-          Math.floor(Math.random() * currentClassLabels.size)
-        );
-        entry[i] = randomEntry;
+        if (dataLabels.get(i) !== "label") {
+          let currentClassLabels = labelClasses.get(dataLabels.get(i));
+          let randomEntry = currentClassLabels.get(
+            Math.floor(Math.random() * currentClassLabels.size)
+          );
+          entry[dataLabels.get(i)] = randomEntry;
+        }
       }
       entry["label"] = count % 2;
       dataState.push(entry);
@@ -138,24 +140,23 @@ class DTree extends React.Component {
     return dataState;
   }
 
-  changeDataRow(e, index, dataIndex) {
+  changeDataRow(e, key, dataIndex) {
     const data = this.state.data;
-    index = index === 3 ? "label" : index;
-    data[dataIndex][index] = e.target.value;
+    data[dataIndex][key] = e.target.value;
     this.setState({
       data: data
     });
   }
 
-  showSelectionForRow(value, index, dataIndex) {
-    const valueClasses = this.props.labelClasses.valueSeq().toArray();
+  showSelectionForRow(value, key, dataIndex) {
+    const valueClasses = this.props.labelClasses.get(key);
 
     return (
       <select
         value={value}
-        onChange={e => this.changeDataRow(e, index, dataIndex)}
+        onChange={e => this.changeDataRow(e, key, dataIndex)}
       >
-        {valueClasses[index].map(entry => {
+        {valueClasses.map(entry => {
           return <option value={entry}>{entry}</option>;
         })}
       </select>
@@ -172,6 +173,7 @@ class DTree extends React.Component {
   }
 
   showCustomDataTable() {
+    console.log(this.state.data);
     return (
       <Table size="sm">
         <thead>
@@ -186,9 +188,11 @@ class DTree extends React.Component {
           {this.state.data.map((dataRow, dataIndex) => {
             return (
               <tr>
-                {Object.values(dataRow).map((value, index) => {
+                {Object.keys(dataRow).map((key, index) => {
                   return (
-                    <td>{this.showSelectionForRow(value, index, dataIndex)}</td>
+                    <td>
+                      {this.showSelectionForRow(dataRow[key], key, dataIndex)}
+                    </td>
                   );
                 })}
                 <td onClick={() => this.deleteRow(dataIndex)}>Delete</td>

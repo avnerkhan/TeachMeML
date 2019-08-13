@@ -84,14 +84,13 @@ export function getGiniMap(feature, data, returnOnlyClassMap) {
   let returnMap = {};
 
   for (const entry of data) {
-    const currentFeature = entry[feature];
     const positiveCount = entry.label;
-    if (classMap[currentFeature] == null) {
-      classMap[currentFeature] = { totalCount: 1, posCount: positiveCount };
+    if (classMap[feature] == null) {
+      classMap[feature] = { totalCount: 1, posCount: positiveCount };
     } else {
-      const currentTotalCount = classMap[currentFeature].totalCount;
-      const currentPositiveCount = classMap[currentFeature].posCount;
-      classMap[currentFeature] = {
+      const currentTotalCount = classMap[feature].totalCount;
+      const currentPositiveCount = classMap[feature].posCount;
+      classMap[feature] = {
         totalCount: currentTotalCount + 1,
         posCount: currentPositiveCount + positiveCount
       };

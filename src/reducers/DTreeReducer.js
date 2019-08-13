@@ -16,11 +16,12 @@ export function DTreeReducer(prevState = initialDtreeState, action) {
 
   switch (action.type) {
     case types.ADD_DATA_CLASS:
-      let newEntry = newState.labelClasses.get(action.feature);
-      newEntry.push(action.modify);
+      let newEntry = newState.labelClasses
+        .get(action.feature)
+        .push(action.modify);
       newState.labelClasses = newState.labelClasses.set(
         action.feature,
-        newState.labelClasses.get(action.feature).push(action.modify)
+        newEntry
       );
       return newState;
     case types.DELETE_DATA_CLASS:
@@ -35,9 +36,10 @@ export function DTreeReducer(prevState = initialDtreeState, action) {
       return newState;
     case types.ADD_DATA_LABEL:
       newState.dataLabels = newState.dataLabels.push(action.feature);
-      newState.labelClasses = newState.labelClasses.set(action.feature, [
-        "Sample"
-      ]);
+      newState.labelClasses = newState.labelClasses.set(
+        action.feature,
+        List(["Sample"])
+      );
       return newState;
     case types.DELETE_DATA_LABEL:
       newState.dataLabels = newState.dataLabels.filter(
