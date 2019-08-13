@@ -18,12 +18,12 @@ export function determineBestSplit(dataLabels, data) {
   let currentHighestGainLabel = "";
   let currentHighestGain = 0.0;
 
-  for (let i = 0; i < dataLabels.length; i++) {
+  for (let i = 0; i < dataLabels.size; i++) {
     const currGain = calculateGainRatio(i, data);
 
     if (currGain > currentHighestGain) {
       currentHighestGain = currGain;
-      currentHighestGainLabel = dataLabels[i];
+      currentHighestGainLabel = dataLabels.get(i);
     }
   }
   return currentHighestGainLabel;

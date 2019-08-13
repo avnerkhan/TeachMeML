@@ -3,14 +3,9 @@ import React from "react";
 import Tree from "react-tree-graph";
 import Table from "react-bootstrap/Table";
 import Button from "react-bootstrap/Button";
-import Card from "react-bootstrap/Card";
-import ListGroup from "react-bootstrap/ListGroup";
-import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import FormControl from "react-bootstrap/FormControl";
-import InputGroup from "react-bootstrap/InputGroup";
 import ButtonToolbar from "react-bootstrap/ButtonToolbar";
+import EditDTree from "./edit/EditDTree";
 import {
   determineBestSplit,
   determineMostLikelyLabel,
@@ -20,18 +15,11 @@ import {
 } from "./algorithims/DTreeAlgo";
 import "../css_files/App.css";
 import "react-table/react-table.css";
+import { connect } from "react-redux";
 
 class DTree extends React.Component {
   constructor(props) {
     super(props);
-
-    this.defaultLabels = ["Passed", "GPA", "Language"];
-    this.defaultLabelClasses = {
-      passed: ["Yes", "No"],
-      gpa: ["4.0", "2.0"],
-      language: ["Python", "Java", "C++"],
-      label: [0, 1]
-    };
 
     // State contains data. features are categorical, and label is last
     // Feature keys are ints so they are easily indexable
@@ -40,10 +28,8 @@ class DTree extends React.Component {
       renderTree: false,
       renderTable: true,
       treeState: {},
-      dataLabels: this.defaultLabels,
       shownData: [],
-      data: this.generateRandomDataState(),
-      labelClasses: this.defaultLabelClasses
+      data: this.generateRandomDataState()
     };
   }
 
@@ -66,7 +52,7 @@ class DTree extends React.Component {
   }
 
   // Builds decision tree, with entropy as 0 as base case.
-  buildTree(dataLabels, data, currTree, maxDepth = null, currDepth = 0) {
+  buildTree(data, currTree, maxDepth = null, currDepth = 0) {
     if (maxDepth != null && currDepth >= maxDepth) {
       return currTree;
     }
@@ -80,8 +66,10 @@ class DTree extends React.Component {
     }
 
     let splitDict = {};
-    const bestSplit = determineBestSplit(dataLabels, data);
-    const splitIndex = dataLabels.indexOf(bestSplit);
+    const bestSplit = determineBestSplit(this.props.dataLabels, data);
+    const splitIndex = this.props.dataLabels.findIndex(entry => {
+      return entry === bestSplit;
+    });
     const classArr = getGiniMap(splitIndex, data, true);
 
     for (const classVal in classArr) {
@@ -99,13 +87,7 @@ class DTree extends React.Component {
         },
         children: []
       };
-      this.buildTree(
-        dataLabels,
-        splitDict[classVal],
-        newNode,
-        maxDepth,
-        currDepth + 1
-      );
+      this.buildTree(splitDict[classVal], newNode, maxDepth, currDepth + 1);
       currTree.children.push(newNode);
     }
 
@@ -116,7 +98,7 @@ class DTree extends React.Component {
   showTree() {
     this.setState({
       renderTree: true,
-      treeState: this.buildTree(this.state.dataLabels, this.state.data, {
+      treeState: this.buildTree(this.state.data, {
         name: "Start",
         gProps: { onMouseOver: () => this.setState({ showMode: false }) },
         children: []
@@ -135,148 +117,18 @@ class DTree extends React.Component {
     });
   }
 
-  // Either deletes a class from feature or adds one
-  changeClassFeatureState(modify, feature, isAdd) {
-    if (modify !== "") {
-      const featureLowerCase = feature.toLowerCase();
-      let copyArr = this.state.labelClasses[featureLowerCase];
-
-      if (isAdd) {
-        copyArr.push(modify);
-      } else {
-        copyArr.splice(copyArr.indexOf(modify), 1);
-      }
-      let copyDict = this.state.labelClasses;
-      copyDict[featureLowerCase] = copyArr;
-      this.setState({
-        labelClasses: copyDict
-      });
-    } else {
-      alert("Please enter valid class name");
-    }
-
-    this.refs[feature].value = "";
-  }
-
-  // Either adds a new feature or deletes a current one
-  changeFeatureState(feature, isAdd) {
-    if (feature !== "") {
-      let copyArr = this.state.dataLabels;
-      let copyClasses = this.state.labelClasses;
-      if (isAdd) {
-        copyArr.push(feature);
-        copyClasses[feature.toLowerCase()] = ["Sample"];
-      } else {
-        delete copyClasses[feature.toLowerCase()];
-        copyArr.splice(copyArr.indexOf(feature), 1);
-      }
-
-      this.setState({
-        dataLabels: copyArr,
-        labelClasses: copyClasses
-      });
-    } else {
-      alert("Please enter a valid feature name");
-    }
-
-    this.refs["newFeature"].value = "";
-  }
-
-  // Demonstrates current layout of table by dynamically generating JSX for state
-  showCurrentLayout() {
-    return (
-      <Container>
-        <Row>
-          {this.state.dataLabels.map(feature => {
-            return (
-              <Col>
-                <Card className="black-text" style={{ width: "32rem" }}>
-                  <Card.Header
-                    onClick={() => this.changeFeatureState(feature, false)}
-                  >
-                    {feature}
-                  </Card.Header>
-                  <ListGroup>
-                    {this.state.labelClasses[feature.toLowerCase()].map(
-                      className => {
-                        return (
-                          <ListGroup.Item
-                            onClick={() =>
-                              this.changeClassFeatureState(
-                                className,
-                                feature,
-                                false
-                              )
-                            }
-                          >
-                            {className}
-                          </ListGroup.Item>
-                        );
-                      }
-                    )}
-                    <InputGroup>
-                      <FormControl
-                        ref={feature}
-                        placeholder="Enter new class name"
-                      />
-                      <InputGroup.Append>
-                        <Button
-                          onClick={() =>
-                            this.changeClassFeatureState(
-                              this.refs[feature].value,
-                              feature,
-                              true
-                            )
-                          }
-                        >
-                          Add New Class
-                        </Button>
-                      </InputGroup.Append>
-                    </InputGroup>
-                  </ListGroup>
-                </Card>
-              </Col>
-            );
-          })}
-          <Col>
-            <InputGroup>
-              <FormControl
-                ref="newFeature"
-                placeholder="Enter new feature name"
-              />
-              <InputGroup.Append>
-                <Button
-                  onClick={() =>
-                    this.changeFeatureState(this.refs["newFeature"].value, true)
-                  }
-                >
-                  Add New Feature
-                </Button>
-              </InputGroup.Append>
-            </InputGroup>
-          </Col>
-        </Row>
-      </Container>
-    );
-  }
-
   generateRandomDataState() {
     let dataState = [];
-    let dataLabels =
-      this.state == undefined ? this.defaultLabels : this.state.dataLabels;
-    let labelClasses =
-      this.state == undefined
-        ? this.defaultLabelClasses
-        : this.state.labelClasses;
+    let dataLabels = this.props.dataLabels;
+    let labelClasses = this.props.labelClasses;
 
     for (let count = 0; count < 10; count++) {
       let entry = {};
-      for (let i = 0; i < dataLabels.length; i++) {
-        let currentClassLabels = labelClasses[dataLabels[i].toLowerCase()];
-        let randomEntry =
-          currentClassLabels[
-            Math.floor(Math.random() * currentClassLabels.length)
-          ];
+      for (let i = 0; i < dataLabels.size; i++) {
+        let currentClassLabels = labelClasses.get(dataLabels.get(i));
+        let randomEntry = currentClassLabels.get(
+          Math.floor(Math.random() * currentClassLabels.size)
+        );
         entry[i] = randomEntry;
       }
       entry["label"] = count % 2;
@@ -288,6 +140,7 @@ class DTree extends React.Component {
 
   changeDataRow(e, index, dataIndex) {
     const data = this.state.data;
+    index = index === 3 ? "label" : index;
     data[dataIndex][index] = e.target.value;
     this.setState({
       data: data
@@ -295,7 +148,8 @@ class DTree extends React.Component {
   }
 
   showSelectionForRow(value, index, dataIndex) {
-    const valueClasses = Object.values(this.state.labelClasses);
+    const valueClasses = this.props.labelClasses.valueSeq().toArray();
+
     return (
       <select
         value={value}
@@ -322,7 +176,7 @@ class DTree extends React.Component {
       <Table size="sm">
         <thead>
           <tr>
-            {this.state.dataLabels.map(feature => {
+            {this.props.dataLabels.map(feature => {
               return <th>{feature}</th>;
             })}
             <th>Label</th>
@@ -367,9 +221,11 @@ class DTree extends React.Component {
                 svgProps={{ className: "custom" }}
               />
             ) : null}
-            {this.state.renderTable
-              ? this.showCustomDataTable()
-              : this.showCurrentLayout()}
+            {this.state.renderTable ? (
+              this.showCustomDataTable()
+            ) : (
+              <EditDTree />
+            )}
           </Row>
           <ButtonToolbar>
             {this.state.renderTree || !this.state.renderTable ? null : (
@@ -404,5 +260,9 @@ class DTree extends React.Component {
     );
   }
 }
+const mapStateToProps = state => ({
+  dataLabels: state.DTree.dataLabels,
+  labelClasses: state.DTree.labelClasses
+});
 
-export default DTree;
+export default connect(mapStateToProps)(DTree);

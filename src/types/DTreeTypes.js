@@ -1,0 +1,4 @@
+export const ADD_DATA_LABEL = "ADD_DATA_LABEL";
+export const ADD_DATA_CLASS = "ADD_DATA_CLASS";
+export const DELETE_DATA_LABEL = "DELETE_DATA_LABEL";
+export const DELETE_DATA_CLASS = "DELETE_DATA_CLASS";
