@@ -28,7 +28,6 @@ class EditDTree extends React.Component {
       <Container>
         <Row>
           {this.props.dataLabels.map(feature => {
-            console.log(this.props.labelClasses.get(feature));
             return (
               <Col>
                 <Card className="black-text" style={{ width: "32rem" }}>

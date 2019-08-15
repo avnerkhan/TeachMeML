@@ -19,7 +19,7 @@ export function determineBestSplit(dataLabels, data) {
   let currentHighestGain = 0.0;
 
   for (let i = 0; i < dataLabels.size; i++) {
-    const currGain = calculateGainRatio(i, data);
+    const currGain = calculateGainRatio(dataLabels.get(i), data);
 
     if (currGain > currentHighestGain) {
       currentHighestGain = currGain;
@@ -33,8 +33,10 @@ export function determineBestSplit(dataLabels, data) {
 
 // Calculates gain ratio from splitting on feature
 function calculateGainRatio(feature, data) {
+  // Problem in one of these two functions
   const gain = calculateGain(feature, data);
   const splitInfo = calculateSplitInfo(feature, data);
+  if (splitInfo === 0) return 0;
   return gain / splitInfo;
 }
 
@@ -70,6 +72,7 @@ export function calculateGiniValue(data) {
 
 // Returns a number divided by total dataset length and squares it
 function getSquaredNumber(number, dataLength) {
+  if (dataLength === 0) return 0;
   const ratio = number / dataLength;
   return ratio * ratio;
 }
@@ -85,17 +88,21 @@ export function getGiniMap(feature, data, returnOnlyClassMap) {
 
   for (const entry of data) {
     const positiveCount = entry.label;
-    if (classMap[feature] == null) {
-      classMap[feature] = { totalCount: 1, posCount: positiveCount };
+    const currentFeature = entry[feature];
+    // Problem Somewhere here
+    if (classMap[currentFeature] == null) {
+      classMap[currentFeature] = { totalCount: 1, posCount: positiveCount };
     } else {
-      const currentTotalCount = classMap[feature].totalCount;
-      const currentPositiveCount = classMap[feature].posCount;
-      classMap[feature] = {
+      const currentTotalCount = classMap[currentFeature].totalCount;
+      const currentPositiveCount = classMap[currentFeature].posCount;
+      classMap[currentFeature] = {
         totalCount: currentTotalCount + 1,
         posCount: currentPositiveCount + positiveCount
       };
     }
   }
+
+  //console.log(classMap);
 
   if (returnOnlyClassMap) {
     return classMap;
@@ -108,6 +115,8 @@ export function getGiniMap(feature, data, returnOnlyClassMap) {
     };
     returnMap[classVal] = mapEntry;
   }
+
+  console.log(returnMap);
 
   return returnMap;
 }

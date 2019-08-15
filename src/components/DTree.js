@@ -66,14 +66,12 @@ class DTree extends React.Component {
     }
 
     let splitDict = {};
+    // Problem is happening here somewhere
     const bestSplit = determineBestSplit(this.props.dataLabels, data);
-    const splitIndex = this.props.dataLabels.findIndex(entry => {
-      return entry === bestSplit;
-    });
-    const classArr = getGiniMap(splitIndex, data, true);
+    const classArr = getGiniMap(bestSplit, data, true);
 
     for (const classVal in classArr) {
-      splitDict[classVal] = filteredData(classVal, splitIndex, data);
+      splitDict[classVal] = filteredData(classVal, bestSplit, data);
     }
 
     for (const classVal in splitDict) {
@@ -173,7 +171,6 @@ class DTree extends React.Component {
   }
 
   showCustomDataTable() {
-    console.log(this.state.data);
     return (
       <Table size="sm">
         <thead>

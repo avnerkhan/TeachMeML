@@ -237,7 +237,6 @@ class Apriori extends React.Component {
   displayFrequentItemsets() {
     let frequentSets = this.state.frequentItemSet;
 
-    console.log(frequentSets);
     return (
       <Row>
         {frequentSets.map((frequentKSet, index) => {
