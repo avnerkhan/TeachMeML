@@ -14,6 +14,7 @@ import ButtonToolbar from "react-bootstrap/ButtonToolbar";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import { euclidFunction, comparator, arrayRange } from "../Utility";
+import { Link } from "react-router-dom";
 import "../css_files/App.css";
 
 class Clustering extends React.Component {
@@ -427,6 +428,9 @@ class Clustering extends React.Component {
             {this.state.runningDBScan ? this.showDBScanSelection() : null}
           </Row>
           <ButtonToolbar>
+            <Link to="/">
+              <Button>Back</Button>
+            </Link>
             {this.state.readyToStartState ? (
               <Button onClick={() => this.startRespectiveAlgorithim()}>
                 Start Algorithim

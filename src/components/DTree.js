@@ -4,6 +4,7 @@ import Tree from "react-tree-graph";
 import Table from "react-bootstrap/Table";
 import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
 import ButtonToolbar from "react-bootstrap/ButtonToolbar";
 import EditDTree from "./edit/EditDTree";
 import {
@@ -16,6 +17,7 @@ import {
 import "../css_files/App.css";
 import "react-table/react-table.css";
 import { connect } from "react-redux";
+import { Link } from "react-router-dom";
 
 class DTree extends React.Component {
   constructor(props) {
@@ -28,26 +30,14 @@ class DTree extends React.Component {
       renderTree: false,
       renderTable: true,
       treeState: {},
-      shownData: [],
-      data: this.generateRandomDataState()
+      data: this.generateRandomDataState(),
+      shownData: []
     };
   }
 
-  // Filters data that is shown when the user presses a node on the tree
-  presentData(name, data) {
-    let toShowArr = [];
-
-    for (let entry of data) {
-      for (let key in entry) {
-        if (entry[key] === name) {
-          toShowArr.push(entry);
-        }
-      }
-    }
-
+  presentData(shownData) {
     this.setState({
-      shownData: toShowArr,
-      showMode: true
+      shownData: shownData
     });
   }
 
@@ -66,7 +56,7 @@ class DTree extends React.Component {
     }
 
     let splitDict = {};
-    // Problem is happening here somewhere
+
     const bestSplit = determineBestSplit(this.props.dataLabels, data);
     const classArr = getGiniMap(bestSplit, data, true);
 
@@ -81,7 +71,7 @@ class DTree extends React.Component {
         name: name,
         gProps: {
           className: "custom",
-          onMouseOver: () => this.presentData(name, data)
+          onClick: () => this.presentData(splitDict[classVal])
         },
         children: []
       };
@@ -170,7 +160,8 @@ class DTree extends React.Component {
     });
   }
 
-  showCustomDataTable() {
+  showCustomDataTable(showNormalMode = true) {
+    const tableToShow = showNormalMode ? this.state.data : this.state.shownData;
     return (
       <Table size="sm">
         <thead>
@@ -182,17 +173,21 @@ class DTree extends React.Component {
           </tr>
         </thead>
         <tbody>
-          {this.state.data.map((dataRow, dataIndex) => {
+          {tableToShow.map((dataRow, dataIndex) => {
             return (
               <tr>
                 {Object.keys(dataRow).map((key, index) => {
                   return (
                     <td>
-                      {this.showSelectionForRow(dataRow[key], key, dataIndex)}
+                      {showNormalMode
+                        ? this.showSelectionForRow(dataRow[key], key, dataIndex)
+                        : dataRow[key]}
                     </td>
                   );
                 })}
-                <td onClick={() => this.deleteRow(dataIndex)}>Delete</td>
+                {showNormalMode ? (
+                  <td onClick={() => this.deleteRow(dataIndex)}>Delete</td>
+                ) : null}
               </tr>
             );
           })}
@@ -215,12 +210,17 @@ class DTree extends React.Component {
         <div className="App-header">
           <Row>
             {this.state.renderTree ? (
-              <Tree
-                height={400}
-                width={800}
-                data={this.state.treeState}
-                svgProps={{ className: "custom" }}
-              />
+              <Row>
+                <Col>
+                  <Tree
+                    height={400}
+                    width={700}
+                    data={this.state.treeState}
+                    svgProps={{ className: "custom" }}
+                  />
+                </Col>
+                <Col>{this.showCustomDataTable(false)}</Col>
+              </Row>
             ) : null}
             {this.state.renderTable ? (
               this.showCustomDataTable()
@@ -229,6 +229,9 @@ class DTree extends React.Component {
             )}
           </Row>
           <ButtonToolbar>
+            <Link to="/">
+              <Button>Back</Button>
+            </Link>
             {this.state.renderTree || !this.state.renderTable ? null : (
               <Button onClick={() => this.showTree()}>Display</Button>
             )}

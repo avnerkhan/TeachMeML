@@ -8,6 +8,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import { arrayRange } from "../Utility";
+import { Link } from "react-router-dom";
 import "../css_files/App.css";
 import "react-table/react-table.css";
 
@@ -438,6 +439,9 @@ class Apriori extends React.Component {
           ) : null}
           {this.state != undefined ? this.displayTransactionTable() : null}
           <Row>
+            <Link to="/">
+              <Button>Back</Button>
+            </Link>
             <Button onClick={() => this.runFPTreeAlgorithim()}>
               Run FP Tree Algorithim
             </Button>

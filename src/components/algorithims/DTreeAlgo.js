@@ -102,8 +102,6 @@ export function getGiniMap(feature, data, returnOnlyClassMap) {
     }
   }
 
-  //console.log(classMap);
-
   if (returnOnlyClassMap) {
     return classMap;
   }
@@ -115,8 +113,6 @@ export function getGiniMap(feature, data, returnOnlyClassMap) {
     };
     returnMap[classVal] = mapEntry;
   }
-
-  console.log(returnMap);
 
   return returnMap;
 }

@@ -14,6 +14,7 @@ import InputGroup from "react-bootstrap/InputGroup";
 import Form from "react-bootstrap/Form";
 import { euclidFunction, comparator, arrayRange } from "../Utility";
 import "../css_files/App.css";
+import { Link } from "react-router-dom";
 
 class KNN extends React.Component {
   constructor(props) {
@@ -216,6 +217,9 @@ class KNN extends React.Component {
             />
           </XYPlot>
           <ButtonToolbar>
+            <Link to="/">
+              <Button>Back</Button>
+            </Link>
             <Button onClick={() => this.randomizeData()}>
               Generate Random Data
             </Button>
