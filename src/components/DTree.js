@@ -31,13 +31,21 @@ class DTree extends React.Component {
       renderTable: true,
       treeState: {},
       data: this.generateRandomDataState(),
+      currentHighlight: null,
       shownData: []
     };
   }
 
-  presentData(shownData) {
+  determineClassLabel(classVal) {
+    for (const key of this.props.labelClasses.keySeq()) {
+      if (this.props.labelClasses.get(key).contains(classVal)) return key;
+    }
+  }
+
+  presentData(shownData, classVal) {
     this.setState({
-      shownData: shownData
+      shownData: shownData,
+      currentHighlight: this.determineClassLabel(classVal)
     });
   }
 
@@ -71,7 +79,7 @@ class DTree extends React.Component {
         name: name,
         gProps: {
           className: "custom",
-          onClick: () => this.presentData(splitDict[classVal])
+          onClick: () => this.presentData(splitDict[classVal], classVal)
         },
         children: []
       };
@@ -161,7 +169,10 @@ class DTree extends React.Component {
   }
 
   showCustomDataTable(showNormalMode = true) {
+    console.log(this.state.treeState);
     const tableToShow = showNormalMode ? this.state.data : this.state.shownData;
+    const shownHighlights = this.state.currentHighlight;
+    console.log(shownHighlights);
     return (
       <Table size="sm">
         <thead>
@@ -177,8 +188,16 @@ class DTree extends React.Component {
             return (
               <tr>
                 {Object.keys(dataRow).map((key, index) => {
+                  console.log(this.props.dataLabels.get(index));
                   return (
-                    <td>
+                    <td
+                      bgcolor={
+                        !showNormalMode &&
+                        this.props.dataLabels.get(index) === shownHighlights
+                          ? "#FFFF00"
+                          : ""
+                      }
+                    >
                       {showNormalMode
                         ? this.showSelectionForRow(dataRow[key], key, dataIndex)
                         : dataRow[key]}

@@ -246,6 +246,7 @@ class Clustering extends React.Component {
   runDBScan() {
     let unlabeled = this.state.unlabeledData;
     let clusters = 0;
+    console.log("RUNNING DB");
 
     for (let point of unlabeled) {
       if (point.label == undefined) {
@@ -330,9 +331,10 @@ class Clustering extends React.Component {
 
   // Checks which algorithim to start, based on selection
   startRespectiveAlgorithim() {
-    if (this.state.algorithim === this.stateEnum.KMEANS)
+    if (this.state.algorithim == this.stateEnum.KMEANS)
       this.setState({ choosingCentroidState: true, readyToStartState: false });
-    if (this.state.algorithim === this.stateEnum.DBSCAN) {
+    if (this.state.algorithim == this.stateEnum.DBSCAN) {
+      console.log("GOT HERE");
       this.runDBScan();
       this.setState({ runningDBScan: true, readyToStartState: false });
     }
