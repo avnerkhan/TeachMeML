@@ -1,11 +1,14 @@
 /* eslint-disable */
 import React from "react";
 import Tree from "react-tree-graph";
-import Table from "react-bootstrap/Table";
-import Button from "react-bootstrap/Button";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import ButtonToolbar from "react-bootstrap/ButtonToolbar";
+import Shuffle from "../Images/shuffle.png";
+import Edit from "../Images/edit.png";
+import Icon from "../Images/icon.png";
+import Save from "../Images/save.png";
+import Back from "../Images/back.png";
+import Add from "../Images/add.png";
+import Trash from "../Images/trash.png";
+import { Image, Navbar, Nav, Table, Row, Col } from "react-bootstrap";
 import EditDTree from "./edit/EditDTree";
 import {
   determineBestSplit,
@@ -18,6 +21,7 @@ import "../css_files/App.css";
 import "react-table/react-table.css";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
+import { displayInfoButton } from "../Utility";
 
 class DTree extends React.Component {
   constructor(props) {
@@ -32,7 +36,9 @@ class DTree extends React.Component {
       treeState: {},
       data: this.generateRandomDataState(),
       currentHighlight: null,
-      shownData: []
+      shownData: [],
+      shownEntropy: 0.0,
+      shownGain: 0.0
     };
   }
 
@@ -42,10 +48,12 @@ class DTree extends React.Component {
     }
   }
 
-  presentData(shownData, classVal) {
+  presentData(shownData, classVal, entropy, highestGainInfo) {
     this.setState({
       shownData: shownData,
-      currentHighlight: this.determineClassLabel(classVal)
+      currentHighlight: this.determineClassLabel(classVal),
+      shownEntropy: entropy,
+      shownGain: highestGainInfo
     });
   }
 
@@ -65,7 +73,9 @@ class DTree extends React.Component {
 
     let splitDict = {};
 
-    const bestSplit = determineBestSplit(this.props.dataLabels, data);
+    const information = determineBestSplit(this.props.dataLabels, data);
+    const bestSplit = information.currentHighestGainLabel;
+    const gainAmount = information.currentHighestGain;
     const classArr = getGiniMap(bestSplit, data, true);
 
     for (const classVal in classArr) {
@@ -79,7 +89,8 @@ class DTree extends React.Component {
         name: name,
         gProps: {
           className: "custom",
-          onClick: () => this.presentData(splitDict[classVal], classVal)
+          onClick: () =>
+            this.presentData(splitDict[classVal], classVal, entropy, gainAmount)
         },
         children: []
       };
@@ -169,10 +180,9 @@ class DTree extends React.Component {
   }
 
   showCustomDataTable(showNormalMode = true) {
-    console.log(this.state.treeState);
     const tableToShow = showNormalMode ? this.state.data : this.state.shownData;
     const shownHighlights = this.state.currentHighlight;
-    console.log(shownHighlights);
+
     return (
       <Table size="sm">
         <thead>
@@ -188,7 +198,6 @@ class DTree extends React.Component {
             return (
               <tr>
                 {Object.keys(dataRow).map((key, index) => {
-                  console.log(this.props.dataLabels.get(index));
                   return (
                     <td
                       bgcolor={
@@ -205,7 +214,9 @@ class DTree extends React.Component {
                   );
                 })}
                 {showNormalMode ? (
-                  <td onClick={() => this.deleteRow(dataIndex)}>Delete</td>
+                  <td onClick={() => this.deleteRow(dataIndex)}>
+                    <Image src={Trash} style={{ width: 40 }} />
+                  </td>
                 ) : null}
               </tr>
             );
@@ -223,61 +234,132 @@ class DTree extends React.Component {
     });
   }
 
+  displayTreeInformation() {
+    console.log(displayInfoButton("yeet", "yeet", "right"));
+    return this.state.renderTree ? (
+      <Row>
+        <Col>
+          {displayInfoButton("yeet", "yeet", "right")}
+          <Tree
+            height={400}
+            width={700}
+            data={this.state.treeState}
+            svgProps={{ className: "custom" }}
+          />
+        </Col>
+        <Col>
+          <Image src={Icon} style={{ width: 20 }} />
+        </Col>
+        <Col>{this.showCustomDataTable(false)}</Col>
+        <Col>
+          <Row>Entropy: {this.state.shownEntropy}</Row>
+          <Row>Gain: {this.state.shownGain}</Row>
+        </Col>
+      </Row>
+    ) : null;
+  }
+
+  displayEditTableInformation() {
+    return this.state.renderTable ? (
+      !this.state.renderTree ? (
+        this.showCustomDataTable()
+      ) : null
+    ) : (
+      <EditDTree />
+    );
+  }
+
+  showDisplayButton() {
+    return this.state.renderTree || !this.state.renderTable ? null : (
+      <Nav.Link onClick={() => this.showTree()}>Generate Tree</Nav.Link>
+    );
+  }
+
+  showAddRowButton() {
+    return this.state.renderTable && !this.state.renderTree ? (
+      <Nav.Link onClick={() => this.addRow()}>
+        <Image src={Add} style={{ width: 40 }} />
+      </Nav.Link>
+    ) : null;
+  }
+
+  showRandomizeDataButton() {
+    return this.state.renderTable && !this.state.renderTree ? (
+      <Nav.Link
+        onClick={() => this.setState({ data: this.generateRandomDataState() })}
+      >
+        <Image src={Shuffle} style={{ width: 40 }} />
+      </Nav.Link>
+    ) : null;
+  }
+
+  showRenderTableButton() {
+    return this.state.renderTable ? (
+      <Nav.Link
+        onClick={() => this.setState({ renderTree: false, renderTable: false })}
+      >
+        <Image src={Edit} style={{ width: 40 }} />
+      </Nav.Link>
+    ) : (
+      <Nav.Link onClick={() => this.saveEditState()}>
+        <Image src={Save} style={{ width: 40 }} />
+      </Nav.Link>
+    );
+  }
+
+  showBackToDataButton() {
+    return this.state.renderTree || !this.state.renderTable ? (
+      <Nav.Link
+        onClick={() => this.setState({ renderTree: false, renderTable: true })}
+      >
+        <Image src={Back} style={{ width: 40 }} />
+      </Nav.Link>
+    ) : null;
+  }
+
+  showBackToAlgorithimPage() {
+    return this.state.renderTable && !this.state.renderTree ? (
+      <Link to="/">
+        <Nav>
+          <Image src={Back} style={{ width: 40 }} />
+        </Nav>
+      </Link>
+    ) : null;
+  }
+
+  showDecisionTreeNavBar() {
+    return (
+      <Navbar fixed="top" bg="dark" variant="dark">
+        {this.showBackToAlgorithimPage()}
+        {this.showBackToDataButton()}
+        {this.showDisplayButton()}
+        {this.showAddRowButton()}
+        {this.showRandomizeDataButton()}
+        {this.showRenderTableButton()}
+      </Navbar>
+    );
+  }
+
+  showInformationBar() {
+    return this.state.renderTable && !this.state.renderTree ? (
+      <Col>
+        <Image src={Icon} style={{ width: 20 }} />
+      </Col>
+    ) : null;
+  }
+
   render() {
     return (
       <div className="App">
         <div className="App-header">
+          {this.showDecisionTreeNavBar()}
           <Row>
-            {this.state.renderTree ? (
-              <Row>
-                <Col>
-                  <Tree
-                    height={400}
-                    width={700}
-                    data={this.state.treeState}
-                    svgProps={{ className: "custom" }}
-                  />
-                </Col>
-                <Col>{this.showCustomDataTable(false)}</Col>
-              </Row>
-            ) : null}
-            {this.state.renderTable ? (
-              this.showCustomDataTable()
-            ) : (
-              <EditDTree />
-            )}
+            {this.showInformationBar()}
+            <Col>
+              {this.displayTreeInformation()}
+              {this.displayEditTableInformation()}
+            </Col>
           </Row>
-          <ButtonToolbar>
-            <Link to="/">
-              <Button>Back</Button>
-            </Link>
-            {this.state.renderTree || !this.state.renderTable ? null : (
-              <Button onClick={() => this.showTree()}>Display</Button>
-            )}
-            {this.state.renderTable && !this.state.renderTree ? (
-              <Button onClick={() => this.addRow()}>Add Row</Button>
-            ) : null}
-            {this.state.renderTable && !this.state.renderTree ? (
-              <Button
-                onClick={() =>
-                  this.setState({ data: this.generateRandomDataState() })
-                }
-              >
-                Randomize Data
-              </Button>
-            ) : null}
-            {this.state.renderTable ? (
-              <Button
-                onClick={() =>
-                  this.setState({ renderTree: false, renderTable: false })
-                }
-              >
-                Edit Table Layout
-              </Button>
-            ) : (
-              <Button onClick={() => this.saveEditState()}>Save State</Button>
-            )}
-          </ButtonToolbar>
         </div>
       </div>
     );

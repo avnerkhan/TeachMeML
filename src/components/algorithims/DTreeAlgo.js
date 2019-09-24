@@ -26,7 +26,7 @@ export function determineBestSplit(dataLabels, data) {
       currentHighestGainLabel = dataLabels.get(i);
     }
   }
-  return currentHighestGainLabel;
+  return { currentHighestGainLabel, currentHighestGain };
 }
 
 // Refer to practice exam 1 decision tree for algorithim.

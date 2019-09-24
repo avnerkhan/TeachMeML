@@ -1,3 +1,7 @@
+import React from "react";
+import { Popover, OverlayTrigger, Image } from "react-bootstrap";
+import Icon from "./Images/icon.png";
+
 // Euclidean distance function that returns orginal point and distance
 export function euclidFunction(pointOne, pointTwo) {
   let xDistance = pointOne.x - pointTwo.x;
@@ -22,4 +26,25 @@ export function comparator(entryOne, entryTwo) {
 
 export function arrayRange(lowerBound, upperBound) {
   return Array.from(new Array(upperBound), (x, i) => i + lowerBound);
+}
+
+function showInformationSlide(title, text) {
+  return (
+    <Popover id="popover-basic">
+      <h3 as="h3">{title}</h3>
+      <div>{text}</div>
+    </Popover>
+  );
+}
+
+export function displayInfoButton(title, text, placement) {
+  return (
+    <OverlayTrigger
+      trigger="click"
+      placement={placement}
+      overlay={showInformationSlide(title, text)}
+    >
+      <Image src={Icon} style={{ width: 20 }} />
+    </OverlayTrigger>
+  );
 }
