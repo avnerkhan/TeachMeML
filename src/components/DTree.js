@@ -235,11 +235,14 @@ class DTree extends React.Component {
   }
 
   displayTreeInformation() {
-    console.log(displayInfoButton("yeet", "yeet", "right"));
     return this.state.renderTree ? (
       <Row>
         <Col>
-          {displayInfoButton("yeet", "yeet", "right")}
+          {displayInfoButton(
+            "Decision Tree",
+            "This is the Decision Tree generated from the previous data, when you press a node, the column that this data splitted on is highlighted, as well the data that was split on that node.",
+            "right"
+          )}
           <Tree
             height={400}
             width={700}
@@ -248,7 +251,11 @@ class DTree extends React.Component {
           />
         </Col>
         <Col>
-          <Image src={Icon} style={{ width: 20 }} />
+          {displayInfoButton(
+            "Data Split Table",
+            "When you press a node, the column that this data splitted on is highlighted, as well the data that was split on that node.",
+            "left"
+          )}
         </Col>
         <Col>{this.showCustomDataTable(false)}</Col>
         <Col>
@@ -343,7 +350,11 @@ class DTree extends React.Component {
   showInformationBar() {
     return this.state.renderTable && !this.state.renderTree ? (
       <Col>
-        <Image src={Icon} style={{ width: 20 }} />
+        {displayInfoButton(
+          "Data Info Table",
+          "This data is the data we use to generate our decision tree. You can change the values on each column on each row, delete rows with the trashcan, randomize data with the shuffle button.",
+          "left"
+        )}
       </Col>
     ) : null;
   }
