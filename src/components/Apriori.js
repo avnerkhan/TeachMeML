@@ -13,6 +13,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import { arrayRange } from "../Utility";
+import { showBackToAlgorithimPage } from "../Utility";
 import { Link } from "react-router-dom";
 import "../css_files/App.css";
 import "react-table/react-table.css";
@@ -446,20 +447,10 @@ class Apriori extends React.Component {
     ) : null;
   }
 
-  showBackToAlgorithimPage() {
-    return (
-      <Link to="/">
-        <Nav>
-          <Image src={Back} style={{ width: 40 }} />
-        </Nav>
-      </Link>
-    );
-  }
-
   showAprioriNavBar() {
     return (
       <Navbar fixed="top" bg="dark" variant="dark">
-        {this.showBackToAlgorithimPage()}
+        {showBackToAlgorithimPage()}
         {this.showStartAlgorithimBar()}
         {this.showRunNextIterationBar()}
         {this.showMinSupSelection()}

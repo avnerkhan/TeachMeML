@@ -9,7 +9,7 @@ import {
   HorizontalGridLines,
   MarkSeries
 } from "react-vis";
-import Back from "../Images/back.png";
+import { showBackToAlgorithimPage } from "../Utility";
 import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 import Image from "react-bootstrap/Image";
@@ -20,7 +20,6 @@ import Forward from "../Images/forward.png";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import { euclidFunction, comparator, arrayRange } from "../Utility";
-import { Link } from "react-router-dom";
 import "../css_files/App.css";
 
 class Clustering extends React.Component {
@@ -388,16 +387,6 @@ class Clustering extends React.Component {
     return this.state.runningDBScan ? this.showDBScanSelection() : null;
   }
 
-  showBackToAlgorithimPage() {
-    return (
-      <Link to="/">
-        <Nav>
-          <Image src={Back} style={{ width: 40 }} />
-        </Nav>
-      </Link>
-    );
-  }
-
   showStartAlgorithimBar() {
     return this.state.readyToStartState ? (
       <Nav.Link onClick={() => this.startRespectiveAlgorithim()}>
@@ -449,7 +438,7 @@ class Clustering extends React.Component {
   showClusteringNavBar() {
     return (
       <Navbar fixed="top" bg="dark" variant="dark">
-        {this.showBackToAlgorithimPage()}
+        {showBackToAlgorithimPage()}
         {this.showStartAlgorithimBar()}
         {this.showStartChoosingCentroidBar()}
         {this.showRunNextIterationBar()}

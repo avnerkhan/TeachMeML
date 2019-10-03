@@ -7,7 +7,6 @@ import {
   HorizontalGridLines,
   MarkSeries
 } from "react-vis";
-import Back from "../Images/back.png";
 import Image from "react-bootstrap/Image";
 import Navbar from "react-bootstrap/Navbar";
 import Shuffle from "../Images/shuffle.png";
@@ -18,7 +17,7 @@ import InputGroup from "react-bootstrap/InputGroup";
 import Form from "react-bootstrap/Form";
 import { euclidFunction, comparator, arrayRange } from "../Utility";
 import "../css_files/App.css";
-import { Link } from "react-router-dom";
+import { showBackToAlgorithimPage } from "../Utility";
 
 class KNN extends React.Component {
   constructor(props) {
@@ -177,16 +176,6 @@ class KNN extends React.Component {
     });
   }
 
-  showBackToAlgorithimPage() {
-    return (
-      <Link to="/">
-        <Nav>
-          <Image src={Back} style={{ width: 40 }} />
-        </Nav>
-      </Link>
-    );
-  }
-
   showRandomizeUndeterminedDataButton() {
     return this.state.positiveData.length > 0 ? (
       <Nav.Link onClick={() => this.generateRandomUndetermined()}>
@@ -226,7 +215,7 @@ class KNN extends React.Component {
   showKNNNavBar() {
     return (
       <Navbar fixed="top" bg="dark" variant="dark">
-        {this.showBackToAlgorithimPage()}
+        {showBackToAlgorithimPage()}
         {this.showAddButton()}
         {this.showRandomizeUndeterminedDataButton()}
         {this.showRandomizeDataButton()}

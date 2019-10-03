@@ -1,5 +1,7 @@
 import React from "react";
-import { Popover, OverlayTrigger, Image } from "react-bootstrap";
+import { Popover, OverlayTrigger, Image, Nav } from "react-bootstrap";
+import { Link } from "react-router-dom";
+import Back from "./Images/back.png";
 import Icon from "./Images/icon.png";
 
 // Euclidean distance function that returns orginal point and distance
@@ -46,5 +48,15 @@ export function displayInfoButton(title, text, placement) {
     >
       <Image src={Icon} style={{ width: 20 }} />
     </OverlayTrigger>
+  );
+}
+
+export function showBackToAlgorithimPage() {
+  return (
+    <Link to="/">
+      <Nav>
+        <Image src={Back} style={{ width: 40 }} />
+      </Nav>
+    </Link>
   );
 }

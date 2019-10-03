@@ -4,7 +4,6 @@ import Tree from "react-tree-graph";
 import Shuffle from "../Images/shuffle.png";
 import Edit from "../Images/edit.png";
 import Save from "../Images/save.png";
-import Back from "../Images/back.png";
 import Add from "../Images/add.png";
 import Trash from "../Images/trash.png";
 import { Image, Navbar, Nav, Table, Row, Col } from "react-bootstrap";
@@ -19,8 +18,7 @@ import {
 import "../css_files/App.css";
 import "react-table/react-table.css";
 import { connect } from "react-redux";
-import { Link } from "react-router-dom";
-import { displayInfoButton } from "../Utility";
+import { displayInfoButton, showBackToAlgorithimPage } from "../Utility";
 
 class DTree extends React.Component {
   constructor(props) {
@@ -323,20 +321,16 @@ class DTree extends React.Component {
     ) : null;
   }
 
-  showBackToAlgorithimPage() {
-    return this.state.renderTable && !this.state.renderTree ? (
-      <Link to="/">
-        <Nav>
-          <Image src={Back} style={{ width: 40 }} />
-        </Nav>
-      </Link>
-    ) : null;
+  showBackToAlgorithimPageCustom() {
+    return this.state.renderTable && !this.state.renderTree
+      ? showBackToAlgorithimPage()
+      : null;
   }
 
   showDecisionTreeNavBar() {
     return (
       <Navbar fixed="top" bg="dark" variant="dark">
-        {this.showBackToAlgorithimPage()}
+        {this.showBackToAlgorithimPageCustom()}
         {this.showBackToDataButton()}
         {this.showDisplayButton()}
         {this.showAddRowButton()}
