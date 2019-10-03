@@ -3,7 +3,6 @@ import React from "react";
 import Tree from "react-tree-graph";
 import Shuffle from "../Images/shuffle.png";
 import Edit from "../Images/edit.png";
-import Icon from "../Images/icon.png";
 import Save from "../Images/save.png";
 import Back from "../Images/back.png";
 import Add from "../Images/add.png";

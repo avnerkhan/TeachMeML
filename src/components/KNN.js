@@ -7,8 +7,12 @@ import {
   HorizontalGridLines,
   MarkSeries
 } from "react-vis";
-import Button from "react-bootstrap/Button";
-import ButtonToolbar from "react-bootstrap/ButtonToolbar";
+import Back from "../Images/back.png";
+import Image from "react-bootstrap/Image";
+import Navbar from "react-bootstrap/Navbar";
+import Shuffle from "../Images/shuffle.png";
+import Add from "../Images/add.png";
+import Nav from "react-bootstrap/Nav";
 import FormControl from "react-bootstrap/FormControl";
 import InputGroup from "react-bootstrap/InputGroup";
 import Form from "react-bootstrap/Form";
@@ -90,29 +94,33 @@ class KNN extends React.Component {
   // Returns JSX for showing the input for x and y
   showXandYInput() {
     return (
-      <InputGroup>
-        <FormControl ref="xCoord" placeholder="Enter X Coordinate" />
-        <FormControl ref="yCoord" placeholder="Enter Y Coordinate" />
-      </InputGroup>
+      <Nav.Link>
+        <InputGroup>
+          <FormControl ref="xCoord" placeholder="Enter X Coordinate" />
+          <FormControl ref="yCoord" placeholder="Enter Y Coordinate" />
+        </InputGroup>
+      </Nav.Link>
     );
   }
 
   // Shows selectable values for K
   showKSelect() {
     return (
-      <Form>
-        <Form.Group>
-          <Form.Label>Select K value</Form.Label>
-          <Form.Control
-            as="select"
-            onChange={e => this.setState({ k: e.target.value })}
-          >
-            {arrayRange(1, 10).map(num => {
-              return <option value={num}>{num}</option>;
-            })}
-          </Form.Control>
-        </Form.Group>
-      </Form>
+      <Nav.Link>
+        <Form>
+          <Form.Group>
+            <Form.Label>Select K value</Form.Label>
+            <Form.Control
+              as="select"
+              onChange={e => this.setState({ k: e.target.value })}
+            >
+              {arrayRange(1, 10).map(num => {
+                return <option value={num}>{num}</option>;
+              })}
+            </Form.Control>
+          </Form.Group>
+        </Form>
+      </Nav.Link>
     );
   }
 
@@ -169,10 +177,70 @@ class KNN extends React.Component {
     });
   }
 
+  showBackToAlgorithimPage() {
+    return (
+      <Link to="/">
+        <Nav>
+          <Image src={Back} style={{ width: 40 }} />
+        </Nav>
+      </Link>
+    );
+  }
+
+  showRandomizeUndeterminedDataButton() {
+    return this.state.positiveData.length > 0 ? (
+      <Nav.Link onClick={() => this.generateRandomUndetermined()}>
+        <Image src={Shuffle} style={{ width: 40 }} />
+      </Nav.Link>
+    ) : null;
+  }
+
+  showRandomizeDataButton() {
+    return (
+      <Nav.Link onClick={() => this.randomizeData()}>
+        <Image src={Shuffle} style={{ width: 40 }} />
+      </Nav.Link>
+    );
+  }
+
+  showAddButton() {
+    return this.state.positiveData.length > 0 ? (
+      <Nav.Link
+        onClick={() =>
+          this.addPoint(this.refs["xCoord"].value, this.refs["yCoord"].value)
+        }
+      >
+        <Image src={Add} style={{ width: 40 }} />
+      </Nav.Link>
+    ) : null;
+  }
+
+  showXandYInputBar() {
+    return this.state.positiveData.length > 0 ? this.showXandYInput() : null;
+  }
+
+  showKSelection() {
+    return this.state.undeterminedData.length > 0 ? this.showKSelect() : null;
+  }
+
+  showKNNNavBar() {
+    return (
+      <Navbar fixed="top" bg="dark" variant="dark">
+        {this.showBackToAlgorithimPage()}
+        {this.showAddButton()}
+        {this.showRandomizeUndeterminedDataButton()}
+        {this.showRandomizeDataButton()}
+        {this.showXandYInputBar()}
+        {this.showKSelection()}
+      </Navbar>
+    );
+  }
+
   render() {
     return (
       <div className="App">
         <div className="App-header">
+          {this.showKNNNavBar()}
           <XYPlot width={600} height={600}>
             <VerticalGridLines />
             <HorizontalGridLines />
@@ -216,33 +284,6 @@ class KNN extends React.Component {
               data={this.state.currentHighlightData}
             />
           </XYPlot>
-          <ButtonToolbar>
-            <Link to="/">
-              <Button>Back</Button>
-            </Link>
-            <Button onClick={() => this.randomizeData()}>
-              Generate Random Data
-            </Button>
-            {this.state.positiveData.length > 0 ? (
-              <Button
-                onClick={() =>
-                  this.addPoint(
-                    this.refs["xCoord"].value,
-                    this.refs["yCoord"].value
-                  )
-                }
-              >
-                Add Point
-              </Button>
-            ) : null}
-            {this.state.positiveData.length > 0 ? (
-              <Button onClick={() => this.generateRandomUndetermined()}>
-                Generate Random Undetermined data
-              </Button>
-            ) : null}
-          </ButtonToolbar>
-          {this.state.positiveData.length > 0 ? this.showXandYInput() : null}
-          {this.state.undeterminedData.length > 0 ? this.showKSelect() : null}
         </div>
       </div>
     );

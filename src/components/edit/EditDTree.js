@@ -11,6 +11,7 @@ import InputGroup from "react-bootstrap/InputGroup";
 import "../../css_files/App.css";
 import "react-table/react-table.css";
 import { connect } from "react-redux";
+import { displayInfoButton } from "../../Utility";
 import {
   addDataClass,
   addDataLabel,
@@ -26,6 +27,11 @@ class EditDTree extends React.Component {
   render() {
     return (
       <Container>
+        {displayInfoButton(
+          "Table Editing Page",
+          "This is the page where you can edit the configuration of your data. For example, you can add another feature, delete it, or add/delete another class label to an existing feature",
+          "bottom"
+        )}
         <Row>
           {this.props.dataLabels.map(feature => {
             return (
