@@ -3,6 +3,11 @@
 import React from "react";
 import Table from "react-bootstrap/Table";
 import Button from "react-bootstrap/Button";
+import Navbar from "react-bootstrap/Navbar";
+import Nav from "react-bootstrap/Nav";
+import Forward from "../Images/forward.png";
+import Image from "react-bootstrap/Image";
+import Back from "../Images/back.png";
 import Tree from "react-tree-graph";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -425,33 +430,60 @@ class Apriori extends React.Component {
     });
   }
 
+  showStartAlgorithimBar() {
+    return (
+      <Nav.Link onClick={() => this.runFPTreeAlgorithim()}>
+        Run FP Tree Algorithim
+      </Nav.Link>
+    );
+  }
+
+  showRunNextIterationBar() {
+    return !this.state.isFPTree ? (
+      <Nav.Link onClick={() => this.runAprioriAlgorithim()}>
+        <Image src={Forward} style={{ width: 40 }} />
+      </Nav.Link>
+    ) : null;
+  }
+
+  showBackToAlgorithimPage() {
+    return (
+      <Link to="/">
+        <Nav>
+          <Image src={Back} style={{ width: 40 }} />
+        </Nav>
+      </Link>
+    );
+  }
+
+  showAprioriNavBar() {
+    return (
+      <Navbar fixed="top" bg="dark" variant="dark">
+        {this.showBackToAlgorithimPage()}
+        {this.showStartAlgorithimBar()}
+        {this.showRunNextIterationBar()}
+        {this.showMinSupSelection()}
+      </Navbar>
+    );
+  }
+
+  showTree() {
+    return this.state.renderTree ? (
+      <Tree
+        height={400}
+        width={800}
+        data={this.state.treeState}
+        svgProps={{ className: "custom" }}
+      />
+    ) : null;
+  }
+
   render() {
     return (
       <div className="App">
         <header className="App-header">
-          {this.state.renderTree ? (
-            <Tree
-              height={400}
-              width={800}
-              data={this.state.treeState}
-              svgProps={{ className: "custom" }}
-            />
-          ) : null}
+          {this.showAprioriNavBar()}
           {this.state != undefined ? this.displayTransactionTable() : null}
-          <Row>
-            <Link to="/">
-              <Button>Back</Button>
-            </Link>
-            <Button onClick={() => this.runFPTreeAlgorithim()}>
-              Run FP Tree Algorithim
-            </Button>
-            {!this.state.isFPTree ? (
-              <Button onClick={() => this.runAprioriAlgorithim()}>
-                Generate Next Apriori Itemset
-              </Button>
-            ) : null}
-          </Row>
-          {this.showMinSupSelection()}
           {this.displayFrequentItemsets()}
         </header>
       </div>

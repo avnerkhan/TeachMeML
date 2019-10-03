@@ -9,8 +9,14 @@ import {
   HorizontalGridLines,
   MarkSeries
 } from "react-vis";
-import Button from "react-bootstrap/Button";
-import ButtonToolbar from "react-bootstrap/ButtonToolbar";
+import Back from "../Images/back.png";
+import Navbar from "react-bootstrap/Navbar";
+import Nav from "react-bootstrap/Nav";
+import Image from "react-bootstrap/Image";
+import Reset from "../Images/reset.png";
+import Check from "../Images/check.png";
+import Eraser from "../Images/eraser.png";
+import Forward from "../Images/forward.png";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import { euclidFunction, comparator, arrayRange } from "../Utility";
@@ -182,8 +188,9 @@ class Clustering extends React.Component {
   // Shows selection for MinEps and MinPts
   showDBScanSelection() {
     return (
-      <Form>
+      <Form.Group>
         <Form.Label>Select MinEps (for DBSCAN)</Form.Label>
+
         <Form.Control
           as="select"
           onChange={e => this.setState({ minEps: e.target.value })}
@@ -201,7 +208,7 @@ class Clustering extends React.Component {
             return <option value={num}>{num}</option>;
           })}
         </Form.Control>
-      </Form>
+      </Form.Group>
     );
   }
 
@@ -209,35 +216,34 @@ class Clustering extends React.Component {
   showClusterDeploymentSelection() {
     return (
       <Form>
-        <Form.Group>
-          <Form.Label>Select Cluster Spacing value</Form.Label>
-          <Form.Control
-            as="select"
-            onChange={e => this.setState({ spacing: e.target.value })}
-          >
-            {arrayRange(1, 10).map(num => {
-              return <option value={num}>{num}</option>;
-            })}
-          </Form.Control>
-          <Form.Label>Select Cluster Points</Form.Label>
-          <Form.Control
-            as="select"
-            onChange={e => this.setState({ pointNum: e.target.value })}
-          >
-            {arrayRange(1, 9).map(num => {
-              return <option value={num}>{num}</option>;
-            })}
-          </Form.Control>
-          {this.showDBScanSelection()}
-          <Form.Label>Select Algorithim</Form.Label>
-          <Form.Control
-            as="select"
-            onChange={e => this.setState({ algorithim: e.target.value })}
-          >
-            <option value={this.stateEnum.KMEANS}>K Means</option>
-            <option value={this.stateEnum.DBSCAN}>DBScan</option>
-          </Form.Control>
-        </Form.Group>
+        <Form.Label>Select Cluster Spacing value</Form.Label>
+
+        <Form.Control
+          as="select"
+          onChange={e => this.setState({ spacing: e.target.value })}
+        >
+          {arrayRange(1, 10).map(num => {
+            return <option value={num}>{num}</option>;
+          })}
+        </Form.Control>
+        <Form.Label>Select Cluster Points</Form.Label>
+        <Form.Control
+          as="select"
+          onChange={e => this.setState({ pointNum: e.target.value })}
+        >
+          {arrayRange(1, 9).map(num => {
+            return <option value={num}>{num}</option>;
+          })}
+        </Form.Control>
+        {this.showDBScanSelection()}
+        <Form.Label>Select Algorithim</Form.Label>
+        <Form.Control
+          as="select"
+          onChange={e => this.setState({ algorithim: e.target.value })}
+        >
+          <option value={this.stateEnum.KMEANS}>K Means</option>
+          <option value={this.stateEnum.DBSCAN}>DBScan</option>
+        </Form.Control>
       </Form>
     );
   }
@@ -370,10 +376,95 @@ class Clustering extends React.Component {
     });
   }
 
+  showClusterDeploymentSelectionBar() {
+    return !this.state.choosingCentroidState &&
+      !this.state.runningKMeans &&
+      !this.state.runningDBScan
+      ? this.showClusterDeploymentSelection()
+      : null;
+  }
+
+  showDBScanSelectionBar() {
+    return this.state.runningDBScan ? this.showDBScanSelection() : null;
+  }
+
+  showBackToAlgorithimPage() {
+    return (
+      <Link to="/">
+        <Nav>
+          <Image src={Back} style={{ width: 40 }} />
+        </Nav>
+      </Link>
+    );
+  }
+
+  showStartAlgorithimBar() {
+    return this.state.readyToStartState ? (
+      <Nav.Link onClick={() => this.startRespectiveAlgorithim()}>
+        Start Algorithim
+      </Nav.Link>
+    ) : null;
+  }
+
+  showStartChoosingCentroidBar() {
+    return this.state.choosingCentroidState ? (
+      <Nav.Link onClick={() => this.checkCentroidPick()}>
+        <Image src={Check} style={{ width: 40 }} />
+      </Nav.Link>
+    ) : null;
+  }
+
+  showRunNextIterationBar() {
+    return this.state.runningKMeans ? (
+      <Nav.Link onClick={() => this.runIteration()}>
+        <Image src={Forward} style={{ width: 40 }} />
+      </Nav.Link>
+    ) : null;
+  }
+
+  showClearSlateBar() {
+    return this.state.runningKMeans || this.state.runningDBScan ? (
+      <Nav.Link onClick={() => this.clearSlate()}>
+        <Image src={Eraser} style={{ width: 40 }} />
+      </Nav.Link>
+    ) : null;
+  }
+
+  showResetClusterBar() {
+    return this.state.runningDBScan ? (
+      <Nav.Link onClick={() => this.unclusterData()}>
+        <Image src={Reset} style={{ width: 40 }} />
+      </Nav.Link>
+    ) : null;
+  }
+
+  showRunDBScanAgainBar() {
+    return this.state.runningDBScan ? (
+      <Nav.Link onClick={() => this.runDBScan()}>
+        <Image src={Reset} />
+      </Nav.Link>
+    ) : null;
+  }
+
+  showClusteringNavBar() {
+    return (
+      <Navbar fixed="top" bg="dark" variant="dark">
+        {this.showBackToAlgorithimPage()}
+        {this.showStartAlgorithimBar()}
+        {this.showStartChoosingCentroidBar()}
+        {this.showRunNextIterationBar()}
+        {this.showClearSlateBar()}
+        {this.showRunDBScanAgainBar()}
+        {this.showResetClusterBar()}
+      </Navbar>
+    );
+  }
+
   render() {
     return (
       <div className="App">
         <div className="App-header">
+          {this.showClusteringNavBar()}
           <Row>
             <XYPlot
               width={600}
@@ -420,46 +511,9 @@ class Clustering extends React.Component {
                 );
               })}
             </XYPlot>
-            {!this.state.choosingCentroidState &&
-            !this.state.runningKMeans &&
-            !this.state.runningDBScan
-              ? this.showClusterDeploymentSelection()
-              : null}
-            {this.state.runningDBScan ? this.showDBScanSelection() : null}
+            {this.showClusterDeploymentSelectionBar()}
+            {this.showDBScanSelectionBar()}
           </Row>
-          <ButtonToolbar>
-            <Link to="/">
-              <Button>Back</Button>
-            </Link>
-            {this.state.readyToStartState ? (
-              <Button onClick={() => this.startRespectiveAlgorithim()}>
-                Start Algorithim
-              </Button>
-            ) : null}
-            {this.state.choosingCentroidState ? (
-              <Button onClick={() => this.checkCentroidPick()}>
-                Done choosing centroids
-              </Button>
-            ) : null}
-            {this.state.runningKMeans ? (
-              <Button onClick={() => this.runIteration()}>
-                Run Next Iteration
-              </Button>
-            ) : null}
-            {this.state.runningKMeans || this.state.runningDBScan ? (
-              <Button onClick={() => this.clearSlate()}>Clear Slate</Button>
-            ) : null}
-            {this.state.runningDBScan ? (
-              <Button onClick={() => this.unclusterData()}>
-                Reset clusters
-              </Button>
-            ) : null}
-            {this.state.runningDBScan ? (
-              <Button onClick={() => this.runDBScan()}>
-                Run K means again
-              </Button>
-            ) : null}
-          </ButtonToolbar>
         </div>
       </div>
     );
