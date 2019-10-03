@@ -2,19 +2,16 @@
 
 import React from "react";
 import Table from "react-bootstrap/Table";
-import Button from "react-bootstrap/Button";
 import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 import Forward from "../Images/forward.png";
 import Image from "react-bootstrap/Image";
-import Back from "../Images/back.png";
 import Tree from "react-tree-graph";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import { arrayRange } from "../Utility";
-import { showBackToAlgorithimPage } from "../Utility";
-import { Link } from "react-router-dom";
+import { showBackToAlgorithimPage, displayInfoButton } from "../Utility";
 import "../css_files/App.css";
 import "react-table/react-table.css";
 
@@ -210,6 +207,11 @@ class Apriori extends React.Component {
 
     return (
       <Table responsive="sm">
+        {displayInfoButton(
+          "TimeSeries data",
+          "Represents the list of transactions. To modify a row, press the letter inside to change its value. To add a column to the row, press plus. To delete a column from a row, press minus. If you want to run Apriori, press the right arrow to run a single iteration, until it cannot generate frequent itemsets anymore. If you want to run FP tree, press the button that does so.",
+          "left"
+        )}
         <tbody>
           {transactions.map((transaction, index) => {
             return (

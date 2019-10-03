@@ -17,7 +17,7 @@ import InputGroup from "react-bootstrap/InputGroup";
 import Form from "react-bootstrap/Form";
 import { euclidFunction, comparator, arrayRange } from "../Utility";
 import "../css_files/App.css";
-import { showBackToAlgorithimPage } from "../Utility";
+import { showBackToAlgorithimPage, displayInfoButton } from "../Utility";
 
 class KNN extends React.Component {
   constructor(props) {
@@ -230,6 +230,11 @@ class KNN extends React.Component {
       <div className="App">
         <div className="App-header">
           {this.showKNNNavBar()}
+          {displayInfoButton(
+            "KNN Plot",
+            "Use the bar above to add your own coordinates to the grid. All undetermined datapoints are black, and there are only two classes. The first shuffle button randomizes determined data, while the second shuffle button places random undetermined points. Hover your mouse over an undetermined point to see which points that it will use nearby to determine, and press on the point to determine.",
+            "left"
+          )}
           <XYPlot width={600} height={600}>
             <VerticalGridLines />
             <HorizontalGridLines />

@@ -19,7 +19,12 @@ import Eraser from "../Images/eraser.png";
 import Forward from "../Images/forward.png";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
-import { euclidFunction, comparator, arrayRange } from "../Utility";
+import {
+  euclidFunction,
+  comparator,
+  arrayRange,
+  displayInfoButton
+} from "../Utility";
 import "../css_files/App.css";
 
 class Clustering extends React.Component {
@@ -215,8 +220,12 @@ class Clustering extends React.Component {
   showClusterDeploymentSelection() {
     return (
       <Form>
-        <Form.Label>Select Cluster Spacing value</Form.Label>
-
+        {displayInfoButton(
+          "Cluster Spacing",
+          "Determine how much each point will be spaced out when placing on grid",
+          "right"
+        )}
+        <Form.Label>Select Cluster Spacing</Form.Label>
         <Form.Control
           as="select"
           onChange={e => this.setState({ spacing: e.target.value })}
@@ -225,6 +234,11 @@ class Clustering extends React.Component {
             return <option value={num}>{num}</option>;
           })}
         </Form.Control>
+        {displayInfoButton(
+          "Cluster Point Number",
+          "Determine how points will be placed on each mouse click",
+          "right"
+        )}
         <Form.Label>Select Cluster Points</Form.Label>
         <Form.Control
           as="select"
@@ -430,7 +444,7 @@ class Clustering extends React.Component {
   showRunDBScanAgainBar() {
     return this.state.runningDBScan ? (
       <Nav.Link onClick={() => this.runDBScan()}>
-        <Image src={Reset} />
+        <Image src={Reset} style={{ width: 40 }} />
       </Nav.Link>
     ) : null;
   }
@@ -454,6 +468,11 @@ class Clustering extends React.Component {
       <div className="App">
         <div className="App-header">
           {this.showClusteringNavBar()}
+          {displayInfoButton(
+            "Clustering Algorithims",
+            "Start pressing on the grid anywhere to start adding points to the grid. Once the algorithim starts running, press the check mark to finish choosing centroids (If KMeans). The right arrow runs an iteration of Kmeans, and the eraser resets the board. If you choose DBScan, simply run the algorithim and watch the board populate with the coloring based on the configurations you chose.",
+            "right"
+          )}
           <Row>
             <XYPlot
               width={600}

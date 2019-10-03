@@ -8,7 +8,7 @@ class Pick extends React.Component {
   render() {
     return (
       <div className="App">
-        <header className="App-header">
+        <header className="App-header-low">
           <p>Pick an algorithim</p>
           <ButtonToolbar>
             <Link to="/DecisionTree">
