@@ -39,6 +39,10 @@ function showInformationSlide(title, text) {
   );
 }
 
+export function roundToTwoDecimalPlaces(num) {
+  return Math.round(num * 100) / 100;
+}
+
 export function displayInfoButton(title, text, placement) {
   return (
     <OverlayTrigger

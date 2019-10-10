@@ -4,9 +4,10 @@ import Tree from "react-tree-graph";
 import Shuffle from "../Images/shuffle.png";
 import Edit from "../Images/edit.png";
 import Save from "../Images/save.png";
+import Back from "../Images/back.png";
 import Add from "../Images/add.png";
 import Trash from "../Images/trash.png";
-import { Image, Navbar, Nav, Table, Row, Col } from "react-bootstrap";
+import { Image, Navbar, Nav, Table, Row, Col, Popover } from "react-bootstrap";
 import EditDTree from "./edit/EditDTree";
 import {
   determineBestSplit,
@@ -18,7 +19,11 @@ import {
 import "../css_files/App.css";
 import "react-table/react-table.css";
 import { connect } from "react-redux";
-import { displayInfoButton, showBackToAlgorithimPage } from "../Utility";
+import {
+  displayInfoButton,
+  showBackToAlgorithimPage,
+  roundToTwoDecimalPlaces
+} from "../Utility";
 
 class DTree extends React.Component {
   constructor(props) {
@@ -231,6 +236,17 @@ class DTree extends React.Component {
     });
   }
 
+  showEntropyAndGain() {
+    return (
+      <div>
+        <h3 as="h3">
+          Entropy: {roundToTwoDecimalPlaces(this.state.shownEntropy)}
+        </h3>
+        <h3 as="h3">Gain: {roundToTwoDecimalPlaces(this.state.shownGain)}</h3>
+      </div>
+    );
+  }
+
   displayTreeInformation() {
     return this.state.renderTree ? (
       <Row>
@@ -240,6 +256,7 @@ class DTree extends React.Component {
             "This is the Decision Tree generated from the previous data, when you press a node, the column that this data splitted on is highlighted, as well the data that was split on that node.",
             "right"
           )}
+
           <Tree
             height={400}
             width={700}
@@ -254,10 +271,9 @@ class DTree extends React.Component {
             "left"
           )}
         </Col>
-        <Col>{this.showCustomDataTable(false)}</Col>
         <Col>
-          <Row>Entropy: {this.state.shownEntropy}</Row>
-          <Row>Gain: {this.state.shownGain}</Row>
+          <Row>{this.showCustomDataTable(false)}</Row>
+          <Row>{this.showEntropyAndGain()}</Row>
         </Col>
       </Row>
     ) : null;
