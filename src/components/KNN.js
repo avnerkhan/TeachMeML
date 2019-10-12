@@ -15,6 +15,7 @@ import Nav from "react-bootstrap/Nav";
 import FormControl from "react-bootstrap/FormControl";
 import InputGroup from "react-bootstrap/InputGroup";
 import Form from "react-bootstrap/Form";
+import { generateRandomData } from "./algorithims/KNNAlgo";
 import { euclidFunction, comparator, arrayRange } from "../Utility";
 import "../css_files/App.css";
 import { showBackToAlgorithimPage, displayInfoButton } from "../Utility";
@@ -30,7 +31,7 @@ class KNN extends React.Component {
       HIGHLIGHT: "#FFFF00"
     };
 
-    let randomData = this.generateRandomData();
+    let randomData = generateRandomData();
 
     this.state = {
       k: 1,
@@ -39,26 +40,6 @@ class KNN extends React.Component {
       undeterminedData: [],
       currentHighlightData: []
     };
-  }
-
-  // Generates random points to put on plot, and clears undetermined points
-  generateRandomData(length = 100, max = 100) {
-    let newDataPositive = [];
-    let newDataNegative = [];
-
-    for (let i = 0; i < length; i++) {
-      const randomX = Math.floor(Math.random() * max);
-      const randomY = Math.floor(Math.random() * max);
-      const entry = { x: randomX, y: randomY };
-
-      if (i % 2 === 0) {
-        newDataPositive.push(entry);
-      } else {
-        newDataNegative.push(entry);
-      }
-    }
-
-    return { positive: newDataPositive, negative: newDataNegative };
   }
 
   // Adds an undetermined point to the grid
@@ -168,7 +149,7 @@ class KNN extends React.Component {
   }
 
   randomizeData() {
-    const newRandomized = this.generateRandomData();
+    const newRandomized = generateRandomData();
 
     this.setState({
       positiveData: newRandomized.positive,

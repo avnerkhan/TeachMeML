@@ -35,6 +35,7 @@ class DTree extends React.Component {
       showMode: false,
       renderTree: false,
       renderTable: true,
+      displayedDepth: -1,
       treeState: {},
       data: this.generateRandomDataState(),
       currentHighlight: null,
@@ -50,8 +51,9 @@ class DTree extends React.Component {
     }
   }
 
-  presentData(shownData, classVal, entropy, highestGainInfo) {
+  presentData(shownData, classVal, entropy, highestGainInfo, currDepth) {
     this.setState({
+      displayedDepth: currDepth,
       shownData: shownData,
       currentHighlight: this.determineClassLabel(classVal),
       shownEntropy: entropy,
@@ -87,12 +89,19 @@ class DTree extends React.Component {
     for (const classVal in splitDict) {
       let name =
         classVal === "undefined" ? determineMostLikelyLabel(data) : classVal;
+
       let newNode = {
         name: name,
         gProps: {
           className: "custom",
           onClick: () =>
-            this.presentData(splitDict[classVal], classVal, entropy, gainAmount)
+            this.presentData(
+              splitDict[classVal],
+              classVal,
+              entropy,
+              gainAmount,
+              currDepth
+            )
         },
         children: []
       };
@@ -239,10 +248,13 @@ class DTree extends React.Component {
   showEntropyAndGain() {
     return (
       <div>
+        <h3 as="h3">At level {this.state.displayedDepth}</h3>
         <h3 as="h3">
-          Entropy: {roundToTwoDecimalPlaces(this.state.shownEntropy)}
+          Entropy of parent: {roundToTwoDecimalPlaces(this.state.shownEntropy)}
         </h3>
-        <h3 as="h3">Gain: {roundToTwoDecimalPlaces(this.state.shownGain)}</h3>
+        <h3 as="h3">
+          Gain of parent: {roundToTwoDecimalPlaces(this.state.shownGain)}
+        </h3>
       </div>
     );
   }

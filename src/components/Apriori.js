@@ -12,6 +12,17 @@ import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import { arrayRange } from "../Utility";
 import { showBackToAlgorithimPage, displayInfoButton } from "../Utility";
+import {
+  generateRandomTransaction,
+  generateOneItemsets,
+  reorderDB,
+  buildTree,
+  findAllPaths,
+  filterFreqSets,
+  getFrequentItemsets,
+  mineFreqItemsets,
+  formatSets
+} from "./algorithims/AprioriAlgo";
 import "../css_files/App.css";
 import "react-table/react-table.css";
 
@@ -28,7 +39,7 @@ class Apriori extends React.Component {
       minSup: 2,
       frequentItemSet: [],
       transactionItems: this.defaultTransactionSelection,
-      transactions: this.generateRandomTransaction()
+      transactions: generateRandomTransaction(this.defaultTransactionSelection)
     };
   }
 
@@ -48,31 +59,6 @@ class Apriori extends React.Component {
         </Form.Group>
       </Form>
     );
-  }
-
-  // Random transaction generator for state
-  generateRandomTransaction() {
-    let randomTransactions = [];
-    const transactionItems =
-      this.state == undefined
-        ? this.defaultTransactionSelection
-        : this.state.transaction;
-
-    for (let i = 0; i < 5; i++) {
-      let transaction = [];
-      const transactionLength =
-        Math.floor(Math.random() * transactionItems.length) + 1;
-
-      for (let c = 0; c < transactionLength; c++) {
-        const item = Math.round(Math.random() * transaction.length);
-        const pushedItem = transactionItems[item];
-        if (!transaction.includes(pushedItem)) transaction.push(pushedItem);
-      }
-
-      randomTransactions.push(transaction);
-    }
-
-    return randomTransactions;
   }
 
   // Either adds or subtracts an element from a transaction
@@ -106,26 +92,6 @@ class Apriori extends React.Component {
     this.setState({ transactions: currentTransactionState });
   }
 
-  generateOneItemsets(transactions, transactionItems, minSup) {
-    let oneItemSet = {};
-
-    for (let transaction of transactions) {
-      for (let item of transactionItems) {
-        if (transaction.includes(item)) {
-          const currCount =
-            oneItemSet[item] == undefined ? 0 : oneItemSet[item];
-          oneItemSet[item] = currCount + 1;
-        }
-      }
-    }
-
-    for (let item in oneItemSet) {
-      if (oneItemSet[item] < minSup) delete oneItemSet[item];
-    }
-
-    return [oneItemSet];
-  }
-
   // Runs apriori by generating next itemset
   runAprioriAlgorithim() {
     const frequentItemSet = this.state.frequentItemSet;
@@ -135,7 +101,7 @@ class Apriori extends React.Component {
 
     if (frequentItemSet.length === 0) {
       this.setState({
-        frequentItemSet: this.generateOneItemsets(
+        frequentItemSet: generateOneItemsets(
           transactions,
           transactionItems,
           minSup
@@ -159,46 +125,16 @@ class Apriori extends React.Component {
         }
       }
 
-      newFrequentSet = this.filterFreqSets(newFrequentSet);
+      newFrequentSet = filterFreqSets(
+        newFrequentSet,
+        this.state.transactions,
+        this.state.minSup
+      );
 
       frequentItemSet.push(newFrequentSet);
 
       this.setState({ frequentItemSet: frequentItemSet });
     }
-  }
-
-  // Prune by counting transacitons here (Apriori principle later?)
-  filterFreqSets(newFrequentSet) {
-    const transactions = this.state.transactions;
-    const minsup = this.state.minSup;
-    let frequentSetCopy = newFrequentSet;
-
-    for (let transaction of transactions) {
-      const compareSet = new Set(transaction);
-
-      for (let frequentSetCandidate in newFrequentSet) {
-        const checkSet = new Set(frequentSetCandidate);
-
-        if (this.isSuperset(compareSet, checkSet))
-          frequentSetCopy[frequentSetCandidate] += 1;
-      }
-    }
-
-    for (let frequentSet in frequentSetCopy) {
-      if (frequentSetCopy[frequentSet] < minsup)
-        delete frequentSetCopy[frequentSet];
-    }
-
-    return frequentSetCopy;
-  }
-
-  isSuperset(compareSet, checkSet) {
-    for (let elem of checkSet) {
-      if (!compareSet.has(elem)) {
-        return false;
-      }
-    }
-    return true;
   }
 
   // Displays the JSX for transaction table
@@ -269,140 +205,8 @@ class Apriori extends React.Component {
     );
   }
 
-  reorderDB(sortedArr) {
-    const order = sortedArr.map(entry => {
-      return entry[0];
-    });
-    let orderedDB = this.state.transactions;
-
-    return orderedDB.map(transaction => {
-      transaction.sort((firstEntry, secondEntry) => {
-        return order.indexOf(firstEntry) - order.indexOf(secondEntry);
-      });
-
-      transaction = transaction.filter(entry => {
-        return order.includes(entry);
-      });
-      return transaction;
-    });
-  }
-
-  buildTree(reorderedDB) {
-    let currTree = {
-      name: "R",
-      children: []
-    };
-
-    for (let transaction of reorderedDB) {
-      currTree = this.addBranch(transaction, currTree);
-    }
-
-    return currTree;
-  }
-
-  addBranch(transaction, currTree) {
-    let root = currTree;
-    let curr = root;
-
-    for (let letter of transaction) {
-      if (curr != undefined) {
-        const names = curr.children.map(children => {
-          return children.name.split(":")[0];
-        });
-
-        if (names.includes(letter)) {
-          const index = names.indexOf(letter);
-          curr = curr.children[index];
-          const newCount = parseInt(curr.name.split(":")[1]) + 1;
-          curr.name = letter + ":" + newCount.toString();
-        } else {
-          const newEntry = {
-            name: letter + ":1",
-            children: []
-          };
-          curr.children.push(newEntry);
-          curr = newEntry;
-        }
-      }
-    }
-
-    return root;
-  }
-
-  findAllPaths(allPaths, currentPath, curr, toFind) {
-    const split = curr.name.split(":");
-    const transaction = split[0];
-    const count = split[1];
-
-    if (transaction === toFind) {
-      return [currentPath, count];
-    }
-
-    currentPath += transaction;
-    for (let child of curr.children) {
-      const elem = this.findAllPaths(allPaths, currentPath, child, toFind);
-      allPaths.push(elem);
-    }
-  }
-
-  getFrequentItemsets(currentPaths) {
-    let frequentItemsets = {};
-
-    for (let pathKey in currentPaths) {
-      let mappingForKey = {};
-      const currentPathsForKey = currentPaths[pathKey];
-      for (let pair of currentPathsForKey) {
-        if (pair != undefined) {
-          const actualPath = pair[0];
-          const count = pair[1];
-          let startString = pathKey;
-          for (let c of actualPath) {
-            if (c !== "R") {
-              startString = c + startString;
-              mappingForKey[startString] =
-                mappingForKey[startString] == undefined
-                  ? count
-                  : mappingForKey[startString] + count;
-            }
-          }
-        }
-      }
-      for (let key in mappingForKey) {
-        if (mappingForKey[key] >= this.state.minSup)
-          frequentItemsets[key] = mappingForKey[key];
-      }
-    }
-
-    return frequentItemsets;
-  }
-
-  mineFreqItemsets(treeState, sortedList) {
-    sortedList.reverse();
-    let currentPaths = {};
-
-    for (let entry of sortedList) {
-      let allPathsForTransactions = [];
-      let root = treeState;
-      const transaction = entry[0];
-      this.findAllPaths(allPathsForTransactions, "", root, transaction);
-      currentPaths[transaction] = allPathsForTransactions;
-    }
-
-    return this.getFrequentItemsets(currentPaths);
-  }
-
-  formatSets(freqItemsets, oneItemSet) {
-    let newFrequentSets = [oneItemSet, {}, {}, {}, {}];
-
-    for (const key in freqItemsets) {
-      newFrequentSets[key.length - 1][key] = freqItemsets[key];
-    }
-
-    return newFrequentSets;
-  }
-
   runFPTreeAlgorithim() {
-    let oneItemSet = this.generateOneItemsets(
+    let oneItemSet = generateOneItemsets(
       this.state.transactions,
       this.state.transactionItems,
       this.state.minSup
@@ -420,16 +224,20 @@ class Apriori extends React.Component {
       return secondPair[0] - firstPair[0];
     });
 
-    const reorderedDB = this.reorderDB(sortable);
-    const treeState = this.buildTree(reorderedDB);
-    const freqItemsets = this.mineFreqItemsets(treeState, sortable);
+    const reorderedDB = reorderDB(sortable, this.state.transactions);
+    const treeState = buildTree(reorderedDB);
+    const freqItemsets = mineFreqItemsets(
+      treeState,
+      sortable,
+      this.state.minSup
+    );
 
     this.setState({
       isFPTree: true,
       transactions: reorderedDB,
       treeState: treeState,
       renderTree: true,
-      frequentItemSet: this.formatSets(freqItemsets, oneItemSet)
+      frequentItemSet: formatSets(freqItemsets, oneItemSet)
     });
   }
 
