@@ -12,10 +12,14 @@ import Navbar from "react-bootstrap/Navbar";
 import Shuffle from "../Images/shuffle.png";
 import Add from "../Images/add.png";
 import KNNLearn from "./learn/KNNLearn";
-import Nav from "react-bootstrap/Nav";
-import FormControl from "react-bootstrap/FormControl";
-import InputGroup from "react-bootstrap/InputGroup";
-import Form from "react-bootstrap/Form";
+import {
+  Nav,
+  FormControl,
+  InputGroup,
+  Form,
+  OverlayTrigger,
+  Tooltip
+} from "react-bootstrap";
 import { generateRandomData } from "./algorithims/KNNAlgo";
 import { euclidFunction, comparator, arrayRange } from "../Utility";
 import "../css_files/App.css";
@@ -165,29 +169,47 @@ class KNN extends React.Component {
 
   showRandomizeUndeterminedDataButton() {
     return this.state.positiveData.length > 0 && !this.state.showLearnMode ? (
-      <Nav.Link onClick={() => this.generateRandomUndetermined()}>
-        <Image src={Shuffle} style={{ width: 40 }} />
-      </Nav.Link>
+      <OverlayTrigger
+        trigger="hover"
+        placement="bottom"
+        overlay={<Tooltip>Generate random undetermined points</Tooltip>}
+      >
+        <Nav.Link onClick={() => this.generateRandomUndetermined()}>
+          <Image src={Shuffle} style={{ width: 40 }} />
+        </Nav.Link>
+      </OverlayTrigger>
     ) : null;
   }
 
   showRandomizeDataButton() {
     return !this.state.showLearnMode ? (
-      <Nav.Link onClick={() => this.randomizeData()}>
-        <Image src={Shuffle} style={{ width: 40 }} />
-      </Nav.Link>
+      <OverlayTrigger
+        trigger="hover"
+        placement="bottom"
+        overlay={<Tooltip>Generate random labeled data</Tooltip>}
+      >
+        <Nav.Link onClick={() => this.randomizeData()}>
+          <Image src={Shuffle} style={{ width: 40 }} />
+        </Nav.Link>
+      </OverlayTrigger>
     ) : null;
   }
 
   showAddButton() {
     return this.state.positiveData.length > 0 && !this.state.showLearnMode ? (
-      <Nav.Link
-        onClick={() =>
-          this.addPoint(this.refs["xCoord"].value, this.refs["yCoord"].value)
-        }
+      <OverlayTrigger
+        trigger="hover"
+        placement="bottom"
+        overlay={<Tooltip>Add a point</Tooltip>}
       >
-        <Image src={Add} style={{ width: 40 }} />
-      </Nav.Link>
+        <Nav.Link
+          onClick={() =>
+            this.addPoint(this.refs["xCoord"].value, this.refs["yCoord"].value)
+          }
+        >
+          <Image src={Add} style={{ width: 40 }} />
+        </Nav.Link>
+      </OverlayTrigger>
     ) : null;
   }
 

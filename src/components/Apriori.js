@@ -24,6 +24,7 @@ import {
 } from "./algorithims/AprioriAlgo";
 import "../css_files/App.css";
 import "react-table/react-table.css";
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
 
 class Apriori extends React.Component {
   constructor(props) {
@@ -251,9 +252,15 @@ class Apriori extends React.Component {
 
   showRunNextIterationBar() {
     return !this.state.isFPTree && !this.state.showLearnMode ? (
-      <Nav.Link onClick={() => this.runAprioriAlgorithim()}>
-        <Image src={Forward} style={{ width: 40 }} />
-      </Nav.Link>
+      <OverlayTrigger
+        trigger="hover"
+        placement="bottom"
+        overlay={<Tooltip>Run next iteration</Tooltip>}
+      >
+        <Nav.Link onClick={() => this.runAprioriAlgorithim()}>
+          <Image src={Forward} style={{ width: 40 }} />
+        </Nav.Link>
+      </OverlayTrigger>
     ) : null;
   }
 

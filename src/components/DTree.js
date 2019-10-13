@@ -407,9 +407,15 @@ class DTree extends React.Component {
 
   showSaveIcon() {
     return this.state.showEditPanel ? (
-      <Nav.Link onClick={() => this.saveEditState({})}>
-        <Image src={Save} style={{ width: 40 }} />
-      </Nav.Link>
+      <OverlayTrigger
+        trigger="hover"
+        placement="bottom"
+        overlay={<Tooltip>Save configuration</Tooltip>}
+      >
+        <Nav.Link onClick={() => this.saveEditState({})}>
+          <Image src={Save} style={{ width: 40 }} />
+        </Nav.Link>
+      </OverlayTrigger>
     ) : null;
   }
 

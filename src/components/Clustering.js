@@ -28,6 +28,7 @@ import {
   showLearnModeIcon
 } from "../Utility";
 import "../css_files/App.css";
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
 
 class Clustering extends React.Component {
   constructor(props) {
@@ -417,33 +418,57 @@ class Clustering extends React.Component {
 
   showStartChoosingCentroidBar() {
     return this.state.choosingCentroidState ? (
-      <Nav.Link onClick={() => this.checkCentroidPick()}>
-        <Image src={Check} style={{ width: 40 }} />
-      </Nav.Link>
+      <OverlayTrigger
+        trigger="hover"
+        placement="bottom"
+        overlay={<Tooltip>Finished choosing centroids</Tooltip>}
+      >
+        <Nav.Link onClick={() => this.checkCentroidPick()}>
+          <Image src={Check} style={{ width: 40 }} />
+        </Nav.Link>
+      </OverlayTrigger>
     ) : null;
   }
 
   showRunNextIterationBar() {
     return this.state.runningKMeans ? (
-      <Nav.Link onClick={() => this.runIteration()}>
-        <Image src={Forward} style={{ width: 40 }} />
-      </Nav.Link>
+      <OverlayTrigger
+        trigger="hover"
+        placement="bottom"
+        overlay={<Tooltip>Run next iteration</Tooltip>}
+      >
+        <Nav.Link onClick={() => this.runIteration()}>
+          <Image src={Forward} style={{ width: 40 }} />
+        </Nav.Link>
+      </OverlayTrigger>
     ) : null;
   }
 
   showClearSlateBar() {
     return this.state.runningKMeans || this.state.runningDBScan ? (
-      <Nav.Link onClick={() => this.clearSlate()}>
-        <Image src={Eraser} style={{ width: 40 }} />
-      </Nav.Link>
+      <OverlayTrigger
+        trigger="hover"
+        placement="bottom"
+        overlay={<Tooltip>Start from beginning</Tooltip>}
+      >
+        <Nav.Link onClick={() => this.clearSlate()}>
+          <Image src={Eraser} style={{ width: 40 }} />
+        </Nav.Link>
+      </OverlayTrigger>
     ) : null;
   }
 
   showResetClusterBar() {
     return this.state.runningDBScan ? (
-      <Nav.Link onClick={() => this.unclusterData()}>
-        <Image src={Reset} style={{ width: 40 }} />
-      </Nav.Link>
+      <OverlayTrigger
+        trigger="hover"
+        placement="bottom"
+        overlay={<Tooltip>Reset this DBSCAN</Tooltip>}
+      >
+        <Nav.Link onClick={() => this.unclusterData()}>
+          <Image src={Reset} style={{ width: 40 }} />
+        </Nav.Link>
+      </OverlayTrigger>
     ) : null;
   }
 
