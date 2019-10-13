@@ -17,6 +17,9 @@ import Reset from "../Images/reset.png";
 import Check from "../Images/check.png";
 import Eraser from "../Images/eraser.png";
 import Forward from "../Images/forward.png";
+import Learn from "../Images/learn.png";
+import Exp from "../Images/exp.png";
+import ClusteringLearn from "./learn/ClusteringLearn";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import {

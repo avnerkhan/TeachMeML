@@ -2,7 +2,7 @@ import React from "react";
 
 class DTreeLearn extends React.Component {
   render() {
-    return <div>DTree Learn</div>;
+    return <h1>DTree Learn</h1>;
   }
 }
 

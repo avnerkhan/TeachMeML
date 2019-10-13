@@ -11,6 +11,9 @@ import Image from "react-bootstrap/Image";
 import Navbar from "react-bootstrap/Navbar";
 import Shuffle from "../Images/shuffle.png";
 import Add from "../Images/add.png";
+import Learn from "../Images/learn.png";
+import Exp from "../Images/exp.png";
+import KNNLearn from "./learn/KNNLearn";
 import Nav from "react-bootstrap/Nav";
 import FormControl from "react-bootstrap/FormControl";
 import InputGroup from "react-bootstrap/InputGroup";
@@ -19,6 +22,7 @@ import { generateRandomData } from "./algorithims/KNNAlgo";
 import { euclidFunction, comparator, arrayRange } from "../Utility";
 import "../css_files/App.css";
 import { showBackToAlgorithimPage, displayInfoButton } from "../Utility";
+import NavbarCollapse from "react-bootstrap/NavbarCollapse";
 
 class KNN extends React.Component {
   constructor(props) {
@@ -37,6 +41,7 @@ class KNN extends React.Component {
       k: 1,
       positiveData: randomData.positive,
       negativeData: randomData.negative,
+      showLearnMode: false,
       undeterminedData: [],
       currentHighlightData: []
     };
@@ -158,7 +163,7 @@ class KNN extends React.Component {
   }
 
   showRandomizeUndeterminedDataButton() {
-    return this.state.positiveData.length > 0 ? (
+    return this.state.positiveData.length > 0 && !this.state.showLearnMode ? (
       <Nav.Link onClick={() => this.generateRandomUndetermined()}>
         <Image src={Shuffle} style={{ width: 40 }} />
       </Nav.Link>
@@ -166,15 +171,15 @@ class KNN extends React.Component {
   }
 
   showRandomizeDataButton() {
-    return (
+    return !this.state.showLearnMode ? (
       <Nav.Link onClick={() => this.randomizeData()}>
         <Image src={Shuffle} style={{ width: 40 }} />
       </Nav.Link>
-    );
+    ) : null;
   }
 
   showAddButton() {
-    return this.state.positiveData.length > 0 ? (
+    return this.state.positiveData.length > 0 && !this.state.showLearnMode ? (
       <Nav.Link
         onClick={() =>
           this.addPoint(this.refs["xCoord"].value, this.refs["yCoord"].value)
@@ -186,11 +191,30 @@ class KNN extends React.Component {
   }
 
   showXandYInputBar() {
-    return this.state.positiveData.length > 0 ? this.showXandYInput() : null;
+    return this.state.positiveData.length > 0 && !this.state.showLearnMode
+      ? this.showXandYInput()
+      : null;
   }
 
   showKSelection() {
-    return this.state.undeterminedData.length > 0 ? this.showKSelect() : null;
+    return this.state.undeterminedData.length > 0 && !this.state.showLearnMode
+      ? this.showKSelect()
+      : null;
+  }
+
+  showLearnIcon() {
+    return (
+      <Nav.Link
+        onClick={() =>
+          this.setState({ showLearnMode: !this.state.showLearnMode })
+        }
+      >
+        <Image
+          src={this.state.showLearnMode ? Exp : Learn}
+          style={{ width: 40 }}
+        />
+      </Nav.Link>
+    );
   }
 
   showKNNNavBar() {
@@ -202,8 +226,66 @@ class KNN extends React.Component {
         {this.showRandomizeDataButton()}
         {this.showXandYInputBar()}
         {this.showKSelection()}
+        {this.showLearnIcon()}
       </Navbar>
     );
+  }
+
+  showLearnKNN() {
+    return this.state.showLearnMode ? <KNNLearn /> : null;
+  }
+
+  displayKNNExperiement() {
+    return !this.state.showLearnMode ? (
+      <div>
+        {displayInfoButton(
+          "KNN Plot",
+          "Use the bar above to add your own coordinates to the grid. All undetermined datapoints are black, and there are only two classes. The first shuffle button randomizes determined data, while the second shuffle button places random undetermined points. Hover your mouse over an undetermined point to see which points that it will use nearby to determine, and press on the point to determine.",
+          "left"
+        )}
+        <XYPlot width={600} height={600}>
+          <VerticalGridLines />
+          <HorizontalGridLines />
+          <XAxis />
+          <YAxis />
+          <MarkSeries
+            className="mark-series-example"
+            strokeWidth={2}
+            opacity="0.8"
+            sizeRange={[0, 100]}
+            color={this.stateEnum.POSITIVE}
+            data={this.state.positiveData}
+          />
+          <MarkSeries
+            className="mark-series-example"
+            strokeWidth={2}
+            opacity="0.8"
+            sizeRange={[0, 100]}
+            color={this.stateEnum.NEGATIVE}
+            data={this.state.negativeData}
+          />
+          <MarkSeries
+            className="mark-series-example"
+            strokeWidth={2}
+            opacity="0.8"
+            sizeRange={[0, 100]}
+            onValueMouseOut={() => this.setState({ currentHighlightData: [] })}
+            onValueMouseOver={datapoint => this.highlightK(datapoint, false)}
+            onValueClick={datapoint => this.highlightK(datapoint, true)}
+            color={this.stateEnum.UNLABELED}
+            data={this.state.undeterminedData}
+          />
+          <MarkSeries
+            className="mark-series-example"
+            strokeWidth={2}
+            opacity="0.8"
+            sizeRange={[0, 100]}
+            color={this.stateEnum.HIGHLIGHT}
+            data={this.state.currentHighlightData}
+          />
+        </XYPlot>
+      </div>
+    ) : null;
   }
 
   render() {
@@ -211,54 +293,8 @@ class KNN extends React.Component {
       <div className="App">
         <div className="App-header">
           {this.showKNNNavBar()}
-          {displayInfoButton(
-            "KNN Plot",
-            "Use the bar above to add your own coordinates to the grid. All undetermined datapoints are black, and there are only two classes. The first shuffle button randomizes determined data, while the second shuffle button places random undetermined points. Hover your mouse over an undetermined point to see which points that it will use nearby to determine, and press on the point to determine.",
-            "left"
-          )}
-          <XYPlot width={600} height={600}>
-            <VerticalGridLines />
-            <HorizontalGridLines />
-            <XAxis />
-            <YAxis />
-            <MarkSeries
-              className="mark-series-example"
-              strokeWidth={2}
-              opacity="0.8"
-              sizeRange={[0, 100]}
-              color={this.stateEnum.POSITIVE}
-              data={this.state.positiveData}
-            />
-            <MarkSeries
-              className="mark-series-example"
-              strokeWidth={2}
-              opacity="0.8"
-              sizeRange={[0, 100]}
-              color={this.stateEnum.NEGATIVE}
-              data={this.state.negativeData}
-            />
-            <MarkSeries
-              className="mark-series-example"
-              strokeWidth={2}
-              opacity="0.8"
-              sizeRange={[0, 100]}
-              onValueMouseOut={() =>
-                this.setState({ currentHighlightData: [] })
-              }
-              onValueMouseOver={datapoint => this.highlightK(datapoint, false)}
-              onValueClick={datapoint => this.highlightK(datapoint, true)}
-              color={this.stateEnum.UNLABELED}
-              data={this.state.undeterminedData}
-            />
-            <MarkSeries
-              className="mark-series-example"
-              strokeWidth={2}
-              opacity="0.8"
-              sizeRange={[0, 100]}
-              color={this.stateEnum.HIGHLIGHT}
-              data={this.state.currentHighlightData}
-            />
-          </XYPlot>
+          {this.displayKNNExperiement()}
+          {this.showLearnKNN()}
         </div>
       </div>
     );

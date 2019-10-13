@@ -9,7 +9,7 @@ import Add from "../Images/add.png";
 import Trash from "../Images/trash.png";
 import Learn from "../Images/learn.png";
 import Exp from "../Images/exp.png";
-import { Image, Navbar, Nav, Table, Row, Col, Popover } from "react-bootstrap";
+import { Image, Navbar, Nav, Table, Row, Col } from "react-bootstrap";
 import DTreeLearn from "./learn/DTreeLearn";
 import EditDTree from "./edit/EditDTree";
 import {
@@ -38,7 +38,7 @@ class DTree extends React.Component {
       renderTree: false,
       showEditPanel: false,
       showLearnMode: false,
-      renderTable: true,
+      showFirstPage: true,
       displayedDepth: -1,
       treeState: {},
       data: this.generateRandomDataState(),
@@ -243,7 +243,7 @@ class DTree extends React.Component {
   saveEditState() {
     this.setState({
       data: this.generateRandomDataState(),
-      renderTable: true,
+      showFirstPage: true,
       renderTree: false,
       showEditPanel: false,
       showLearnMode: false
@@ -301,12 +301,12 @@ class DTree extends React.Component {
   }
 
   showDisplayButton() {
-    return this.state.renderTable && !this.state.showLearnMode ? (
+    return this.state.showFirstPage && !this.state.showLearnMode ? (
       <Nav.Link
         onClick={() => {
           this.setState({
             renderTree: true,
-            renderTable: false,
+            showFirstPage: false,
             showLearnMode: false,
             showEditPanel: false
           });
@@ -319,7 +319,7 @@ class DTree extends React.Component {
   }
 
   showAddRowButton() {
-    return this.state.renderTable && !this.state.showLearnMode ? (
+    return this.state.showFirstPage && !this.state.showLearnMode ? (
       <Nav.Link onClick={() => this.addRow()}>
         <Image src={Add} style={{ width: 40 }} />
       </Nav.Link>
@@ -327,7 +327,7 @@ class DTree extends React.Component {
   }
 
   showRandomizeDataButton() {
-    return this.state.renderTable && !this.state.showLearnMode ? (
+    return this.state.showFirstPage && !this.state.showLearnMode ? (
       <Nav.Link
         onClick={() => this.setState({ data: this.generateRandomDataState() })}
       >
@@ -337,12 +337,12 @@ class DTree extends React.Component {
   }
 
   showRenderTableButton() {
-    return this.state.renderTable && !this.state.showLearnMode ? (
+    return this.state.showFirstPage && !this.state.showLearnMode ? (
       <Nav.Link
         onClick={() =>
           this.setState({
             renderTree: false,
-            renderTable: false,
+            showFirstPage: false,
             showEditPanel: true,
             showLearnMode: false
           })
@@ -359,7 +359,7 @@ class DTree extends React.Component {
         onClick={() =>
           this.setState({
             renderTree: false,
-            renderTable: true,
+            showFirstPage: true,
             showLearnMode: false
           })
         }
@@ -370,16 +370,16 @@ class DTree extends React.Component {
   }
 
   showBackToAlgorithimPageCustom() {
-    return this.state.renderTable ? showBackToAlgorithimPage() : null;
+    return this.state.showFirstPage ? showBackToAlgorithimPage() : null;
   }
 
   showLearnModeIcon() {
-    return this.state.renderTable ? (
+    return this.state.showFirstPage ? (
       <Nav.Link
         onClick={() =>
           this.setState({
             showLearnMode: !this.state.showLearnMode,
-            renderTable: this.state.showLearnMode,
+            showFirstPage: true,
             showEditPanel: false,
             renderTree: false
           })
@@ -402,6 +402,7 @@ class DTree extends React.Component {
   }
 
   showDecisionTreeNavBar() {
+    console.log(this.state);
     return (
       <Navbar fixed="top" bg="dark" variant="dark">
         {this.showBackToAlgorithimPageCustom()}
@@ -417,7 +418,7 @@ class DTree extends React.Component {
   }
 
   showInformationBar() {
-    return this.state.renderTable ? (
+    return this.state.showFirstPage && !this.state.showLearnMode ? (
       <Col>
         {displayInfoButton(
           "Data Info Table",
