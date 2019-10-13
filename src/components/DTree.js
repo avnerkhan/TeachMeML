@@ -7,7 +7,16 @@ import Save from "../Images/save.png";
 import Back from "../Images/back.png";
 import Add from "../Images/add.png";
 import Trash from "../Images/trash.png";
-import { Image, Navbar, Nav, Table, Row, Col } from "react-bootstrap";
+import {
+  Image,
+  Navbar,
+  Nav,
+  Table,
+  Row,
+  Col,
+  OverlayTrigger,
+  Tooltip
+} from "react-bootstrap";
 import DTreeLearn from "./learn/DTreeLearn";
 import EditDTree from "./edit/EditDTree";
 import {
@@ -319,36 +328,56 @@ class DTree extends React.Component {
 
   showAddRowButton() {
     return this.state.showFirstPage && !this.state.showLearnMode ? (
-      <Nav.Link onClick={() => this.addRow()}>
-        <Image src={Add} style={{ width: 40 }} />
-      </Nav.Link>
+      <OverlayTrigger
+        trigger="hover"
+        placement="bottom"
+        overlay={<Tooltip>Add a data row</Tooltip>}
+      >
+        <Nav.Link onClick={() => this.addRow()}>
+          <Image src={Add} style={{ width: 40 }} />
+        </Nav.Link>
+      </OverlayTrigger>
     ) : null;
   }
 
   showRandomizeDataButton() {
     return this.state.showFirstPage && !this.state.showLearnMode ? (
-      <Nav.Link
-        onClick={() => this.setState({ data: this.generateRandomDataState() })}
+      <OverlayTrigger
+        trigger="hover"
+        placement="bottom"
+        overlay={<Tooltip>Generate Random Data</Tooltip>}
       >
-        <Image src={Shuffle} style={{ width: 40 }} />
-      </Nav.Link>
+        <Nav.Link
+          onClick={() =>
+            this.setState({ data: this.generateRandomDataState() })
+          }
+        >
+          <Image src={Shuffle} style={{ width: 40 }} />
+        </Nav.Link>
+      </OverlayTrigger>
     ) : null;
   }
 
   showRenderTableButton() {
     return this.state.showFirstPage && !this.state.showLearnMode ? (
-      <Nav.Link
-        onClick={() =>
-          this.setState({
-            renderTree: false,
-            showFirstPage: false,
-            showEditPanel: true,
-            showLearnMode: false
-          })
-        }
+      <OverlayTrigger
+        trigger="hover"
+        placement="bottom"
+        overlay={<Tooltip>Edit Features</Tooltip>}
       >
-        <Image src={Edit} style={{ width: 40 }} />
-      </Nav.Link>
+        <Nav.Link
+          onClick={() =>
+            this.setState({
+              renderTree: false,
+              showFirstPage: false,
+              showEditPanel: true,
+              showLearnMode: false
+            })
+          }
+        >
+          <Image src={Edit} style={{ width: 40 }} />
+        </Nav.Link>
+      </OverlayTrigger>
     ) : null;
   }
 

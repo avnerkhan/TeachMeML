@@ -1,5 +1,5 @@
 import React from "react";
-import { Popover, OverlayTrigger, Image, Nav } from "react-bootstrap";
+import { Popover, OverlayTrigger, Image, Nav, Tooltip } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import Back from "./Images/back.png";
 import Icon from "./Images/icon.png";
@@ -69,17 +69,23 @@ export function showBackToAlgorithimPage() {
 
 export function showLearnModeIcon(component) {
   return (
-    <Nav.Link
-      onClick={() =>
-        component.setState({
-          showLearnMode: !component.state.showLearnMode
-        })
-      }
+    <OverlayTrigger
+      trigger="hover"
+      placement="bottom"
+      overlay={<Tooltip>Toggle Learn Mode</Tooltip>}
     >
-      <Image
-        src={component.state.showLearnMode ? Exp : Learn}
-        style={{ width: 40 }}
-      />
-    </Nav.Link>
+      <Nav.Link
+        onClick={() =>
+          component.setState({
+            showLearnMode: !component.state.showLearnMode
+          })
+        }
+      >
+        <Image
+          src={component.state.showLearnMode ? Exp : Learn}
+          style={{ width: 40 }}
+        />
+      </Nav.Link>
+    </OverlayTrigger>
   );
 }
