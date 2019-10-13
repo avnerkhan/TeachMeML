@@ -7,7 +7,10 @@ import Save from "../Images/save.png";
 import Back from "../Images/back.png";
 import Add from "../Images/add.png";
 import Trash from "../Images/trash.png";
+import Learn from "../Images/learn.png";
+import Exp from "../Images/exp.png";
 import { Image, Navbar, Nav, Table, Row, Col, Popover } from "react-bootstrap";
+import DTreeLearn from "./learn/DTreeLearn";
 import EditDTree from "./edit/EditDTree";
 import {
   determineBestSplit,
@@ -32,8 +35,9 @@ class DTree extends React.Component {
     // State contains data. features are categorical, and label is last
     // Feature keys are ints so they are easily indexable
     this.state = {
-      showMode: false,
       renderTree: false,
+      showEditPanel: false,
+      showLearnMode: false,
       renderTable: true,
       displayedDepth: -1,
       treeState: {},
@@ -115,10 +119,8 @@ class DTree extends React.Component {
   // Method that allows the tree to be show and initializes/resets its state
   showTree() {
     this.setState({
-      renderTree: true,
       treeState: this.buildTree(this.state.data, {
         name: "Start",
-        gProps: { onMouseOver: () => this.setState({ showMode: false }) },
         children: []
       })
     });
@@ -241,7 +243,10 @@ class DTree extends React.Component {
   saveEditState() {
     this.setState({
       data: this.generateRandomDataState(),
-      renderTable: true
+      renderTable: true,
+      renderTree: false,
+      showEditPanel: false,
+      showLearnMode: false
     });
   }
 
@@ -292,23 +297,29 @@ class DTree extends React.Component {
   }
 
   displayEditTableInformation() {
-    return this.state.renderTable ? (
-      !this.state.renderTree ? (
-        this.showCustomDataTable()
-      ) : null
-    ) : (
-      <EditDTree />
-    );
+    return this.state.showEditPanel ? <EditDTree /> : null;
   }
 
   showDisplayButton() {
-    return this.state.renderTree || !this.state.renderTable ? null : (
-      <Nav.Link onClick={() => this.showTree()}>Generate Tree</Nav.Link>
-    );
+    return this.state.renderTable && !this.state.showLearnMode ? (
+      <Nav.Link
+        onClick={() => {
+          this.setState({
+            renderTree: true,
+            renderTable: false,
+            showLearnMode: false,
+            showEditPanel: false
+          });
+          this.showTree();
+        }}
+      >
+        Generate Tree
+      </Nav.Link>
+    ) : null;
   }
 
   showAddRowButton() {
-    return this.state.renderTable && !this.state.renderTree ? (
+    return this.state.renderTable && !this.state.showLearnMode ? (
       <Nav.Link onClick={() => this.addRow()}>
         <Image src={Add} style={{ width: 40 }} />
       </Nav.Link>
@@ -316,7 +327,7 @@ class DTree extends React.Component {
   }
 
   showRandomizeDataButton() {
-    return this.state.renderTable && !this.state.renderTree ? (
+    return this.state.renderTable && !this.state.showLearnMode ? (
       <Nav.Link
         onClick={() => this.setState({ data: this.generateRandomDataState() })}
       >
@@ -326,23 +337,32 @@ class DTree extends React.Component {
   }
 
   showRenderTableButton() {
-    return this.state.renderTable ? (
+    return this.state.renderTable && !this.state.showLearnMode ? (
       <Nav.Link
-        onClick={() => this.setState({ renderTree: false, renderTable: false })}
+        onClick={() =>
+          this.setState({
+            renderTree: false,
+            renderTable: false,
+            showEditPanel: true,
+            showLearnMode: false
+          })
+        }
       >
         <Image src={Edit} style={{ width: 40 }} />
       </Nav.Link>
-    ) : (
-      <Nav.Link onClick={() => this.saveEditState()}>
-        <Image src={Save} style={{ width: 40 }} />
-      </Nav.Link>
-    );
+    ) : null;
   }
 
   showBackToDataButton() {
-    return this.state.renderTree || !this.state.renderTable ? (
+    return this.state.renderTree ? (
       <Nav.Link
-        onClick={() => this.setState({ renderTree: false, renderTable: true })}
+        onClick={() =>
+          this.setState({
+            renderTree: false,
+            renderTable: true,
+            showLearnMode: false
+          })
+        }
       >
         <Image src={Back} style={{ width: 40 }} />
       </Nav.Link>
@@ -350,9 +370,35 @@ class DTree extends React.Component {
   }
 
   showBackToAlgorithimPageCustom() {
-    return this.state.renderTable && !this.state.renderTree
-      ? showBackToAlgorithimPage()
-      : null;
+    return this.state.renderTable ? showBackToAlgorithimPage() : null;
+  }
+
+  showLearnModeIcon() {
+    return this.state.renderTable ? (
+      <Nav.Link
+        onClick={() =>
+          this.setState({
+            showLearnMode: !this.state.showLearnMode,
+            renderTable: this.state.showLearnMode,
+            showEditPanel: false,
+            renderTree: false
+          })
+        }
+      >
+        <Image
+          src={this.state.showLearnMode ? Exp : Learn}
+          style={{ width: 40 }}
+        />
+      </Nav.Link>
+    ) : null;
+  }
+
+  showSaveIcon() {
+    return this.state.showEditPanel ? (
+      <Nav.Link onClick={() => this.saveEditState({})}>
+        <Image src={Save} style={{ width: 40 }} />
+      </Nav.Link>
+    ) : null;
   }
 
   showDecisionTreeNavBar() {
@@ -362,22 +408,29 @@ class DTree extends React.Component {
         {this.showBackToDataButton()}
         {this.showDisplayButton()}
         {this.showAddRowButton()}
+        {this.showSaveIcon()}
         {this.showRandomizeDataButton()}
         {this.showRenderTableButton()}
+        {this.showLearnModeIcon()}
       </Navbar>
     );
   }
 
   showInformationBar() {
-    return this.state.renderTable && !this.state.renderTree ? (
+    return this.state.renderTable ? (
       <Col>
         {displayInfoButton(
           "Data Info Table",
           "This data is the data we use to generate our decision tree. You can change the values on each column on each row, delete rows with the trashcan, randomize data with the shuffle button.",
           "left"
         )}
+        {this.showCustomDataTable()}
       </Col>
     ) : null;
+  }
+
+  displayLearnModeDTree() {
+    return this.state.showLearnMode ? <DTreeLearn /> : null;
   }
 
   render() {
@@ -389,6 +442,7 @@ class DTree extends React.Component {
             {this.showInformationBar()}
             <Col>
               {this.displayTreeInformation()}
+              {this.displayLearnModeDTree()}
               {this.displayEditTableInformation()}
             </Col>
           </Row>
