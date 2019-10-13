@@ -7,8 +7,6 @@ import Save from "../Images/save.png";
 import Back from "../Images/back.png";
 import Add from "../Images/add.png";
 import Trash from "../Images/trash.png";
-import Learn from "../Images/learn.png";
-import Exp from "../Images/exp.png";
 import { Image, Navbar, Nav, Table, Row, Col } from "react-bootstrap";
 import DTreeLearn from "./learn/DTreeLearn";
 import EditDTree from "./edit/EditDTree";
@@ -25,7 +23,8 @@ import { connect } from "react-redux";
 import {
   displayInfoButton,
   showBackToAlgorithimPage,
-  roundToTwoDecimalPlaces
+  roundToTwoDecimalPlaces,
+  showLearnModeIcon
 } from "../Utility";
 
 class DTree extends React.Component {
@@ -373,24 +372,8 @@ class DTree extends React.Component {
     return this.state.showFirstPage ? showBackToAlgorithimPage() : null;
   }
 
-  showLearnModeIcon() {
-    return this.state.showFirstPage ? (
-      <Nav.Link
-        onClick={() =>
-          this.setState({
-            showLearnMode: !this.state.showLearnMode,
-            showFirstPage: true,
-            showEditPanel: false,
-            renderTree: false
-          })
-        }
-      >
-        <Image
-          src={this.state.showLearnMode ? Exp : Learn}
-          style={{ width: 40 }}
-        />
-      </Nav.Link>
-    ) : null;
+  showLearnModeIconCustom() {
+    return this.state.showFirstPage ? showLearnModeIcon(this) : null;
   }
 
   showSaveIcon() {
@@ -412,7 +395,7 @@ class DTree extends React.Component {
         {this.showSaveIcon()}
         {this.showRandomizeDataButton()}
         {this.showRenderTableButton()}
-        {this.showLearnModeIcon()}
+        {this.showLearnModeIconCustom()}
       </Navbar>
     );
   }

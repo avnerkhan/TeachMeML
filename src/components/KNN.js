@@ -11,8 +11,6 @@ import Image from "react-bootstrap/Image";
 import Navbar from "react-bootstrap/Navbar";
 import Shuffle from "../Images/shuffle.png";
 import Add from "../Images/add.png";
-import Learn from "../Images/learn.png";
-import Exp from "../Images/exp.png";
 import KNNLearn from "./learn/KNNLearn";
 import Nav from "react-bootstrap/Nav";
 import FormControl from "react-bootstrap/FormControl";
@@ -21,8 +19,11 @@ import Form from "react-bootstrap/Form";
 import { generateRandomData } from "./algorithims/KNNAlgo";
 import { euclidFunction, comparator, arrayRange } from "../Utility";
 import "../css_files/App.css";
-import { showBackToAlgorithimPage, displayInfoButton } from "../Utility";
-import NavbarCollapse from "react-bootstrap/NavbarCollapse";
+import {
+  showBackToAlgorithimPage,
+  displayInfoButton,
+  showLearnModeIcon
+} from "../Utility";
 
 class KNN extends React.Component {
   constructor(props) {
@@ -202,21 +203,6 @@ class KNN extends React.Component {
       : null;
   }
 
-  showLearnIcon() {
-    return (
-      <Nav.Link
-        onClick={() =>
-          this.setState({ showLearnMode: !this.state.showLearnMode })
-        }
-      >
-        <Image
-          src={this.state.showLearnMode ? Exp : Learn}
-          style={{ width: 40 }}
-        />
-      </Nav.Link>
-    );
-  }
-
   showKNNNavBar() {
     return (
       <Navbar fixed="top" bg="dark" variant="dark">
@@ -226,7 +212,7 @@ class KNN extends React.Component {
         {this.showRandomizeDataButton()}
         {this.showXandYInputBar()}
         {this.showKSelection()}
-        {this.showLearnIcon()}
+        {showLearnModeIcon(this)}
       </Navbar>
     );
   }

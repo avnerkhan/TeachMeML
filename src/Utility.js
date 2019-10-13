@@ -3,6 +3,8 @@ import { Popover, OverlayTrigger, Image, Nav } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import Back from "./Images/back.png";
 import Icon from "./Images/icon.png";
+import Learn from "./Images/learn.png";
+import Exp from "./Images/exp.png";
 
 // Euclidean distance function that returns orginal point and distance
 export function euclidFunction(pointOne, pointTwo) {
@@ -62,5 +64,22 @@ export function showBackToAlgorithimPage() {
         <Image src={Back} style={{ width: 40 }} />
       </Nav>
     </Link>
+  );
+}
+
+export function showLearnModeIcon(component) {
+  return (
+    <Nav.Link
+      onClick={() =>
+        component.setState({
+          showLearnMode: !component.state.showLearnMode
+        })
+      }
+    >
+      <Image
+        src={component.state.showLearnMode ? Exp : Learn}
+        style={{ width: 40 }}
+      />
+    </Nav.Link>
   );
 }

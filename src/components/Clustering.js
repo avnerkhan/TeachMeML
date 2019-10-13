@@ -17,8 +17,6 @@ import Reset from "../Images/reset.png";
 import Check from "../Images/check.png";
 import Eraser from "../Images/eraser.png";
 import Forward from "../Images/forward.png";
-import Learn from "../Images/learn.png";
-import Exp from "../Images/exp.png";
 import ClusteringLearn from "./learn/ClusteringLearn";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
@@ -26,7 +24,8 @@ import {
   euclidFunction,
   comparator,
   arrayRange,
-  displayInfoButton
+  displayInfoButton,
+  showLearnModeIcon
 } from "../Utility";
 import "../css_files/App.css";
 
@@ -53,6 +52,7 @@ class Clustering extends React.Component {
       readyToStartState: false,
       choosingCentroidState: false,
       runningKMeans: false,
+      showLearnMode: false,
       unlabeledData: [{ x: 0, y: 0 }],
       clusteredData: this.generateEmptyCluster(),
       centroidData: []
@@ -395,13 +395,16 @@ class Clustering extends React.Component {
   showClusterDeploymentSelectionBar() {
     return !this.state.choosingCentroidState &&
       !this.state.runningKMeans &&
-      !this.state.runningDBScan
+      !this.state.runningDBScan &&
+      !this.state.showLearnMode
       ? this.showClusterDeploymentSelection()
       : null;
   }
 
   showDBScanSelectionBar() {
-    return this.state.runningDBScan ? this.showDBScanSelection() : null;
+    return this.state.runningDBScan && !this.state.showLearnMode
+      ? this.showDBScanSelection()
+      : null;
   }
 
   showStartAlgorithimBar() {
@@ -462,7 +465,70 @@ class Clustering extends React.Component {
         {this.showClearSlateBar()}
         {this.showRunDBScanAgainBar()}
         {this.showResetClusterBar()}
+        {showLearnModeIcon(this)}
       </Navbar>
+    );
+  }
+
+  displayClusterDeploymentArea() {
+    return !this.state.showLearnMode ? (
+      <XYPlot
+        width={600}
+        height={600}
+        onClick={e => this.smallClusterDrop(e)}
+        xDomain={[0, 100]}
+        yDomain={[0, 100]}
+      >
+        <VerticalGridLines />
+        <HorizontalGridLines />
+        <XAxis />
+        <YAxis />
+        <MarkSeries
+          className="mark-series-example"
+          strokeWidth={2}
+          opacity="0.8"
+          sizeRange={[0, 100]}
+          color={this.stateEnum.UNLABELED}
+          data={this.state.unlabeledData}
+          onValueClick={datapoint => this.makeCentroid(datapoint)}
+        />
+        <MarkSeries
+          className="mark-series-example"
+          strokeWidth={2}
+          opacity="0.8"
+          sizeRange={[0, 100]}
+          color={this.stateEnum.CENTROID}
+          data={this.state.centroidData}
+        />
+        {this.state.clusteredData.map(cluster => {
+          return (
+            <MarkSeries
+              className="mark-series-example"
+              strokeWidth={2}
+              opacity="0.8"
+              sizeRange={[0, 100]}
+              color={
+                this.stateEnum.CLUSTER[
+                  this.state.clusteredData.indexOf(cluster)
+                ]
+              }
+              data={cluster}
+            />
+          );
+        })}
+      </XYPlot>
+    ) : null;
+  }
+
+  showInfoIconOrLearn() {
+    return !this.state.showLearnMode ? (
+      displayInfoButton(
+        "Clustering Algorithims",
+        "Start pressing on the grid anywhere to start adding points to the grid. Once the algorithim starts running, press the check mark to finish choosing centroids (If KMeans). The right arrow runs an iteration of Kmeans, and the eraser resets the board. If you choose DBScan, simply run the algorithim and watch the board populate with the coloring based on the configurations you chose.",
+        "right"
+      )
+    ) : (
+      <ClusteringLearn />
     );
   }
 
@@ -471,57 +537,9 @@ class Clustering extends React.Component {
       <div className="App">
         <div className="App-header">
           {this.showClusteringNavBar()}
-          {displayInfoButton(
-            "Clustering Algorithims",
-            "Start pressing on the grid anywhere to start adding points to the grid. Once the algorithim starts running, press the check mark to finish choosing centroids (If KMeans). The right arrow runs an iteration of Kmeans, and the eraser resets the board. If you choose DBScan, simply run the algorithim and watch the board populate with the coloring based on the configurations you chose.",
-            "right"
-          )}
+          {this.showInfoIconOrLearn()}
           <Row>
-            <XYPlot
-              width={600}
-              height={600}
-              onClick={e => this.smallClusterDrop(e)}
-              xDomain={[0, 100]}
-              yDomain={[0, 100]}
-            >
-              <VerticalGridLines />
-              <HorizontalGridLines />
-              <XAxis />
-              <YAxis />
-              <MarkSeries
-                className="mark-series-example"
-                strokeWidth={2}
-                opacity="0.8"
-                sizeRange={[0, 100]}
-                color={this.stateEnum.UNLABELED}
-                data={this.state.unlabeledData}
-                onValueClick={datapoint => this.makeCentroid(datapoint)}
-              />
-              <MarkSeries
-                className="mark-series-example"
-                strokeWidth={2}
-                opacity="0.8"
-                sizeRange={[0, 100]}
-                color={this.stateEnum.CENTROID}
-                data={this.state.centroidData}
-              />
-              {this.state.clusteredData.map(cluster => {
-                return (
-                  <MarkSeries
-                    className="mark-series-example"
-                    strokeWidth={2}
-                    opacity="0.8"
-                    sizeRange={[0, 100]}
-                    color={
-                      this.stateEnum.CLUSTER[
-                        this.state.clusteredData.indexOf(cluster)
-                      ]
-                    }
-                    data={cluster}
-                  />
-                );
-              })}
-            </XYPlot>
+            {this.displayClusterDeploymentArea()}
             {this.showClusterDeploymentSelectionBar()}
             {this.showDBScanSelectionBar()}
           </Row>

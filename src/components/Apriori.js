@@ -5,24 +5,20 @@ import Table from "react-bootstrap/Table";
 import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 import Forward from "../Images/forward.png";
-import Learn from "../Images/learn.png";
-import Exp from "../Images/exp.png";
 import AprioriLearn from "./learn/AprioriLearn";
 import Image from "react-bootstrap/Image";
 import Tree from "react-tree-graph";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
-import { arrayRange } from "../Utility";
+import { arrayRange, showLearnModeIcon } from "../Utility";
 import { showBackToAlgorithimPage, displayInfoButton } from "../Utility";
 import {
   generateRandomTransaction,
   generateOneItemsets,
   reorderDB,
   buildTree,
-  findAllPaths,
   filterFreqSets,
-  getFrequentItemsets,
   mineFreqItemsets,
   formatSets
 } from "./algorithims/AprioriAlgo";
@@ -39,6 +35,7 @@ class Apriori extends React.Component {
       treeState: {},
       renderTree: false,
       isFPTree: false,
+      showLearnMode: false,
       minSup: 2,
       frequentItemSet: [],
       transactionItems: this.defaultTransactionSelection,
@@ -47,7 +44,7 @@ class Apriori extends React.Component {
   }
 
   showMinSupSelection() {
-    return (
+    return !this.state.showLearnMode ? (
       <Form>
         <Form.Group>
           <Form.Label>Select MinSup value</Form.Label>
@@ -61,7 +58,7 @@ class Apriori extends React.Component {
           </Form.Control>
         </Form.Group>
       </Form>
-    );
+    ) : null;
   }
 
   // Either adds or subtracts an element from a transaction
@@ -245,15 +242,15 @@ class Apriori extends React.Component {
   }
 
   showStartAlgorithimBar() {
-    return (
+    return !this.state.showLearnMode ? (
       <Nav.Link onClick={() => this.runFPTreeAlgorithim()}>
         Run FP Tree Algorithim
       </Nav.Link>
-    );
+    ) : null;
   }
 
   showRunNextIterationBar() {
-    return !this.state.isFPTree ? (
+    return !this.state.isFPTree && !this.state.showLearnMode ? (
       <Nav.Link onClick={() => this.runAprioriAlgorithim()}>
         <Image src={Forward} style={{ width: 40 }} />
       </Nav.Link>
@@ -267,6 +264,7 @@ class Apriori extends React.Component {
         {this.showStartAlgorithimBar()}
         {this.showRunNextIterationBar()}
         {this.showMinSupSelection()}
+        {showLearnModeIcon(this)}
       </Navbar>
     );
   }
@@ -282,12 +280,23 @@ class Apriori extends React.Component {
     ) : null;
   }
 
+  showDataTable() {
+    return this.state != undefined && !this.state.showLearnMode
+      ? this.displayTransactionTable()
+      : null;
+  }
+
+  displayLearnModeApriori() {
+    return this.state.showLearnMode ? <AprioriLearn /> : null;
+  }
+
   render() {
     return (
       <div className="App">
         <header className="App-header">
           {this.showAprioriNavBar()}
-          {this.state != undefined ? this.displayTransactionTable() : null}
+          {this.showDataTable()}
+          {this.displayLearnModeApriori()}
           {this.displayFrequentItemsets()}
         </header>
       </div>
