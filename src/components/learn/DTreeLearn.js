@@ -2,7 +2,11 @@ import React from "react";
 
 class DTreeLearn extends React.Component {
   render() {
-    return <h1>DTree Learn</h1>;
+    return (
+      <div>
+        <h1>Decision Trees</h1>
+      </div>
+    );
   }
 }
 

@@ -252,7 +252,9 @@ class Clustering extends React.Component {
             return <option value={num}>{num}</option>;
           })}
         </Form.Control>
-        {this.showDBScanSelection()}
+        {this.state.algorithim == this.stateEnum.DBSCAN
+          ? this.showDBScanSelection()
+          : null}
         <Form.Label>Select Algorithim</Form.Label>
         <Form.Control
           as="select"
@@ -282,7 +284,7 @@ class Clustering extends React.Component {
           point.label = clusters;
 
           for (let newPoint of neighbhors) {
-            if (newPoint.label === this.stateEnum.OUTLIER)
+            if (newPoint.label == this.stateEnum.OUTLIER)
               newPoint.label = clusters;
 
             if (newPoint.label == undefined) {
@@ -475,7 +477,7 @@ class Clustering extends React.Component {
   showRunDBScanAgainBar() {
     return this.state.runningDBScan ? (
       <Nav.Link onClick={() => this.runDBScan()}>
-        <Image src={Reset} style={{ width: 40 }} />
+        <Image src={Check} style={{ width: 40 }} />
       </Nav.Link>
     ) : null;
   }
@@ -564,6 +566,9 @@ class Clustering extends React.Component {
           {this.showClusteringNavBar()}
           {this.showInfoIconOrLearn()}
           <Row>
+            {this.state.choosingCentroidState ? (
+              <h1>Please Select Clusters</h1>
+            ) : null}
             {this.displayClusterDeploymentArea()}
             {this.showClusterDeploymentSelectionBar()}
             {this.showDBScanSelectionBar()}

@@ -207,6 +207,7 @@ class Apriori extends React.Component {
   }
 
   runFPTreeAlgorithim() {
+    debugger;
     let oneItemSet = generateOneItemsets(
       this.state.transactions,
       this.state.transactionItems,

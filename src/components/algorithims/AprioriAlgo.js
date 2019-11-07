@@ -157,7 +157,7 @@ export function getFrequentItemsets(currentPaths, minsup) {
     for (let pair of currentPathsForKey) {
       if (pair != undefined) {
         const actualPath = pair[0];
-        const count = pair[1];
+        const count = parseInt(pair[1]);
         let startString = pathKey;
         for (let c of actualPath) {
           if (c !== "R") {
