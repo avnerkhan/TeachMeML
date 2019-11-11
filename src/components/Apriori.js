@@ -35,6 +35,7 @@ class Apriori extends React.Component {
     this.state = {
       treeState: {},
       renderTree: false,
+      isApriori: false,
       isFPTree: false,
       showLearnMode: false,
       minSup: 2,
@@ -106,7 +107,8 @@ class Apriori extends React.Component {
           transactions,
           transactionItems,
           minSup
-        )
+        ),
+        isApriori: true
       });
     } else {
       let oneItemSet = Object.keys(frequentItemSet[0]);
@@ -134,7 +136,7 @@ class Apriori extends React.Component {
 
       frequentItemSet.push(newFrequentSet);
 
-      this.setState({ frequentItemSet: frequentItemSet });
+      this.setState({ frequentItemSet: frequentItemSet, isApriori: true });
     }
   }
 
@@ -207,7 +209,6 @@ class Apriori extends React.Component {
   }
 
   runFPTreeAlgorithim() {
-    debugger;
     let oneItemSet = generateOneItemsets(
       this.state.transactions,
       this.state.transactionItems,
@@ -244,7 +245,7 @@ class Apriori extends React.Component {
   }
 
   showStartAlgorithimBar() {
-    return !this.state.showLearnMode ? (
+    return !this.state.showLearnMode && !this.state.isApriori ? (
       <Nav.Link onClick={() => this.runFPTreeAlgorithim()}>
         Run FP Tree Algorithim
       </Nav.Link>
@@ -256,7 +257,7 @@ class Apriori extends React.Component {
       <OverlayTrigger
         trigger="hover"
         placement="bottom"
-        overlay={<Tooltip>Run next iteration</Tooltip>}
+        overlay={<Tooltip>Run next Apriori iteration</Tooltip>}
       >
         <Nav.Link onClick={() => this.runAprioriAlgorithim()}>
           <Image src={Forward} style={{ width: 40 }} />
@@ -279,12 +280,15 @@ class Apriori extends React.Component {
 
   showTree() {
     return this.state.renderTree ? (
-      <Tree
-        height={400}
-        width={800}
-        data={this.state.treeState}
-        svgProps={{ className: "custom" }}
-      />
+      <div>
+        <h1>Generated Tree</h1>
+        <Tree
+          height={400}
+          width={800}
+          data={this.state.treeState}
+          svgProps={{ className: "custom" }}
+        />
+      </div>
     ) : null;
   }
 
@@ -306,6 +310,7 @@ class Apriori extends React.Component {
           {this.showDataTable()}
           {this.displayLearnModeApriori()}
           {this.displayFrequentItemsets()}
+          {this.showTree()}
         </header>
       </div>
     );

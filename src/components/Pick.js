@@ -23,6 +23,9 @@ class Pick extends React.Component {
             <Link to="/Apriori">
               <Button variant="primary">Apriori Frequent Itemsets</Button>
             </Link>
+            <Link to="/Intro">
+              <Button variant="primary">Introduction to Data Mining</Button>
+            </Link>
           </ButtonToolbar>
         </header>
       </div>
