@@ -22,9 +22,9 @@ import EditDTree from "./edit/EditDTree";
 import {
   determineBestSplit,
   determineMostLikelyLabel,
-  getGiniMap,
+  getMap,
   filteredData,
-  calculateGiniValue
+  calculateImpurityValue
 } from "./algorithims/DTreeAlgo";
 import "../css_files/App.css";
 import "react-table/react-table.css";
@@ -43,6 +43,7 @@ class DTree extends React.Component {
     // State contains data. features are categorical, and label is last
     // Feature keys are ints so they are easily indexable
     this.state = {
+      isGini: true,
       renderTree: false,
       showEditPanel: false,
       showLearnMode: false,
@@ -79,7 +80,7 @@ class DTree extends React.Component {
       return currTree;
     }
 
-    let entropy = calculateGiniValue(data);
+    let entropy = calculateImpurityValue(data, this.state.isGini);
 
     if (entropy === 0) {
       let dataClass = data[0].label;
@@ -89,10 +90,14 @@ class DTree extends React.Component {
 
     let splitDict = {};
 
-    const information = determineBestSplit(this.props.dataLabels, data);
+    const information = determineBestSplit(
+      this.props.dataLabels,
+      data,
+      this.state.isGini
+    );
     const bestSplit = information.currentHighestGainLabel;
     const gainAmount = information.currentHighestGain;
-    const classArr = getGiniMap(bestSplit, data, true);
+    const classArr = getMap(bestSplit, data, true, this.state.isGini);
 
     for (const classVal in classArr) {
       splitDict[classVal] = filteredData(classVal, bestSplit, data);
@@ -419,6 +424,20 @@ class DTree extends React.Component {
     ) : null;
   }
 
+  showEntropyOrGiniSelection() {
+    return !this.state.showLearnMode && !this.state.renderTree ? (
+      <div>
+        <select
+          value={this.state.isGini ? "gini" : "entropy"}
+          onChange={e => this.setState({ isGini: e.target.value === "gini" })}
+        >
+          <option value="gini">Gini</option>
+          <option value="entropy">Entropy</option>
+        </select>
+      </div>
+    ) : null;
+  }
+
   showDecisionTreeNavBar() {
     console.log(this.state);
     return (
@@ -430,6 +449,7 @@ class DTree extends React.Component {
         {this.showSaveIcon()}
         {this.showRandomizeDataButton()}
         {this.showRenderTableButton()}
+        {this.showEntropyOrGiniSelection()}
         {this.showLearnModeIconCustom()}
       </Navbar>
     );

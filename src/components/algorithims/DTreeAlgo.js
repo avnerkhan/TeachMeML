@@ -14,12 +14,12 @@ export function determineMostLikelyLabel(data) {
 }
 
 // Determines best split based on comparing gain ratios of all entries
-export function determineBestSplit(dataLabels, data) {
+export function determineBestSplit(dataLabels, data, isGini) {
   let currentHighestGainLabel = "";
   let currentHighestGain = 0.0;
 
   for (let i = 0; i < dataLabels.size; i++) {
-    const currGain = calculateGainRatio(dataLabels.get(i), data);
+    const currGain = calculateGainRatio(dataLabels.get(i), data, isGini);
 
     if (currGain > currentHighestGain) {
       currentHighestGain = currGain;
@@ -32,20 +32,20 @@ export function determineBestSplit(dataLabels, data) {
 // Refer to practice exam 1 decision tree for algorithim.
 
 // Calculates gain ratio from splitting on feature
-function calculateGainRatio(feature, data) {
+function calculateGainRatio(feature, data, isGini) {
   // Problem in one of these two functions
-  const gain = calculateGain(feature, data);
+  const gain = calculateGain(feature, data, isGini);
   const splitInfo = calculateSplitInfo(feature, data);
   if (splitInfo === 0) return 0;
   return gain / splitInfo;
 }
 
 function calculateSplitInfo(feature, data) {
-  const giniMap = getGiniMap(feature, data, false);
+  const featureMap = getMap(feature, data, false);
   let totalSplit = 0.0;
 
-  for (const entry in giniMap) {
-    const fraction = giniMap[entry].totalNum / data.length;
+  for (const entry in featureMap) {
+    const fraction = featureMap[entry].totalNum / data.length;
     totalSplit += -fraction * Math.log2(fraction);
   }
 
@@ -53,21 +53,32 @@ function calculateSplitInfo(feature, data) {
 }
 
 // Calculates information gain from splitting on feature
-function calculateGain(feature, data) {
-  const overallEntropy = calculateGiniValue(data);
-  const splitValue = calculateSplitGini(feature, data);
-  return overallEntropy - splitValue;
+function calculateGain(feature, data, isGini) {
+  const overallImpurity = calculateImpurityValue(data, isGini);
+  const splitValue = calculateSplit(feature, data, isGini);
+  return overallImpurity - splitValue;
 }
 
 // Based on the currently given dataset, calculate the positive and negative
-// counts. Can be used to calculate overall entropy of dataset or gini
+// counts. Can be used to calculate overall impurity of dataset or gini
 // of specific features
-export function calculateGiniValue(data) {
+export function calculateImpurityValue(data, isGini) {
   const posNegCount = countPositiveAndNegative(data);
-  const posSquared = getSquaredNumber(posNegCount.pos, data.length);
-  const negSquared = getSquaredNumber(posNegCount.neg, data.length);
 
-  return 1 - posSquared - negSquared;
+  if (isGini) {
+    const posSquared = getSquaredNumber(posNegCount.pos, data.length);
+    const negSquared = getSquaredNumber(posNegCount.neg, data.length);
+
+    return 1 - posSquared - negSquared;
+  }
+
+  const posRatio = posNegCount.pos / data.length;
+  const negRatio = posNegCount.neg / data.length;
+
+  const posCalc = posRatio === 0 ? 0 : -(posRatio * Math.log2(posRatio));
+  const negCalc = negRatio === 0 ? 0 : -(negRatio * Math.log2(negRatio));
+
+  return posCalc + negCalc;
 }
 
 // Returns a number divided by total dataset length and squares it
@@ -82,7 +93,7 @@ function getSquaredNumber(number, dataLength) {
 // and the value is the total count of that class and the positive count
 // The function then creates another map that has classes as keys and
 // has the values as the calculated gini of that class and the total count
-export function getGiniMap(feature, data, returnOnlyClassMap) {
+export function getMap(feature, data, returnOnlyClassMap, isGini) {
   let classMap = {};
   let returnMap = {};
 
@@ -108,7 +119,10 @@ export function getGiniMap(feature, data, returnOnlyClassMap) {
 
   for (const classVal in classMap) {
     const mapEntry = {
-      giniValue: calculateGiniValue(filteredData(classVal, feature, data)),
+      impurityValue: calculateImpurityValue(
+        filteredData(classVal, feature, data),
+        isGini
+      ),
       totalNum: classMap[classVal].totalCount
     };
     returnMap[classVal] = mapEntry;
@@ -132,13 +146,13 @@ export function filteredData(classVal, feature, data) {
 }
 
 // Calculates split gini for feature
-function calculateSplitGini(feature, data) {
-  const giniMap = getGiniMap(feature, data, false);
+function calculateSplit(feature, data, isGini) {
+  const featureMap = getMap(feature, data, false, isGini);
   let totalSplit = 0.0;
 
-  for (let entry in giniMap) {
-    const fractionValue = giniMap[entry].totalNum / data.length;
-    totalSplit += fractionValue * giniMap[entry].giniValue;
+  for (let entry in featureMap) {
+    const fractionValue = featureMap[entry].totalNum / data.length;
+    totalSplit += fractionValue * featureMap[entry].impurityValue;
   }
 
   return totalSplit;

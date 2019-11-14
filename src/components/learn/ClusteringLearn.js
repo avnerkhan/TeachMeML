@@ -45,7 +45,30 @@ class ClusteringLearn extends React.Component {
           At this point, our algorithm will have classified our labels.
         </p>
         <h2>How DBScan Works</h2>
-        <p>Info</p>
+        <p>
+          DBScan is another clustering algorithm, but it works better for more
+          oddly shaped clusters. It clusters based on the density of a region.
+        </p>
+        <p>
+          At each point in the dataset, we calculate the density of the point by
+          counting the number of other points within that points “eps”, which is
+          basically a parameter radius. Once we have the density of that point,
+          we can categorize it in three ways.
+        </p>
+        <p>
+          Core Points are basically points in the interior of a dense region. If
+          the number of points in it’s eps meets minPts, which is the minimum
+          number of points to satisfy the condition, then it is a core point.
+        </p>
+        <p>
+          Border points are points that are not core points, but fall in the eps
+          of a core point
+        </p>
+        <p>Noise points are neither core or border</p>
+        <p>
+          Once DBscan labels all points, we eliminate noise points, and label
+          points in the same eps as the same cluster, as are border points
+        </p>
         <h2>When to use KMeans and DBSCAN</h2>
         <p>
           There are certain reasons why we would choose KMeans over DBScan and
