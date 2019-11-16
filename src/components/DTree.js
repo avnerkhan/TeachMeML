@@ -59,8 +59,8 @@ class DTree extends React.Component {
   }
 
   determineClassLabel(classVal) {
-    for (const key of this.props.labelClasses.keySeq()) {
-      if (this.props.labelClasses.get(key).contains(classVal)) return key;
+    for (const key of this.props.featureClasses.keySeq()) {
+      if (this.props.featureClasses.get(key).contains(classVal)) return key;
     }
   }
 
@@ -80,10 +80,14 @@ class DTree extends React.Component {
       return currTree;
     }
 
-    let entropy = calculateImpurityValue(data, this.state.isGini);
+    let entropy = calculateImpurityValue(
+      data,
+      this.state.isGini,
+      this.props.label
+    );
 
     if (entropy === 0) {
-      let dataClass = data[0].label;
+      let dataClass = data[0][this.props.label];
       currTree.children.push({ name: dataClass, gProps: {} });
       return currTree;
     }
@@ -91,13 +95,20 @@ class DTree extends React.Component {
     let splitDict = {};
 
     const information = determineBestSplit(
-      this.props.dataLabels,
+      this.props.features,
       data,
-      this.state.isGini
+      this.state.isGini,
+      this.props.label
     );
     const bestSplit = information.currentHighestGainLabel;
     const gainAmount = information.currentHighestGain;
-    const classArr = getMap(bestSplit, data, true, this.state.isGini);
+    const classArr = getMap(
+      bestSplit,
+      data,
+      true,
+      this.state.isGini,
+      this.props.label
+    );
 
     for (const classVal in classArr) {
       splitDict[classVal] = filteredData(classVal, bestSplit, data);
@@ -152,21 +163,25 @@ class DTree extends React.Component {
 
   generateRandomDataState() {
     let dataState = [];
-    let dataLabels = this.props.dataLabels;
-    let labelClasses = this.props.labelClasses;
+    const features = this.props.features;
+    const featureClasses = this.props.featureClasses;
+    const labelClasses = this.props.labelClasses;
 
     for (let count = 0; count < 10; count++) {
       let entry = {};
-      for (let i = 0; i < dataLabels.size; i++) {
-        if (dataLabels.get(i) !== "label") {
-          let currentClassLabels = labelClasses.get(dataLabels.get(i));
-          let randomEntry = currentClassLabels.get(
+      for (let i = 0; i < features.size; i++) {
+        if (features.get(i) !== "label") {
+          const currentClassLabels = featureClasses.get(features.get(i));
+          const randomEntry = currentClassLabels.get(
             Math.floor(Math.random() * currentClassLabels.size)
           );
-          entry[dataLabels.get(i)] = randomEntry;
+          entry[features.get(i)] = randomEntry;
         }
       }
-      entry["label"] = count % 2;
+      const randomLabel = labelClasses.get(
+        Math.floor(Math.random() * labelClasses.size)
+      );
+      entry[this.props.label] = randomLabel;
       dataState.push(entry);
     }
 
@@ -182,7 +197,10 @@ class DTree extends React.Component {
   }
 
   showSelectionForRow(value, key, dataIndex) {
-    const valueClasses = this.props.labelClasses.get(key);
+    const valueClasses =
+      this.props.featureClasses.get(key) != undefined
+        ? this.props.featureClasses.get(key)
+        : this.props.labelClasses;
 
     return (
       <select
@@ -213,10 +231,10 @@ class DTree extends React.Component {
       <Table size="sm">
         <thead>
           <tr>
-            {this.props.dataLabels.map(feature => {
+            {this.props.features.map(feature => {
               return <th>{feature}</th>;
             })}
-            <th>Label</th>
+            <th>{this.props.label}</th>
           </tr>
         </thead>
         <tbody>
@@ -228,7 +246,7 @@ class DTree extends React.Component {
                     <td
                       bgcolor={
                         !showNormalMode &&
-                        this.props.dataLabels.get(index) === shownHighlights
+                        this.props.features.get(index) === shownHighlights
                           ? "#FFFF00"
                           : ""
                       }
@@ -425,7 +443,9 @@ class DTree extends React.Component {
   }
 
   showEntropyOrGiniSelection() {
-    return !this.state.showLearnMode && !this.state.renderTree ? (
+    return !this.state.showLearnMode &&
+      !this.state.renderTree &&
+      !this.state.showEditPanel ? (
       <div>
         <select
           value={this.state.isGini ? "gini" : "entropy"}
@@ -491,7 +511,9 @@ class DTree extends React.Component {
   }
 }
 const mapStateToProps = state => ({
-  dataLabels: state.DTree.dataLabels,
+  features: state.DTree.features,
+  featureClasses: state.DTree.featureClasses,
+  label: state.DTree.label,
   labelClasses: state.DTree.labelClasses
 });
 

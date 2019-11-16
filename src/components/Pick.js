@@ -20,8 +20,8 @@ class Pick extends React.Component {
             <Link to="/Clustering">
               <Button variant="primary">Clustering</Button>
             </Link>
-            <Link to="/Apriori">
-              <Button variant="primary">Apriori Frequent Itemsets</Button>
+            <Link to="/Association">
+              <Button variant="primary">Association Analsys</Button>
             </Link>
             <Link to="/Intro">
               <Button variant="primary">Introduction to Data Mining</Button>

@@ -5,7 +5,7 @@ import Table from "react-bootstrap/Table";
 import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 import Forward from "../Images/forward.png";
-import AprioriLearn from "./learn/AprioriLearn";
+import AssociationLearn from "./learn/AssociationLearn";
 import Image from "react-bootstrap/Image";
 import Tree from "react-tree-graph";
 import Row from "react-bootstrap/Row";
@@ -21,12 +21,12 @@ import {
   filterFreqSets,
   mineFreqItemsets,
   formatSets
-} from "./algorithims/AprioriAlgo";
+} from "./algorithims/AssociationAlgo";
 import "../css_files/App.css";
 import "react-table/react-table.css";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 
-class Apriori extends React.Component {
+class Association extends React.Component {
   constructor(props) {
     super(props);
 
@@ -46,7 +46,8 @@ class Apriori extends React.Component {
   }
 
   showMinSupSelection() {
-    return !this.state.showLearnMode ? (
+    return !this.state.showLearnMode &&
+      this.state.frequentItemSet.length === 0 ? (
       <Form>
         <Form.Group>
           <Form.Label>Select MinSup value</Form.Label>
@@ -299,7 +300,7 @@ class Apriori extends React.Component {
   }
 
   displayLearnModeApriori() {
-    return this.state.showLearnMode ? <AprioriLearn /> : null;
+    return this.state.showLearnMode ? <AssociationLearn /> : null;
   }
 
   render() {
@@ -317,4 +318,4 @@ class Apriori extends React.Component {
   }
 }
 
-export default Apriori;
+export default Association;

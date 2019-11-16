@@ -14,12 +14,17 @@ export function determineMostLikelyLabel(data) {
 }
 
 // Determines best split based on comparing gain ratios of all entries
-export function determineBestSplit(dataLabels, data, isGini) {
+export function determineBestSplit(dataLabels, data, isGini, labelName) {
   let currentHighestGainLabel = "";
   let currentHighestGain = 0.0;
 
   for (let i = 0; i < dataLabels.size; i++) {
-    const currGain = calculateGainRatio(dataLabels.get(i), data, isGini);
+    const currGain = calculateGainRatio(
+      dataLabels.get(i),
+      data,
+      isGini,
+      labelName
+    );
 
     if (currGain > currentHighestGain) {
       currentHighestGain = currGain;
@@ -32,9 +37,9 @@ export function determineBestSplit(dataLabels, data, isGini) {
 // Refer to practice exam 1 decision tree for algorithim.
 
 // Calculates gain ratio from splitting on feature
-function calculateGainRatio(feature, data, isGini) {
+function calculateGainRatio(feature, data, isGini, labelName) {
   // Problem in one of these two functions
-  const gain = calculateGain(feature, data, isGini);
+  const gain = calculateGain(feature, data, isGini, labelName);
   const splitInfo = calculateSplitInfo(feature, data);
   if (splitInfo === 0) return 0;
   return gain / splitInfo;
@@ -53,8 +58,8 @@ function calculateSplitInfo(feature, data) {
 }
 
 // Calculates information gain from splitting on feature
-function calculateGain(feature, data, isGini) {
-  const overallImpurity = calculateImpurityValue(data, isGini);
+function calculateGain(feature, data, isGini, labelName) {
+  const overallImpurity = calculateImpurityValue(data, isGini, labelName);
   const splitValue = calculateSplit(feature, data, isGini);
   return overallImpurity - splitValue;
 }
@@ -62,8 +67,8 @@ function calculateGain(feature, data, isGini) {
 // Based on the currently given dataset, calculate the positive and negative
 // counts. Can be used to calculate overall impurity of dataset or gini
 // of specific features
-export function calculateImpurityValue(data, isGini) {
-  const posNegCount = countPositiveAndNegative(data);
+export function calculateImpurityValue(data, isGini, labelName) {
+  const posNegCount = countPositiveAndNegative(data, labelName);
 
   if (isGini) {
     const posSquared = getSquaredNumber(posNegCount.pos, data.length);
@@ -93,7 +98,7 @@ function getSquaredNumber(number, dataLength) {
 // and the value is the total count of that class and the positive count
 // The function then creates another map that has classes as keys and
 // has the values as the calculated gini of that class and the total count
-export function getMap(feature, data, returnOnlyClassMap, isGini) {
+export function getMap(feature, data, returnOnlyClassMap, isGini, labelName) {
   let classMap = {};
   let returnMap = {};
 
@@ -121,7 +126,8 @@ export function getMap(feature, data, returnOnlyClassMap, isGini) {
     const mapEntry = {
       impurityValue: calculateImpurityValue(
         filteredData(classVal, feature, data),
-        isGini
+        isGini,
+        labelName
       ),
       totalNum: classMap[classVal].totalCount
     };
@@ -159,13 +165,13 @@ function calculateSplit(feature, data, isGini) {
 }
 
 // Counts number of negative and positive labels in a dataset
-function countPositiveAndNegative(data) {
+function countPositiveAndNegative(data, labelName) {
   let positiveCount = 0;
   let negativeCount = 0;
 
   for (let entry of data) {
-    const label = entry.label;
-    if (label === 1) {
+    const label = entry[labelName];
+    if (label === "1") {
       positiveCount++;
     } else {
       negativeCount++;

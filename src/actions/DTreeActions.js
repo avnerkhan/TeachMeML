@@ -1,30 +1,30 @@
 import * as types from "../types/DTreeTypes";
 
-export function addDataLabel(feature) {
+export function addFeature(feature) {
   return {
-    type: types.ADD_DATA_LABEL,
+    type: types.ADD_FEATURE,
     feature
   };
 }
 
-export function deleteDataLabel(feature) {
+export function deleteFeature(feature) {
   return {
-    type: types.DELETE_DATA_LABEL,
+    type: types.DELETE_FEATURE,
     feature
   };
 }
 
-export function addDataClass(feature, modify) {
+export function addFeatureClass(feature, modify) {
   return {
-    type: types.ADD_DATA_CLASS,
+    type: types.ADD_FEATURE_CLASS,
     feature,
     modify
   };
 }
 
-export function deleteDataClass(feature, modify) {
+export function deleteFeatureClass(feature, modify) {
   return {
-    type: types.DELETE_DATA_CLASS,
+    type: types.DELETE_FEATURE_CLASS,
     feature,
     modify
   };

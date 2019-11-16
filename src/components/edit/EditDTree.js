@@ -13,10 +13,10 @@ import "react-table/react-table.css";
 import { connect } from "react-redux";
 import { displayInfoButton } from "../../Utility";
 import {
-  addDataClass,
-  addDataLabel,
-  deleteDataClass,
-  deleteDataLabel
+  addFeatureClass,
+  addFeature,
+  deleteFeatureClass,
+  deleteFeature
 } from "../../actions/DTreeActions";
 
 class EditDTree extends React.Component {
@@ -32,22 +32,23 @@ class EditDTree extends React.Component {
           "This is the page where you can edit the configuration of your data. For example, you can add another feature, delete it, or add/delete another class label to an existing feature",
           "bottom"
         )}
+        <h1>Current Features and Label</h1>
         <Row>
-          {this.props.dataLabels.map(feature => {
+          {this.props.features.map(feature => {
             return (
               <Col>
                 <Card className="black-text" style={{ width: "32rem" }}>
                   <Card.Header
-                    onClick={() => this.props.deleteDataLabel(feature)}
+                    onClick={() => this.props.deleteFeature(feature)}
                   >
                     {feature}
                   </Card.Header>
                   <ListGroup>
-                    {this.props.labelClasses.get(feature).map(className => {
+                    {this.props.featureClasses.get(feature).map(className => {
                       return (
                         <ListGroup.Item
                           onClick={() =>
-                            this.props.deleteDataClass(feature, className)
+                            this.props.deleteFeatureClass(feature, className)
                           }
                         >
                           {className}
@@ -62,7 +63,7 @@ class EditDTree extends React.Component {
                       <InputGroup.Append>
                         <Button
                           onClick={() =>
-                            this.props.addDataClass(
+                            this.props.addFeatureClass(
                               feature,
                               this.refs[feature].value
                             )
@@ -86,7 +87,7 @@ class EditDTree extends React.Component {
               <InputGroup.Append>
                 <Button
                   onClick={() =>
-                    this.props.addDataLabel(this.refs["newFeature"].value)
+                    this.props.addFeature(this.refs["newFeature"].value)
                   }
                 >
                   Add New Feature
@@ -101,18 +102,15 @@ class EditDTree extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  dataLabels: state.DTree.dataLabels,
-  labelClasses: state.DTree.labelClasses
+  features: state.DTree.features,
+  featureClasses: state.DTree.featureClasses
 });
 
 const mapDispatchToProps = {
-  addDataLabel,
-  addDataClass,
-  deleteDataLabel,
-  deleteDataClass
+  addFeature,
+  addFeatureClass,
+  deleteFeature,
+  deleteFeatureClass
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(EditDTree);
+export default connect(mapStateToProps, mapDispatchToProps)(EditDTree);

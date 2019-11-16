@@ -4,7 +4,7 @@ import "./index.css";
 import Pick from "./components/Pick";
 import DTree from "./components/DTree";
 import KNN from "./components/KNN";
-import Apriori from "./components/Apriori";
+import Association from "./components/Association";
 import Intro from "./components/learn/Intro";
 import * as serviceWorker from "./serviceWorker";
 import { BrowserRouter, Route } from "react-router-dom";
@@ -27,7 +27,7 @@ const webroutes = (
         <Route exact path="/DecisionTree" component={DTree} />
         <Route exact path="/KNearestNeighbors" component={KNN} />
         <Route exact path="/Clustering" component={Clustering} />
-        <Route exact path="/Apriori" component={Apriori} />
+        <Route exact path="/Association" component={Association} />
         <Route exact path="/Intro" component={Intro} />
       </div>
     </BrowserRouter>
