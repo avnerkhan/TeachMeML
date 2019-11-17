@@ -8,6 +8,7 @@ import {
   MarkSeries
 } from "react-vis";
 import Image from "react-bootstrap/Image";
+import Save from "../Images/save.png";
 import Navbar from "react-bootstrap/Navbar";
 import Shuffle from "../Images/shuffle.png";
 import Add from "../Images/add.png";
@@ -30,24 +31,22 @@ import {
   showLearnModeIcon
 } from "../Utility";
 import EditKNN from "./edit/EditKNN";
+import { connect } from "react-redux";
 
 class KNN extends React.Component {
   constructor(props) {
     super(props);
 
     this.stateEnum = {
-      POSITIVE: "#32CD32",
-      NEGATIVE: "#FF6347",
       UNLABELED: "#FFFFFF",
       HIGHLIGHT: "#FFFF00"
     };
 
-    let randomData = generateRandomData();
+    let randomData = generateRandomData(30, 100, this.props.labels);
 
     this.state = {
       k: 1,
-      positiveData: randomData.positive,
-      negativeData: randomData.negative,
+      labeledData: randomData,
       isEdit: false,
       showLearnMode: false,
       undeterminedData: [],
@@ -75,12 +74,19 @@ class KNN extends React.Component {
     this.refs["yCoord"].value = "";
   }
 
+  findCorrelatedColor(point) {
+    const labeledData = this.state.labeledData;
+    for (const key in labeledData) {
+      if (labeledData[key].includes(point)) return key;
+    }
+    return null;
+  }
+
   // Labels data as either positive or negative based on the state array that
   // it orginally belongs to
   relabelData(point) {
-    point["class"] = this.state.positiveData.includes(point)
-      ? this.stateEnum.POSITIVE
-      : this.stateEnum.NEGATIVE;
+    console.log(point);
+    point["class"] = this.findCorrelatedColor(point);
     return point;
   }
 
@@ -117,37 +123,55 @@ class KNN extends React.Component {
     );
   }
 
+  getAllData() {
+    let allData = [];
+    const labeledData = this.state.labeledData;
+
+    for (const color in labeledData) {
+      const currentList = labeledData[color];
+      for (const point of currentList) {
+        allData.push(point);
+      }
+    }
+
+    return allData;
+  }
+
   // Highlights K on mouse over or determines point on click
   highlightK(datapoint, isChange) {
     let highlightPoints = [];
-    let newPositive = this.state.positiveData;
-    let newNegative = this.state.negativeData;
+    let newData = this.state.labeledData;
     let newUnlabeled = this.state.undeterminedData;
-    let allData = this.state.positiveData.concat(this.state.negativeData);
+    let allData = this.getAllData();
     allData = allData.map(point => this.relabelData(point));
     let euclidMap = allData.map(point => euclidFunction(point, datapoint));
     euclidMap.sort(comparator);
-    let positiveCount = 0;
+    let countMap = {};
+    let highestCount = 0;
 
     for (let i = 0; i < this.state.k; i++) {
       highlightPoints.push(euclidMap[i].orginalPoint);
-      positiveCount +=
-        euclidMap[i].orginalPoint.class === this.stateEnum.POSITIVE ? 1 : 0;
+      const currentColor = euclidMap[i].orginalPoint.class;
+      if (countMap[currentColor] == undefined) {
+        countMap[currentColor] = 1;
+      } else {
+        countMap[currentColor] += 1;
+      }
+      highestCount = Math.max(highestCount, countMap[currentColor]);
     }
 
     if (isChange) {
-      if (positiveCount >= this.state.k / 2) {
-        newPositive.push(datapoint);
-      } else {
-        newNegative.push(datapoint);
+      for (const color in countMap) {
+        if (countMap[color] === highestCount) {
+          newData[color].push(datapoint);
+        }
       }
       newUnlabeled.splice(newUnlabeled.indexOf(datapoint), 1);
       highlightPoints = [];
     }
 
     this.setState({
-      positiveData: newPositive,
-      negativeData: newNegative,
+      labeledData: newData,
       undeterminedData: newUnlabeled,
       currentHighlightData: highlightPoints
     });
@@ -162,16 +186,17 @@ class KNN extends React.Component {
   }
 
   randomizeData() {
-    const newRandomized = generateRandomData();
+    const newRandomized = generateRandomData(30, 100, this.props.labels);
 
     this.setState({
-      positiveData: newRandomized.positive,
-      negativeData: newRandomized.negative
+      labeledData: newRandomized
     });
   }
 
   showRandomizeUndeterminedDataButton() {
-    return this.state.positiveData.length > 0 && !this.state.showLearnMode ? (
+    return Object.keys(this.state.labeledData).length > 0 &&
+      !this.state.showLearnMode &&
+      !this.state.isEdit ? (
       <OverlayTrigger
         trigger="hover"
         placement="bottom"
@@ -185,7 +210,7 @@ class KNN extends React.Component {
   }
 
   showRandomizeDataButton() {
-    return !this.state.showLearnMode ? (
+    return !this.state.showLearnMode && !this.state.isEdit ? (
       <OverlayTrigger
         trigger="hover"
         placement="bottom"
@@ -199,7 +224,9 @@ class KNN extends React.Component {
   }
 
   showAddButton() {
-    return this.state.positiveData.length > 0 && !this.state.showLearnMode ? (
+    return Object.keys(this.state.labeledData).length > 0 &&
+      !this.state.showLearnMode &&
+      !this.state.isEdit ? (
       <OverlayTrigger
         trigger="hover"
         placement="bottom"
@@ -217,13 +244,17 @@ class KNN extends React.Component {
   }
 
   showXandYInputBar() {
-    return this.state.positiveData.length > 0 && !this.state.showLearnMode
+    return Object.keys(this.state.labeledData).length > 0 &&
+      !this.state.showLearnMode &&
+      !this.state.isEdit
       ? this.showXandYInput()
       : null;
   }
 
   showKSelection() {
-    return this.state.undeterminedData.length > 0 && !this.state.showLearnMode
+    return this.state.undeterminedData.length > 0 &&
+      !this.state.showLearnMode &&
+      !this.state.isEdit
       ? this.showKSelect()
       : null;
   }
@@ -233,17 +264,21 @@ class KNN extends React.Component {
       <OverlayTrigger
         trigger="hover"
         placement="bottom"
-        overlay={<Tooltip>Edit Features</Tooltip>}
+        overlay={
+          <Tooltip>
+            {this.state.isEdit ? "Save Configurations" : "Edit Features"}
+          </Tooltip>
+        }
       >
         <Nav.Link
           onClick={() =>
             this.setState({
-              isEdit: true,
+              isEdit: !this.state.isEdit,
               showLearnMode: false
             })
           }
         >
-          <Image src={Edit} style={{ width: 40 }} />
+          <Image src={this.state.isEdit ? Save : Edit} style={{ width: 40 }} />
         </Nav.Link>
       </OverlayTrigger>
     ) : null;
@@ -272,6 +307,21 @@ class KNN extends React.Component {
     return this.state.isEdit ? <EditKNN /> : null;
   }
 
+  showLabeledMarkSeries() {
+    return Object.keys(this.state.labeledData).map(color => {
+      return (
+        <MarkSeries
+          className="mark-series-example"
+          strokeWidth={2}
+          opacity="0.8"
+          sizeRange={[0, 100]}
+          color={color}
+          data={this.state.labeledData[color]}
+        />
+      );
+    });
+  }
+
   displayKNNExperiement() {
     return !this.state.showLearnMode && !this.state.isEdit ? (
       <div>
@@ -285,22 +335,7 @@ class KNN extends React.Component {
           <HorizontalGridLines />
           <XAxis />
           <YAxis />
-          <MarkSeries
-            className="mark-series-example"
-            strokeWidth={2}
-            opacity="0.8"
-            sizeRange={[0, 100]}
-            color={this.stateEnum.POSITIVE}
-            data={this.state.positiveData}
-          />
-          <MarkSeries
-            className="mark-series-example"
-            strokeWidth={2}
-            opacity="0.8"
-            sizeRange={[0, 100]}
-            color={this.stateEnum.NEGATIVE}
-            data={this.state.negativeData}
-          />
+          {this.showLabeledMarkSeries()}
           <MarkSeries
             className="mark-series-example"
             strokeWidth={2}
@@ -339,4 +374,8 @@ class KNN extends React.Component {
   }
 }
 
-export default KNN;
+const mapStateToProps = state => ({
+  labels: state.KNN.labels
+});
+
+export default connect(mapStateToProps)(KNN);

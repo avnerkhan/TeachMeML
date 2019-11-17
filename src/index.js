@@ -12,10 +12,12 @@ import Clustering from "./components/Clustering";
 import { Provider } from "react-redux";
 import { createStore, combineReducers } from "redux";
 import { DTreeReducer } from "./reducers/DTreeReducer";
+import { KNNReducer } from "./reducers/KNNReducer";
 
 const store = createStore(
   combineReducers({
-    DTree: DTreeReducer
+    DTree: DTreeReducer,
+    KNN: KNNReducer
   })
 );
 
