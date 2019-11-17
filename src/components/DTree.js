@@ -116,7 +116,9 @@ class DTree extends React.Component {
 
     for (const classVal in splitDict) {
       let name =
-        classVal === "undefined" ? determineMostLikelyLabel(data) : classVal;
+        classVal === "undefined"
+          ? determineMostLikelyLabel(data, this.props.label)
+          : classVal;
 
       let newNode = {
         name: name,

@@ -29,3 +29,24 @@ export function deleteFeatureClass(feature, modify) {
     modify
   };
 }
+
+export function deleteLabelClass(className) {
+  return {
+    type: types.DELETE_LABEL_CLASS,
+    className
+  };
+}
+
+export function addLabelClass(className) {
+  return {
+    type: types.ADD_LABEL_CLASS,
+    className
+  };
+}
+
+export function changeLabelName(newName) {
+  return {
+    type: types.CHANGE_LABEL_NAME,
+    newName
+  };
+}

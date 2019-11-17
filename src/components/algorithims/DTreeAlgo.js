@@ -1,16 +1,20 @@
 // For determing ties when a node has multiple labels in its dataset
-export function determineMostLikelyLabel(data) {
-  let posLabelCount = 0;
-
+export function determineMostLikelyLabel(data, labelName) {
+  let labelMap = {};
+  let maxCount = 0;
   for (let entry of data) {
-    posLabelCount += entry.label === 1 ? 1 : 0;
+    const label = entry[labelName];
+    if (labelMap[label] == undefined) {
+      labelMap[label] = 1;
+    } else {
+      labelMap[label] += 1;
+    }
+    maxCount = Math.max(maxCount, labelMap[label]);
   }
 
-  if (posLabelCount / data.length === 0.5) {
-    return "1/0";
+  for (const key in labelMap) {
+    if (labelMap[key] === maxCount) return key;
   }
-
-  return posLabelCount / data.length > 0.5 ? 1 : 0;
 }
 
 // Determines best split based on comparing gain ratios of all entries
@@ -68,22 +72,32 @@ function calculateGain(feature, data, isGini, labelName) {
 // counts. Can be used to calculate overall impurity of dataset or gini
 // of specific features
 export function calculateImpurityValue(data, isGini, labelName) {
-  const posNegCount = countPositiveAndNegative(data, labelName);
+  const labelMap = countLabels(data, labelName);
 
-  if (isGini) {
-    const posSquared = getSquaredNumber(posNegCount.pos, data.length);
-    const negSquared = getSquaredNumber(posNegCount.neg, data.length);
+  return isGini
+    ? getGiniCalculation(labelMap, data.length)
+    : getEntropyCalculation(labelMap, data.length);
+}
 
-    return 1 - posSquared - negSquared;
+function getGiniCalculation(labelMap, dataLength) {
+  let totalSquare = 0.0;
+
+  for (const key in labelMap) {
+    totalSquare += getSquaredNumber(labelMap[key], dataLength);
   }
 
-  const posRatio = posNegCount.pos / data.length;
-  const negRatio = posNegCount.neg / data.length;
+  return 1.0 - totalSquare;
+}
 
-  const posCalc = posRatio === 0 ? 0 : -(posRatio * Math.log2(posRatio));
-  const negCalc = negRatio === 0 ? 0 : -(negRatio * Math.log2(negRatio));
+function getEntropyCalculation(labelMap, dataLength) {
+  let totalCalc = 0.0;
 
-  return posCalc + negCalc;
+  for (const key in labelMap) {
+    const ratio = labelMap[key] / dataLength;
+    totalCalc += ratio === 0 ? 0 : -(ratio * Math.log2(ratio));
+  }
+
+  return totalCalc;
 }
 
 // Returns a number divided by total dataset length and squares it
@@ -165,18 +179,17 @@ function calculateSplit(feature, data, isGini) {
 }
 
 // Counts number of negative and positive labels in a dataset
-function countPositiveAndNegative(data, labelName) {
-  let positiveCount = 0;
-  let negativeCount = 0;
+function countLabels(data, labelName) {
+  let labelMap = {};
 
   for (let entry of data) {
     const label = entry[labelName];
-    if (label === "1") {
-      positiveCount++;
+    if (labelMap[label] == undefined) {
+      labelMap[label] = 1;
     } else {
-      negativeCount++;
+      labelMap[label] += 1;
     }
   }
 
-  return { pos: positiveCount, neg: negativeCount };
+  return labelMap;
 }

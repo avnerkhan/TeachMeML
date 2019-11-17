@@ -9,8 +9,8 @@ const initialDtreeState = {
     Language: List(["Python", "Java", "C++"]),
     label: List([0, 1])
   }),
-  label: "Label",
-  labelClasses: List(["1", "0"])
+  label: "Good Student",
+  labelClasses: List(["Yes", "No"])
 };
 
 export function DTreeReducer(prevState = initialDtreeState, action) {
@@ -48,6 +48,17 @@ export function DTreeReducer(prevState = initialDtreeState, action) {
         featureName => featureName !== action.feature
       );
       newState.featureClasses = newState.featureClasses.delete(action.feature);
+      return newState;
+    case types.ADD_LABEL_CLASS:
+      newState.labelClasses = newState.labelClasses.push(action.className);
+      return newState;
+    case types.DELETE_LABEL_CLASS:
+      newState.labelClasses = newState.labelClasses.filter(
+        className => className !== action.className
+      );
+      return newState;
+    case types.CHANGE_LABEL_NAME:
+      newState.label = action.newName;
       return newState;
     default:
       break;

@@ -16,7 +16,10 @@ import {
   addFeatureClass,
   addFeature,
   deleteFeatureClass,
-  deleteFeature
+  deleteFeature,
+  addLabelClass,
+  deleteLabelClass,
+  changeLabelName
 } from "../../actions/DTreeActions";
 
 class EditDTree extends React.Component {
@@ -96,6 +99,44 @@ class EditDTree extends React.Component {
             </InputGroup>
           </Col>
         </Row>
+        <Row>
+          <Card className="black-text" style={{ width: "32rem" }}>
+            <Card.Header>
+              <FormControl
+                onChange={e => this.props.changeLabelName(e.target.value)}
+                placeholder={"Current Label Name is '" + this.props.label + "'"}
+              />
+            </Card.Header>
+            <ListGroup>
+              {this.props.labelClasses.map(className => {
+                return (
+                  <ListGroup.Item
+                    onClick={() => this.props.deleteLabelClass(className)}
+                  >
+                    {className}
+                  </ListGroup.Item>
+                );
+              })}
+              <InputGroup>
+                <FormControl
+                  ref={this.props.label}
+                  placeholder="Enter new class name"
+                />
+                <InputGroup.Append>
+                  <Button
+                    onClick={() =>
+                      this.props.addLabelClass(
+                        this.refs[this.props.label].value
+                      )
+                    }
+                  >
+                    Add New Class
+                  </Button>
+                </InputGroup.Append>
+              </InputGroup>
+            </ListGroup>
+          </Card>
+        </Row>
       </Container>
     );
   }
@@ -103,14 +144,19 @@ class EditDTree extends React.Component {
 
 const mapStateToProps = state => ({
   features: state.DTree.features,
-  featureClasses: state.DTree.featureClasses
+  featureClasses: state.DTree.featureClasses,
+  label: state.DTree.label,
+  labelClasses: state.DTree.labelClasses
 });
 
 const mapDispatchToProps = {
   addFeature,
   addFeatureClass,
   deleteFeature,
-  deleteFeatureClass
+  deleteFeatureClass,
+  addLabelClass,
+  deleteLabelClass,
+  changeLabelName
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(EditDTree);
