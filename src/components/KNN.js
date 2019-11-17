@@ -271,12 +271,13 @@ class KNN extends React.Component {
         }
       >
         <Nav.Link
-          onClick={() =>
+          onClick={() => {
+            if (this.state.isEdit) this.randomizeData();
             this.setState({
               isEdit: !this.state.isEdit,
               showLearnMode: false
-            })
-          }
+            });
+          }}
         >
           <Image src={this.state.isEdit ? Save : Edit} style={{ width: 40 }} />
         </Nav.Link>

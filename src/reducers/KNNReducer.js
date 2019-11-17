@@ -10,7 +10,7 @@ export function KNNReducer(prevState = initialKNNState, action) {
 
   switch (action.type) {
     case types.ADD_LABEL_CLASS:
-      if (!newState.includes(action.classColor)) {
+      if (!newState.labels.includes(action.classColor)) {
         newState.labels = newState.labels.push(action.classColor);
       }
       return newState;
@@ -20,7 +20,7 @@ export function KNNReducer(prevState = initialKNNState, action) {
       );
       return newState;
     case types.CHANGE_LABEL_COLOR:
-      if (!newState.includes(action.newColor)) {
+      if (!newState.labels.includes(action.newColor)) {
         newState.labels = newState.labels.set(action.index, action.newColor);
       }
       return newState;
