@@ -11,6 +11,7 @@ import Image from "react-bootstrap/Image";
 import Navbar from "react-bootstrap/Navbar";
 import Shuffle from "../Images/shuffle.png";
 import Add from "../Images/add.png";
+import Edit from "../Images/edit.png";
 import KNNLearn from "./learn/KNNLearn";
 import {
   Nav,
@@ -28,6 +29,7 @@ import {
   displayInfoButton,
   showLearnModeIcon
 } from "../Utility";
+import EditKNN from "./edit/EditKNN";
 
 class KNN extends React.Component {
   constructor(props) {
@@ -46,6 +48,7 @@ class KNN extends React.Component {
       k: 1,
       positiveData: randomData.positive,
       negativeData: randomData.negative,
+      isEdit: false,
       showLearnMode: false,
       undeterminedData: [],
       currentHighlightData: []
@@ -225,6 +228,27 @@ class KNN extends React.Component {
       : null;
   }
 
+  showEditKNN() {
+    return !this.state.showLearnMode ? (
+      <OverlayTrigger
+        trigger="hover"
+        placement="bottom"
+        overlay={<Tooltip>Edit Features</Tooltip>}
+      >
+        <Nav.Link
+          onClick={() =>
+            this.setState({
+              isEdit: true,
+              showLearnMode: false
+            })
+          }
+        >
+          <Image src={Edit} style={{ width: 40 }} />
+        </Nav.Link>
+      </OverlayTrigger>
+    ) : null;
+  }
+
   showKNNNavBar() {
     return (
       <Navbar fixed="top" bg="dark" variant="dark">
@@ -233,6 +257,7 @@ class KNN extends React.Component {
         {this.showRandomizeUndeterminedDataButton()}
         {this.showRandomizeDataButton()}
         {this.showXandYInputBar()}
+        {this.showEditKNN()}
         {this.showKSelection()}
         {showLearnModeIcon(this)}
       </Navbar>
@@ -243,8 +268,12 @@ class KNN extends React.Component {
     return this.state.showLearnMode ? <KNNLearn /> : null;
   }
 
+  showEditPanel() {
+    return this.state.isEdit ? <EditKNN /> : null;
+  }
+
   displayKNNExperiement() {
-    return !this.state.showLearnMode ? (
+    return !this.state.showLearnMode && !this.state.isEdit ? (
       <div>
         {displayInfoButton(
           "KNN Plot",
@@ -303,6 +332,7 @@ class KNN extends React.Component {
           {this.showKNNNavBar()}
           {this.displayKNNExperiement()}
           {this.showLearnKNN()}
+          {this.showEditPanel()}
         </div>
       </div>
     );
