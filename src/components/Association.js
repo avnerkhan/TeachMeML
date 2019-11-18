@@ -11,6 +11,7 @@ import Tree from "react-tree-graph";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
+import SomeTree from "../Images/SomeTree.png";
 import { arrayRange, showLearnModeIcon } from "../Utility";
 import { showBackToAlgorithimPage, displayInfoButton } from "../Utility";
 import {
@@ -22,6 +23,9 @@ import {
   mineFreqItemsets,
   formatSets
 } from "./algorithims/AssociationAlgo";
+import Add from "../Images/add.png";
+import Trash from "../Images/trash.png";
+import Shuffle from "../Images/shuffle.png";
 import "../css_files/App.css";
 import "react-table/react-table.css";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
@@ -70,8 +74,17 @@ class Association extends React.Component {
     const transactionItems = this.state.transactionItems;
 
     if (isAdd) {
+      let index = 0;
+      while (
+        currentTransactionState[currentTransactionIndex].includes(
+          transactionItems[index]
+        ) ||
+        index === transactionItems.length
+      ) {
+        index++;
+      }
       currentTransactionState[currentTransactionIndex].push(
-        transactionItems[0]
+        transactionItems[index]
       );
     } else {
       currentTransactionState[currentTransactionIndex].pop();
@@ -88,7 +101,15 @@ class Association extends React.Component {
       transaction
     );
     const currentItemIndex = transactionItems.indexOf(item);
-    const nextItemIndex = (currentItemIndex + 1) % transactionItems.length;
+    let nextItemIndex = (currentItemIndex + 1) % transactionItems.length;
+    while (
+      currentTransactionState[currentTransactionIndex].includes(
+        transactionItems[nextItemIndex]
+      ) ||
+      nextItemIndex === currentItemIndex
+    ) {
+      nextItemIndex = (nextItemIndex + 1) % transactionItems.length;
+    }
     currentTransactionState[currentTransactionIndex][itemIndexInTransaction] =
       transactionItems[nextItemIndex];
 
@@ -141,6 +162,22 @@ class Association extends React.Component {
     }
   }
 
+  addNewTransaction() {
+    let currentTransactions = this.state.transactions;
+    currentTransactions.push(["A"]);
+    this.setState({
+      transactions: currentTransactions
+    });
+  }
+
+  deleteTransaction(index) {
+    let currentTransactions = this.state.transactions;
+    currentTransactions.splice(index, 1);
+    this.setState({
+      transactions: currentTransactions
+    });
+  }
+
   // Displays the JSX for transaction table
   displayTransactionTable() {
     let transactions = this.state.transactions;
@@ -174,9 +211,17 @@ class Association extends React.Component {
                 <td onClick={() => this.changeTransactionState(index, false)}>
                   -
                 </td>
+                <td onClick={() => this.deleteTransaction(index)}>
+                  <Image src={Trash} style={{ width: 40 }} />
+                </td>
               </tr>
             );
           })}
+          <tr>
+            <td onClick={() => this.addNewTransaction()}>
+              <Image src={Add} style={{ width: 40 }} />
+            </td>
+          </tr>
         </tbody>
       </Table>
     );
@@ -246,10 +291,18 @@ class Association extends React.Component {
   }
 
   showStartAlgorithimBar() {
-    return !this.state.showLearnMode && !this.state.isApriori ? (
-      <Nav.Link onClick={() => this.runFPTreeAlgorithim()}>
-        Run FP Tree Algorithim
-      </Nav.Link>
+    return !this.state.showLearnMode &&
+      !this.state.isApriori &&
+      !this.state.renderTree ? (
+      <OverlayTrigger
+        trigger="hover"
+        placement="bottom"
+        overlay={<Tooltip>Run FP Tree Algorithim</Tooltip>}
+      >
+        <Nav.Link onClick={() => this.runFPTreeAlgorithim()}>
+          <Image src={SomeTree} style={{ width: 40 }} />
+        </Nav.Link>
+      </OverlayTrigger>
     ) : null;
   }
 
@@ -267,12 +320,38 @@ class Association extends React.Component {
     ) : null;
   }
 
+  showShuffleDataBar() {
+    return !this.state.isFPTree &&
+      !this.state.isApriori &&
+      !this.state.showLearnMode ? (
+      <OverlayTrigger
+        trigger="hover"
+        placement="bottom"
+        overlay={<Tooltip>Shuffle Transaction Data</Tooltip>}
+      >
+        <Nav.Link
+          onClick={() =>
+            this.setState({
+              transactions: generateRandomTransaction(
+                this.state.transactionItems,
+                this.state.transactions.length
+              )
+            })
+          }
+        >
+          <Image src={Shuffle} style={{ width: 40 }} />
+        </Nav.Link>
+      </OverlayTrigger>
+    ) : null;
+  }
+
   showAprioriNavBar() {
     return (
       <Navbar fixed="top" bg="dark" variant="dark">
         {showBackToAlgorithimPage()}
         {this.showStartAlgorithimBar()}
         {this.showRunNextIterationBar()}
+        {this.showShuffleDataBar()}
         {this.showMinSupSelection()}
         {showLearnModeIcon(this)}
       </Navbar>

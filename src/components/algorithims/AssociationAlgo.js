@@ -1,10 +1,13 @@
 /* eslint-disable */
 
 // Random transaction generator for state
-export function generateRandomTransaction(transactionItems) {
+export function generateRandomTransaction(
+  transactionItems,
+  lengthPerTransaction = 5
+) {
   let randomTransactions = [];
 
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < lengthPerTransaction; i++) {
     let transaction = [];
     const transactionLength =
       Math.floor(Math.random() * transactionItems.length) + 1;

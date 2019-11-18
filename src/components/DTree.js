@@ -6,6 +6,7 @@ import Edit from "../Images/edit.png";
 import Save from "../Images/save.png";
 import Back from "../Images/back.png";
 import Add from "../Images/add.png";
+import SomeTree from "../Images/SomeTree.png";
 import Trash from "../Images/trash.png";
 import {
   Image,
@@ -335,19 +336,25 @@ class DTree extends React.Component {
 
   showDisplayButton() {
     return this.state.showFirstPage && !this.state.showLearnMode ? (
-      <Nav.Link
-        onClick={() => {
-          this.setState({
-            renderTree: true,
-            showFirstPage: false,
-            showLearnMode: false,
-            showEditPanel: false
-          });
-          this.showTree();
-        }}
+      <OverlayTrigger
+        trigger="hover"
+        placement="bottom"
+        overlay={<Tooltip>Generate Tree</Tooltip>}
       >
-        Generate Tree
-      </Nav.Link>
+        <Nav.Link
+          onClick={() => {
+            this.setState({
+              renderTree: true,
+              showFirstPage: false,
+              showLearnMode: false,
+              showEditPanel: false
+            });
+            this.showTree();
+          }}
+        >
+          <Image src={SomeTree} style={{ width: 40 }} />
+        </Nav.Link>
+      </OverlayTrigger>
     ) : null;
   }
 
