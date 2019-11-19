@@ -50,3 +50,11 @@ export function changeLabelName(newName) {
     newName
   };
 }
+
+export function editFeatureName(oldName, newName) {
+  return {
+    type: types.EDIT_FEATURE_NAME,
+    oldName,
+    newName
+  };
+}

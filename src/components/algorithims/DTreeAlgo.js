@@ -22,17 +22,12 @@ export function determineBestSplit(dataLabels, data, isGini, labelName) {
   let currentHighestGainLabel = "";
   let currentHighestGain = 0.0;
 
-  for (let i = 0; i < dataLabels.size; i++) {
-    const currGain = calculateGainRatio(
-      dataLabels.get(i),
-      data,
-      isGini,
-      labelName
-    );
+  for (let i = 0; i < dataLabels.length; i++) {
+    const currGain = calculateGainRatio(dataLabels[i], data, isGini, labelName);
 
     if (currGain > currentHighestGain) {
       currentHighestGain = currGain;
-      currentHighestGainLabel = dataLabels.get(i);
+      currentHighestGainLabel = dataLabels[i];
     }
   }
   return { currentHighestGainLabel, currentHighestGain };

@@ -60,7 +60,7 @@ class DTree extends React.Component {
   }
 
   determineClassLabel(classVal) {
-    for (const key of this.props.featureClasses.keySeq()) {
+    for (const key of this.props.featureClasses.keySeq().toArray()) {
       if (this.props.featureClasses.get(key).contains(classVal)) return key;
     }
   }
@@ -96,7 +96,7 @@ class DTree extends React.Component {
     let splitDict = {};
 
     const information = determineBestSplit(
-      this.props.features,
+      this.props.featureClasses.keySeq().toArray(),
       data,
       this.state.isGini,
       this.props.label
@@ -166,19 +166,19 @@ class DTree extends React.Component {
 
   generateRandomDataState() {
     let dataState = [];
-    const features = this.props.features;
+    const features = this.props.featureClasses.keySeq().toArray();
     const featureClasses = this.props.featureClasses;
     const labelClasses = this.props.labelClasses;
 
     for (let count = 0; count < 10; count++) {
       let entry = {};
-      for (let i = 0; i < features.size; i++) {
-        if (features.get(i) !== "label") {
-          const currentClassLabels = featureClasses.get(features.get(i));
+      for (let i = 0; i < features.length; i++) {
+        if (features[i] !== "label") {
+          const currentClassLabels = featureClasses.get(features[i]);
           const randomEntry = currentClassLabels.get(
             Math.floor(Math.random() * currentClassLabels.size)
           );
-          entry[features.get(i)] = randomEntry;
+          entry[features[i]] = randomEntry;
         }
       }
       const randomLabel = labelClasses.get(
@@ -229,12 +229,13 @@ class DTree extends React.Component {
   showCustomDataTable(showNormalMode = true) {
     const tableToShow = showNormalMode ? this.state.data : this.state.shownData;
     const shownHighlights = this.state.currentHighlight;
+    const features = this.props.featureClasses.keySeq().toArray();
 
     return (
       <Table size="sm">
         <thead>
           <tr>
-            {this.props.features.map(feature => {
+            {features.map(feature => {
               return <th>{feature}</th>;
             })}
             <th>{this.props.label}</th>
@@ -248,8 +249,7 @@ class DTree extends React.Component {
                   return (
                     <td
                       bgcolor={
-                        !showNormalMode &&
-                        this.props.features.get(index) === shownHighlights
+                        !showNormalMode && features[index] === shownHighlights
                           ? "#FFFF00"
                           : ""
                       }
@@ -520,7 +520,6 @@ class DTree extends React.Component {
   }
 }
 const mapStateToProps = state => ({
-  features: state.DTree.features,
   featureClasses: state.DTree.featureClasses,
   label: state.DTree.label,
   labelClasses: state.DTree.labelClasses

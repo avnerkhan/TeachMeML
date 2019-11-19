@@ -1,13 +1,5 @@
 /* eslint-disable */
 import React from "react";
-import Button from "react-bootstrap/Button";
-import Card from "react-bootstrap/Card";
-import ListGroup from "react-bootstrap/ListGroup";
-import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import FormControl from "react-bootstrap/FormControl";
-import InputGroup from "react-bootstrap/InputGroup";
 import "../../css_files/App.css";
 import "react-table/react-table.css";
 import { connect } from "react-redux";
@@ -19,8 +11,12 @@ import {
   deleteFeature,
   addLabelClass,
   deleteLabelClass,
-  changeLabelName
+  changeLabelName,
+  editFeatureName
 } from "../../actions/DTreeActions";
+import Trash from "../../Images/trash.png";
+import Add from "../../Images/add.png";
+import { Table, OverlayTrigger, Tooltip, Image } from "react-bootstrap";
 
 class EditDTree extends React.Component {
   constructor(props) {
@@ -28,122 +24,91 @@ class EditDTree extends React.Component {
   }
 
   render() {
+    const features = this.props.featureClasses.keySeq().toArray();
+
     return (
-      <Container>
+      <Table size="sm">
         {displayInfoButton(
           "Table Editing Page",
           "This is the page where you can edit the configuration of your data. For example, you can add another feature, delete it, or add/delete another class label to an existing feature",
           "bottom"
         )}
-        <h1>Current Features and Label</h1>
-        <Row>
-          {this.props.features.map(feature => {
+        <thead>
+          <tr>
+            <th>Current Features And Labels</th>
+          </tr>
+        </thead>
+        <tbody>
+          {features.map((feature, index) => {
             return (
-              <Col>
-                <Card className="black-text" style={{ width: "32rem" }}>
-                  <Card.Header
-                    onClick={() => this.props.deleteFeature(feature)}
-                  >
-                    {feature}
-                  </Card.Header>
-                  <ListGroup>
-                    {this.props.featureClasses.get(feature).map(className => {
-                      return (
-                        <ListGroup.Item
-                          onClick={() =>
-                            this.props.deleteFeatureClass(feature, className)
-                          }
-                        >
-                          {className}
-                        </ListGroup.Item>
-                      );
-                    })}
-                    <InputGroup>
-                      <FormControl
-                        ref={feature}
-                        placeholder="Enter new class name"
-                      />
-                      <InputGroup.Append>
-                        <Button
-                          onClick={() =>
-                            this.props.addFeatureClass(
-                              feature,
-                              this.refs[feature].value
-                            )
-                          }
-                        >
-                          Add New Class
-                        </Button>
-                      </InputGroup.Append>
-                    </InputGroup>
-                  </ListGroup>
-                </Card>
-              </Col>
-            );
-          })}
-          <Col>
-            <InputGroup>
-              <FormControl
-                ref="newFeature"
-                placeholder="Enter new feature name"
-              />
-              <InputGroup.Append>
-                <Button
+              <tr>
+                <td>
+                  <input
+                    type="text"
+                    value={feature}
+                    onChange={e =>
+                      this.props.editFeatureName(feature, e.target.value)
+                    }
+                  />
+                </td>
+                {this.props.featureClasses.get(feature).map(featureClass => {
+                  return (
+                    <OverlayTrigger
+                      trigger="hover"
+                      placement="bottom"
+                      overlay={<Tooltip>{"Delete " + featureClass}</Tooltip>}
+                    >
+                      <td
+                        onClick={() =>
+                          this.props.deleteFeatureClass(feature, featureClass)
+                        }
+                      >
+                        {featureClass}
+                      </td>
+                    </OverlayTrigger>
+                  );
+                })}
+                <td>
+                  <input type="text" ref={"classInput" + index} />
+                </td>
+                <td
                   onClick={() =>
-                    this.props.addFeature(this.refs["newFeature"].value)
+                    this.props.addFeatureClass(
+                      feature,
+                      this.refs["classInput" + index].value
+                    )
                   }
                 >
-                  Add New Feature
-                </Button>
-              </InputGroup.Append>
-            </InputGroup>
-          </Col>
-        </Row>
-        <Row>
-          <Card className="black-text" style={{ width: "32rem" }}>
-            <Card.Header>
-              <FormControl
-                onChange={e => this.props.changeLabelName(e.target.value)}
-                placeholder={"Current Label Name is '" + this.props.label + "'"}
-              />
-            </Card.Header>
-            <ListGroup>
-              {this.props.labelClasses.map(className => {
-                return (
-                  <ListGroup.Item
-                    onClick={() => this.props.deleteLabelClass(className)}
-                  >
-                    {className}
-                  </ListGroup.Item>
-                );
-              })}
-              <InputGroup>
-                <FormControl
-                  ref={this.props.label}
-                  placeholder="Enter new class name"
-                />
-                <InputGroup.Append>
-                  <Button
-                    onClick={() =>
-                      this.props.addLabelClass(
-                        this.refs[this.props.label].value
-                      )
-                    }
-                  >
-                    Add New Class
-                  </Button>
-                </InputGroup.Append>
-              </InputGroup>
-            </ListGroup>
-          </Card>
-        </Row>
-      </Container>
+                  <Image src={Add} style={{ width: 40 }} />
+                </td>
+                <td onClick={() => this.props.deleteFeature(feature)}>
+                  <Image src={Trash} style={{ width: 40 }} />
+                </td>
+              </tr>
+            );
+          })}
+          <tr>
+            <td>Add</td>
+            <td>
+              <input type="text" ref="featureInput" />
+            </td>
+            <tr>
+              <td
+                onClick={() =>
+                  this.props.addFeature(this.refs["featureInput"].value)
+                }
+              >
+                <Image src={Add} style={{ width: 40 }} />
+              </td>
+            </tr>
+          </tr>
+        </tbody>
+      </Table>
     );
   }
 }
 
 const mapStateToProps = state => ({
-  features: state.DTree.features,
   featureClasses: state.DTree.featureClasses,
   label: state.DTree.label,
   labelClasses: state.DTree.labelClasses
@@ -156,7 +121,8 @@ const mapDispatchToProps = {
   deleteFeatureClass,
   addLabelClass,
   deleteLabelClass,
-  changeLabelName
+  changeLabelName,
+  editFeatureName
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(EditDTree);

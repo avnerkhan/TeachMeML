@@ -2,12 +2,10 @@ import * as types from "../types/DTreeTypes";
 import { Map, List } from "immutable";
 
 const initialDtreeState = {
-  features: List(["Passed", "GPA", "Language"]),
   featureClasses: Map({
     Passed: List(["Yes", "No"]),
     GPA: List(["4.0", "2.0"]),
-    Language: List(["Python", "Java", "C++"]),
-    label: List([0, 1])
+    Language: List(["Python", "Java", "C++"])
   }),
   label: "Good Student",
   labelClasses: List(["Yes", "No"])
@@ -18,6 +16,7 @@ export function DTreeReducer(prevState = initialDtreeState, action) {
 
   switch (action.type) {
     case types.ADD_FEATURE_CLASS:
+      debugger;
       let newEntry = newState.featureClasses
         .get(action.feature)
         .push(action.modify);
@@ -37,16 +36,12 @@ export function DTreeReducer(prevState = initialDtreeState, action) {
         newState.featureClasses.delete(action.feature);
       return newState;
     case types.ADD_FEATURE:
-      newState.features = newState.features.push(action.feature);
       newState.featureClasses = newState.featureClasses.set(
         action.feature,
         List(["Sample"])
       );
       return newState;
     case types.DELETE_FEATURE:
-      newState.features = newState.features.filter(
-        featureName => featureName !== action.feature
-      );
       newState.featureClasses = newState.featureClasses.delete(action.feature);
       return newState;
     case types.ADD_LABEL_CLASS:
@@ -59,6 +54,14 @@ export function DTreeReducer(prevState = initialDtreeState, action) {
       return newState;
     case types.CHANGE_LABEL_NAME:
       newState.label = action.newName;
+      return newState;
+    case types.EDIT_FEATURE_NAME:
+      const prevData = newState.featureClasses.get(action.oldName);
+      newState.featureClasses = newState.featureClasses.delete(action.oldName);
+      newState.featureClasses = newState.featureClasses.set(
+        action.newName,
+        prevData
+      );
       return newState;
     default:
       break;
