@@ -7,6 +7,7 @@ import {
 import { Table, Image } from "react-bootstrap";
 import Trash from "../../Images/trash.png";
 import Add from "../../Images/add.png";
+import { showBasicBackNavBar } from "../../Utility";
 import { connect } from "react-redux";
 
 class EditKNN extends React.Component {
@@ -14,6 +15,7 @@ class EditKNN extends React.Component {
     return (
       <div className="App">
         <div className="App-header-low">
+          {showBasicBackNavBar()}
           <Table size="sm">
             <thead>
               <tr>

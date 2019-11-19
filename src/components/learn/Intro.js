@@ -6,12 +6,14 @@ import Unlabeled_cluster from "../../Images/Unlabeled_cluster.png";
 import Labeled_cluster from "../../Images/Labeled_cluster.png";
 
 import "../../css_files/App.css";
+import { showBasicBackNavBar } from "../../Utility";
 
 class Intro extends React.Component {
   render() {
     return (
       <div className="App">
         <div className="App-header-low">
+          {showBasicBackNavBar()}
           <h2>What is Data Mining?</h2>
           <p>
             In general, Data Mining is taking a bunch of previous data, passing

@@ -3,7 +3,7 @@ import React from "react";
 import "../../css_files/App.css";
 import "react-table/react-table.css";
 import { connect } from "react-redux";
-import { displayInfoButton } from "../../Utility";
+import { displayInfoButton, showBasicBackNavBar } from "../../Utility";
 import {
   addFeatureClass,
   addFeature,
@@ -32,6 +32,7 @@ class EditDTree extends React.Component {
     return (
       <div className="App">
         <div className="App-header-low">
+          {showBasicBackNavBar()}
           <Table size="sm">
             {displayInfoButton(
               "Table Editing Page",

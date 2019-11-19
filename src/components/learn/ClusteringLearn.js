@@ -5,12 +5,14 @@ import LabeledFirst from "../../Images/LabeledFirst.png";
 import LabeledSecond from "../../Images/LabeledSecond.png";
 import BulletPoints from "../../Images/BulletPoints.png";
 import Graphs from "../../Images/Graphs.png";
+import { showBasicBackNavBar } from "../../Utility";
 
 class ClusteringLearn extends React.Component {
   render() {
     return (
       <div className="App">
         <div className="App-header-low">
+          {showBasicBackNavBar()}
           <h1>Clustering Learn</h1>
           <h2>What is clustering?</h2>
           <p>

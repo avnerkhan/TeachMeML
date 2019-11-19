@@ -8,12 +8,14 @@ import Entropy from "../../Images/Entropy.png";
 import Split from "../../Images/Split.png";
 import SplitInfo from "../../Images/SplitInfo.png";
 import GainRatio from "../../Images/GainRatio.png";
+import { showBasicBackNavBar } from "../../Utility";
 
 class DTreeLearn extends React.Component {
   render() {
     return (
       <div className="App">
         <div className="App-header-low">
+          {showBasicBackNavBar()}
           <h1>Decision Trees</h1>
           <h2>What is a Decision Tree?</h2>
           <p>

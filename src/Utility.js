@@ -1,10 +1,15 @@
 import React from "react";
-import { Popover, OverlayTrigger, Image, Nav, Tooltip } from "react-bootstrap";
+import {
+  Popover,
+  OverlayTrigger,
+  Image,
+  Nav,
+  Tooltip,
+  Navbar
+} from "react-bootstrap";
 import { Link } from "react-router-dom";
 import Back from "./Images/back.png";
 import Icon from "./Images/icon.png";
-import Learn from "./Images/learn.png";
-import Exp from "./Images/exp.png";
 
 // Euclidean distance function that returns orginal point and distance
 export function euclidFunction(pointOne, pointTwo) {
@@ -64,5 +69,13 @@ export function showBackToAlgorithimPage() {
         <Image src={Back} style={{ width: 40 }} />
       </Nav>
     </Link>
+  );
+}
+
+export function showBasicBackNavBar() {
+  return (
+    <Navbar fixed="top" bg="dark" variant="dark">
+      {showBackToAlgorithimPage()}
+    </Navbar>
   );
 }

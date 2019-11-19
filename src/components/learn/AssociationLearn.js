@@ -7,12 +7,14 @@ import ThreeSet from "../../Images/3-set.png";
 import Conditonal from "../../Images/Conditional.png";
 import FPTree from "../../Images/FPTree.png";
 import Sorted from "../../Images/Sorted.png";
+import { showBasicBackNavBar } from "../../Utility";
 
 class AprioriLearn extends React.Component {
   render() {
     return (
       <div className="App">
         <div className="App-header-low">
+          {showBasicBackNavBar()}
           <h1>Apriori Learn</h1>
           <h2>What is timeseries data</h2>
           <p>

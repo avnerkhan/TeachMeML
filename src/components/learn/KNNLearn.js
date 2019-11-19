@@ -1,12 +1,14 @@
 import React from "react";
 import { Image } from "react-bootstrap";
 import Euclid from "../../Images/Euclid.png";
+import { showBasicBackNavBar } from "../../Utility";
 
 class KNNLearn extends React.Component {
   render() {
     return (
       <div className="App">
         <div className="App-header-low">
+          {showBasicBackNavBar()}
           <h1>KNNLearn Learn</h1>
           <h2>What is KNN</h2>
           <p>
