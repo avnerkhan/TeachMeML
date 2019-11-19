@@ -5,16 +5,12 @@ import Table from "react-bootstrap/Table";
 import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 import Forward from "../Images/forward.png";
-import AssociationLearn from "./learn/AssociationLearn";
 import Image from "react-bootstrap/Image";
 import Tree from "react-tree-graph";
-import Save from "../Images/save.png";
-import Edit from "../Images/edit.png";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import SomeTree from "../Images/SomeTree.png";
-import EditAssociation from "../components/edit/EditAssosciation";
 import { arrayRange } from "../Utility";
 import { showBackToAlgorithimPage, displayInfoButton } from "../Utility";
 import {
@@ -42,6 +38,7 @@ class Association extends React.Component {
       treeState: {},
       renderTree: false,
       isApriori: false,
+      isDoneApriori: false,
       isFPTree: false,
       minSup: 2,
       frequentItemSet: [],
@@ -139,12 +136,13 @@ class Association extends React.Component {
       let newFrequentSet = {};
 
       for (let frequentSet in lastFrequentSet) {
-        const lastLetter = frequentSet.substring(frequentSet.length - 1);
-        let index = oneItemSet.indexOf(lastLetter) + 1;
+        const splitString = frequentSet.split(",");
+        const lastItem = splitString[splitString.length - 1];
+        let index = oneItemSet.indexOf(lastItem) + 1;
 
         while (index < oneItemSet.length) {
           let newFrequentPattern = frequentSet;
-          newFrequentPattern += oneItemSet[index];
+          newFrequentPattern += "," + oneItemSet[index];
           newFrequentSet[newFrequentPattern] = 0;
           index++;
         }
@@ -158,7 +156,13 @@ class Association extends React.Component {
 
       frequentItemSet.push(newFrequentSet);
 
-      this.setState({ frequentItemSet: frequentItemSet, isApriori: true });
+      const isDoneApriori = Object.keys(newFrequentSet).length === 0;
+
+      this.setState({
+        frequentItemSet: frequentItemSet,
+        isApriori: true,
+        isDoneApriori: isDoneApriori
+      });
     }
   }
 
@@ -305,7 +309,7 @@ class Association extends React.Component {
   }
 
   showRunNextIterationBar() {
-    return !this.state.isFPTree ? (
+    return !this.state.isFPTree && !this.state.isDoneApriori ? (
       <OverlayTrigger
         trigger="hover"
         placement="bottom"

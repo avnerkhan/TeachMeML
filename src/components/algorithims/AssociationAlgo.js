@@ -87,20 +87,20 @@ function addBranch(transaction, currTree) {
   let root = currTree;
   let curr = root;
 
-  for (let letter of transaction) {
+  for (let item of transaction) {
     if (curr != undefined) {
       const names = curr.children.map(children => {
         return children.name.split(":")[0];
       });
 
-      if (names.includes(letter)) {
-        const index = names.indexOf(letter);
+      if (names.includes(item)) {
+        const index = names.indexOf(item);
         curr = curr.children[index];
         const newCount = parseInt(curr.name.split(":")[1]) + 1;
-        curr.name = letter + ":" + newCount.toString();
+        curr.name = item + ":" + newCount.toString();
       } else {
         const newEntry = {
-          name: letter + ":1",
+          name: item + ":1",
           children: []
         };
         curr.children.push(newEntry);
@@ -121,7 +121,7 @@ export function findAllPaths(allPaths, currentPath, curr, toFind) {
     return [currentPath, count];
   }
 
-  currentPath += transaction;
+  currentPath += "," + transaction;
   for (let child of curr.children) {
     const elem = findAllPaths(allPaths, currentPath, child, toFind);
     allPaths.push(elem);
@@ -136,7 +136,7 @@ export function filterFreqSets(newFrequentSet, transactions, minsup) {
     const compareSet = new Set(transaction);
 
     for (let frequentSetCandidate in newFrequentSet) {
-      const checkSet = new Set(frequentSetCandidate);
+      const checkSet = new Set(frequentSetCandidate.split(","));
 
       if (isSuperset(compareSet, checkSet))
         frequentSetCopy[frequentSetCandidate] += 1;
@@ -153,18 +153,19 @@ export function filterFreqSets(newFrequentSet, transactions, minsup) {
 
 export function getFrequentItemsets(currentPaths, minsup) {
   let frequentItemsets = {};
+  debugger;
 
   for (let pathKey in currentPaths) {
     let mappingForKey = {};
     const currentPathsForKey = currentPaths[pathKey];
     for (let pair of currentPathsForKey) {
       if (pair != undefined) {
-        const actualPath = pair[0];
+        const actualPath = pair[0].split(",");
         const count = parseInt(pair[1]);
         let startString = pathKey;
         for (let c of actualPath) {
-          if (c !== "R") {
-            startString = c + startString;
+          if (c !== "R" && c !== "") {
+            startString = c + "," + startString;
             mappingForKey[startString] =
               mappingForKey[startString] == undefined
                 ? count
@@ -201,7 +202,8 @@ export function formatSets(freqItemsets, oneItemSet) {
   let newFrequentSets = [oneItemSet, {}, {}, {}, {}];
 
   for (const key in freqItemsets) {
-    newFrequentSets[key.length - 1][key] = freqItemsets[key];
+    const keyLength = key.split(",").length;
+    newFrequentSets[keyLength - 1][key] = freqItemsets[key];
   }
 
   return newFrequentSets;
