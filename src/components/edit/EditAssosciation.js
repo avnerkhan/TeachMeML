@@ -12,50 +12,56 @@ import { connect } from "react-redux";
 class EditAssociation extends React.Component {
   render() {
     return (
-      <Table size="sm">
-        <thead>
-          <tr>
-            <th>Current Transactions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {this.props.transactionItems.map((transaction, index) => {
-            return (
+      <div className="App">
+        <div className="App-header-low">
+          <Table size="sm">
+            <thead>
               <tr>
-                <td>
-                  <input
-                    type="text"
-                    value={this.props.transactionItems.get(index)}
-                    onChange={e =>
-                      this.props.editTransactionType(e.target.value, index)
-                    }
-                  />
-                </td>
-                <td
-                  onClick={() => this.props.deleteTransactionType(transaction)}
-                >
-                  <Image src={Trash} style={{ width: 40 }} />
-                </td>
+                <th>Current Transactions</th>
               </tr>
-            );
-          })}
-          <tr>
-            <td>Add</td>
-            <td>
-              <input type="text" ref="input" />
-            </td>
-            <tr>
-              <td
-                onClick={() =>
-                  this.props.addTransactionType(this.refs["input"].value)
-                }
-              >
-                <Image src={Add} style={{ width: 40 }} />
-              </td>
-            </tr>
-          </tr>
-        </tbody>
-      </Table>
+            </thead>
+            <tbody>
+              {this.props.transactionItems.map((transaction, index) => {
+                return (
+                  <tr>
+                    <td>
+                      <input
+                        type="text"
+                        value={this.props.transactionItems.get(index)}
+                        onChange={e =>
+                          this.props.editTransactionType(e.target.value, index)
+                        }
+                      />
+                    </td>
+                    <td
+                      onClick={() =>
+                        this.props.deleteTransactionType(transaction)
+                      }
+                    >
+                      <Image src={Trash} style={{ width: 40 }} />
+                    </td>
+                  </tr>
+                );
+              })}
+              <tr>
+                <td>Add</td>
+                <td>
+                  <input type="text" ref="input" />
+                </td>
+                <tr>
+                  <td
+                    onClick={() =>
+                      this.props.addTransactionType(this.refs["input"].value)
+                    }
+                  >
+                    <Image src={Add} style={{ width: 40 }} />
+                  </td>
+                </tr>
+              </tr>
+            </tbody>
+          </Table>
+        </div>
+      </div>
     );
   }
 }

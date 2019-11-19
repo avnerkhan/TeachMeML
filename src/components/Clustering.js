@@ -24,8 +24,7 @@ import {
   euclidFunction,
   comparator,
   arrayRange,
-  displayInfoButton,
-  showLearnModeIcon
+  displayInfoButton
 } from "../Utility";
 import "../css_files/App.css";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
@@ -53,7 +52,6 @@ class Clustering extends React.Component {
       readyToStartState: false,
       choosingCentroidState: false,
       runningKMeans: false,
-      showLearnMode: false,
       unlabeledData: [{ x: 0, y: 0 }],
       clusteredData: this.generateEmptyCluster(),
       centroidData: []
@@ -398,16 +396,13 @@ class Clustering extends React.Component {
   showClusterDeploymentSelectionBar() {
     return !this.state.choosingCentroidState &&
       !this.state.runningKMeans &&
-      !this.state.runningDBScan &&
-      !this.state.showLearnMode
+      !this.state.runningDBScan
       ? this.showClusterDeploymentSelection()
       : null;
   }
 
   showDBScanSelectionBar() {
-    return this.state.runningDBScan && !this.state.showLearnMode
-      ? this.showDBScanSelection()
-      : null;
+    return this.state.runningDBScan ? this.showDBScanSelection() : null;
   }
 
   showStartAlgorithimBar() {
@@ -492,13 +487,12 @@ class Clustering extends React.Component {
         {this.showClearSlateBar()}
         {this.showRunDBScanAgainBar()}
         {this.showResetClusterBar()}
-        {showLearnModeIcon(this)}
       </Navbar>
     );
   }
 
   displayClusterDeploymentArea() {
-    return !this.state.showLearnMode ? (
+    return (
       <XYPlot
         width={600}
         height={600}
@@ -544,18 +538,6 @@ class Clustering extends React.Component {
           );
         })}
       </XYPlot>
-    ) : null;
-  }
-
-  showInfoIconOrLearn() {
-    return !this.state.showLearnMode ? (
-      displayInfoButton(
-        "Clustering Algorithims",
-        "Start pressing on the grid anywhere to start adding points to the grid. Once the algorithim starts running, press the check mark to finish choosing centroids (If KMeans). The right arrow runs an iteration of Kmeans, and the eraser resets the board. If you choose DBScan, simply run the algorithim and watch the board populate with the coloring based on the configurations you chose.",
-        "right"
-      )
-    ) : (
-      <ClusteringLearn />
     );
   }
 
@@ -564,7 +546,11 @@ class Clustering extends React.Component {
       <div className="App">
         <div className="App-header">
           {this.showClusteringNavBar()}
-          {this.showInfoIconOrLearn()}
+          {displayInfoButton(
+            "Clustering Algorithims",
+            "Start pressing on the grid anywhere to start adding points to the grid. Once the algorithim starts running, press the check mark to finish choosing centroids (If KMeans). The right arrow runs an iteration of Kmeans, and the eraser resets the board. If you choose DBScan, simply run the algorithim and watch the board populate with the coloring based on the configurations you chose.",
+            "right"
+          )}
           <Row>
             {this.state.choosingCentroidState ? (
               <h1>Please Select Clusters</h1>

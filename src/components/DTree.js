@@ -2,8 +2,6 @@
 import React from "react";
 import Tree from "react-tree-graph";
 import Shuffle from "../Images/shuffle.png";
-import Edit from "../Images/edit.png";
-import Save from "../Images/save.png";
 import Back from "../Images/back.png";
 import Add from "../Images/add.png";
 import SomeTree from "../Images/SomeTree.png";
@@ -18,8 +16,6 @@ import {
   OverlayTrigger,
   Tooltip
 } from "react-bootstrap";
-import DTreeLearn from "./learn/DTreeLearn";
-import EditDTree from "./edit/EditDTree";
 import {
   determineBestSplit,
   determineMostLikelyLabel,
@@ -33,8 +29,7 @@ import { connect } from "react-redux";
 import {
   displayInfoButton,
   showBackToAlgorithimPage,
-  roundToTwoDecimalPlaces,
-  showLearnModeIcon
+  roundToTwoDecimalPlaces
 } from "../Utility";
 
 class DTree extends React.Component {
@@ -46,8 +41,6 @@ class DTree extends React.Component {
     this.state = {
       isGini: true,
       renderTree: false,
-      showEditPanel: false,
-      showLearnMode: false,
       showFirstPage: true,
       displayedDepth: -1,
       treeState: {},
@@ -278,9 +271,7 @@ class DTree extends React.Component {
     this.setState({
       data: this.generateRandomDataState(),
       showFirstPage: true,
-      renderTree: false,
-      showEditPanel: false,
-      showLearnMode: false
+      renderTree: false
     });
   }
 
@@ -330,12 +321,8 @@ class DTree extends React.Component {
     ) : null;
   }
 
-  displayEditTableInformation() {
-    return this.state.showEditPanel ? <EditDTree /> : null;
-  }
-
   showDisplayButton() {
-    return this.state.showFirstPage && !this.state.showLearnMode ? (
+    return this.state.showFirstPage ? (
       <OverlayTrigger
         trigger="hover"
         placement="bottom"
@@ -345,9 +332,7 @@ class DTree extends React.Component {
           onClick={() => {
             this.setState({
               renderTree: true,
-              showFirstPage: false,
-              showLearnMode: false,
-              showEditPanel: false
+              showFirstPage: false
             });
             this.showTree();
           }}
@@ -390,37 +375,13 @@ class DTree extends React.Component {
     ) : null;
   }
 
-  showRenderTableButton() {
-    return this.state.showFirstPage && !this.state.showLearnMode ? (
-      <OverlayTrigger
-        trigger="hover"
-        placement="bottom"
-        overlay={<Tooltip>Edit Features</Tooltip>}
-      >
-        <Nav.Link
-          onClick={() =>
-            this.setState({
-              renderTree: false,
-              showFirstPage: false,
-              showEditPanel: true,
-              showLearnMode: false
-            })
-          }
-        >
-          <Image src={Edit} style={{ width: 40 }} />
-        </Nav.Link>
-      </OverlayTrigger>
-    ) : null;
-  }
-
   showBackToDataButton() {
     return this.state.renderTree ? (
       <Nav.Link
         onClick={() =>
           this.setState({
             renderTree: false,
-            showFirstPage: true,
-            showLearnMode: false
+            showFirstPage: true
           })
         }
       >
@@ -433,28 +394,8 @@ class DTree extends React.Component {
     return this.state.showFirstPage ? showBackToAlgorithimPage() : null;
   }
 
-  showLearnModeIconCustom() {
-    return this.state.showFirstPage ? showLearnModeIcon(this) : null;
-  }
-
-  showSaveIcon() {
-    return this.state.showEditPanel ? (
-      <OverlayTrigger
-        trigger="hover"
-        placement="bottom"
-        overlay={<Tooltip>Save configuration</Tooltip>}
-      >
-        <Nav.Link onClick={() => this.saveEditState({})}>
-          <Image src={Save} style={{ width: 40 }} />
-        </Nav.Link>
-      </OverlayTrigger>
-    ) : null;
-  }
-
   showEntropyOrGiniSelection() {
-    return !this.state.showLearnMode &&
-      !this.state.renderTree &&
-      !this.state.showEditPanel ? (
+    return !this.state.renderTree ? (
       <div>
         <select
           value={this.state.isGini ? "gini" : "entropy"}
@@ -468,24 +409,20 @@ class DTree extends React.Component {
   }
 
   showDecisionTreeNavBar() {
-    console.log(this.state);
     return (
       <Navbar fixed="top" bg="dark" variant="dark">
         {this.showBackToAlgorithimPageCustom()}
         {this.showBackToDataButton()}
         {this.showDisplayButton()}
         {this.showAddRowButton()}
-        {this.showSaveIcon()}
         {this.showRandomizeDataButton()}
-        {this.showRenderTableButton()}
         {this.showEntropyOrGiniSelection()}
-        {this.showLearnModeIconCustom()}
       </Navbar>
     );
   }
 
   showInformationBar() {
-    return this.state.showFirstPage && !this.state.showLearnMode ? (
+    return this.state.showFirstPage ? (
       <Col>
         {displayInfoButton(
           "Data Info Table",
@@ -497,10 +434,6 @@ class DTree extends React.Component {
     ) : null;
   }
 
-  displayLearnModeDTree() {
-    return this.state.showLearnMode ? <DTreeLearn /> : null;
-  }
-
   render() {
     return (
       <div className="App">
@@ -508,11 +441,7 @@ class DTree extends React.Component {
           {this.showDecisionTreeNavBar()}
           <Row>
             {this.showInformationBar()}
-            <Col>
-              {this.displayTreeInformation()}
-              {this.displayLearnModeDTree()}
-              {this.displayEditTableInformation()}
-            </Col>
+            <Col>{this.displayTreeInformation()}</Col>
           </Row>
         </div>
       </div>

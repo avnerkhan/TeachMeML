@@ -15,7 +15,7 @@ import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import SomeTree from "../Images/SomeTree.png";
 import EditAssociation from "../components/edit/EditAssosciation";
-import { arrayRange, showLearnModeIcon } from "../Utility";
+import { arrayRange } from "../Utility";
 import { showBackToAlgorithimPage, displayInfoButton } from "../Utility";
 import {
   generateRandomTransaction,
@@ -43,8 +43,6 @@ class Association extends React.Component {
       renderTree: false,
       isApriori: false,
       isFPTree: false,
-      showLearnMode: false,
-      isEdit: false,
       minSup: 2,
       frequentItemSet: [],
       transactions: generateRandomTransaction(this.props.transactionItems)
@@ -52,9 +50,7 @@ class Association extends React.Component {
   }
 
   showMinSupSelection() {
-    return !this.state.showLearnMode &&
-      this.state.frequentItemSet.length === 0 &&
-      !this.state.isEdit ? (
+    return this.state.frequentItemSet.length === 0 ? (
       <Form>
         <Form.Group>
           <Form.Label>Select MinSup value</Form.Label>
@@ -295,10 +291,7 @@ class Association extends React.Component {
   }
 
   showStartAlgorithimBar() {
-    return !this.state.showLearnMode &&
-      !this.state.isApriori &&
-      !this.state.renderTree &&
-      !this.state.isEdit ? (
+    return !this.state.isApriori && !this.state.renderTree ? (
       <OverlayTrigger
         trigger="hover"
         placement="bottom"
@@ -312,9 +305,7 @@ class Association extends React.Component {
   }
 
   showRunNextIterationBar() {
-    return !this.state.isFPTree &&
-      !this.state.showLearnMode &&
-      !this.state.isEdit ? (
+    return !this.state.isFPTree ? (
       <OverlayTrigger
         trigger="hover"
         placement="bottom"
@@ -328,10 +319,7 @@ class Association extends React.Component {
   }
 
   showShuffleDataBar() {
-    return !this.state.isFPTree &&
-      !this.state.isApriori &&
-      !this.state.showLearnMode &&
-      !this.state.isEdit ? (
+    return !this.state.isFPTree && !this.state.isApriori ? (
       <OverlayTrigger
         trigger="hover"
         placement="bottom"
@@ -355,41 +343,6 @@ class Association extends React.Component {
 
   randomizeData() {}
 
-  showEditIcon() {
-    return !this.state.showLearnMode &&
-      !this.state.isApriori &&
-      !this.state.isFPTree &&
-      !this.state.renderTree ? (
-      <OverlayTrigger
-        trigger="hover"
-        placement="bottom"
-        overlay={
-          <Tooltip>
-            {this.state.isEdit ? "Save Configurations" : "Edit Transactions"}
-          </Tooltip>
-        }
-      >
-        <Nav.Link
-          onClick={() => {
-            if (this.state.isEdit) {
-              this.setState({
-                transactions: generateRandomTransaction(
-                  this.props.transactionItems
-                )
-              });
-            }
-            this.setState({
-              isEdit: !this.state.isEdit,
-              showLearnMode: false
-            });
-          }}
-        >
-          <Image src={this.state.isEdit ? Save : Edit} style={{ width: 40 }} />
-        </Nav.Link>
-      </OverlayTrigger>
-    ) : null;
-  }
-
   showAprioriNavBar() {
     return (
       <Navbar fixed="top" bg="dark" variant="dark">
@@ -398,8 +351,6 @@ class Association extends React.Component {
         {this.showRunNextIterationBar()}
         {this.showShuffleDataBar()}
         {this.showMinSupSelection()}
-        {this.showEditIcon()}
-        {showLearnModeIcon(this)}
       </Navbar>
     );
   }
@@ -419,19 +370,7 @@ class Association extends React.Component {
   }
 
   showDataTable() {
-    return this.state != undefined &&
-      !this.state.showLearnMode &&
-      !this.state.isEdit
-      ? this.displayTransactionTable()
-      : null;
-  }
-
-  displayEditMode() {
-    return this.state.isEdit ? <EditAssociation /> : null;
-  }
-
-  displayLearnModeApriori() {
-    return this.state.showLearnMode ? <AssociationLearn /> : null;
+    return this.state != undefined ? this.displayTransactionTable() : null;
   }
 
   render() {
@@ -440,9 +379,7 @@ class Association extends React.Component {
         <header className="App-header">
           {this.showAprioriNavBar()}
           {this.showDataTable()}
-          {this.displayLearnModeApriori()}
           {this.displayFrequentItemsets()}
-          {this.displayEditMode()}
           {this.showTree()}
         </header>
       </div>

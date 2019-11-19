@@ -66,26 +66,3 @@ export function showBackToAlgorithimPage() {
     </Link>
   );
 }
-
-export function showLearnModeIcon(component) {
-  return (
-    <OverlayTrigger
-      trigger="hover"
-      placement="bottom"
-      overlay={<Tooltip>Toggle Learn Mode</Tooltip>}
-    >
-      <Nav.Link
-        onClick={() =>
-          component.setState({
-            showLearnMode: !component.state.showLearnMode
-          })
-        }
-      >
-        <Image
-          src={component.state.showLearnMode ? Exp : Learn}
-          style={{ width: 40 }}
-        />
-      </Nav.Link>
-    </OverlayTrigger>
-  );
-}

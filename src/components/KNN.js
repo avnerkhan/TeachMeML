@@ -8,12 +8,9 @@ import {
   MarkSeries
 } from "react-vis";
 import Image from "react-bootstrap/Image";
-import Save from "../Images/save.png";
-import Edit from "../Images/edit.png";
 import Navbar from "react-bootstrap/Navbar";
 import Shuffle from "../Images/shuffle.png";
 import Add from "../Images/add.png";
-import KNNLearn from "./learn/KNNLearn";
 import {
   Nav,
   FormControl,
@@ -25,12 +22,7 @@ import {
 import { generateRandomData } from "./algorithims/KNNAlgo";
 import { euclidFunction, comparator, arrayRange } from "../Utility";
 import "../css_files/App.css";
-import {
-  showBackToAlgorithimPage,
-  displayInfoButton,
-  showLearnModeIcon
-} from "../Utility";
-import EditKNN from "./edit/EditKNN";
+import { showBackToAlgorithimPage, displayInfoButton } from "../Utility";
 import { connect } from "react-redux";
 
 class KNN extends React.Component {
@@ -47,8 +39,6 @@ class KNN extends React.Component {
     this.state = {
       k: 1,
       labeledData: randomData,
-      isEdit: false,
-      showLearnMode: false,
       undeterminedData: [],
       currentHighlightData: []
     };
@@ -194,9 +184,7 @@ class KNN extends React.Component {
   }
 
   showRandomizeUndeterminedDataButton() {
-    return Object.keys(this.state.labeledData).length > 0 &&
-      !this.state.showLearnMode &&
-      !this.state.isEdit ? (
+    return Object.keys(this.state.labeledData).length > 0 ? (
       <OverlayTrigger
         trigger="hover"
         placement="bottom"
@@ -210,7 +198,7 @@ class KNN extends React.Component {
   }
 
   showRandomizeDataButton() {
-    return !this.state.showLearnMode && !this.state.isEdit ? (
+    return (
       <OverlayTrigger
         trigger="hover"
         placement="bottom"
@@ -220,13 +208,11 @@ class KNN extends React.Component {
           <Image src={Shuffle} style={{ width: 40 }} />
         </Nav.Link>
       </OverlayTrigger>
-    ) : null;
+    );
   }
 
   showAddButton() {
-    return Object.keys(this.state.labeledData).length > 0 &&
-      !this.state.showLearnMode &&
-      !this.state.isEdit ? (
+    return Object.keys(this.state.labeledData).length > 0 ? (
       <OverlayTrigger
         trigger="hover"
         placement="bottom"
@@ -244,45 +230,13 @@ class KNN extends React.Component {
   }
 
   showXandYInputBar() {
-    return Object.keys(this.state.labeledData).length > 0 &&
-      !this.state.showLearnMode &&
-      !this.state.isEdit
+    return Object.keys(this.state.labeledData).length > 0
       ? this.showXandYInput()
       : null;
   }
 
   showKSelection() {
-    return this.state.undeterminedData.length > 0 &&
-      !this.state.showLearnMode &&
-      !this.state.isEdit
-      ? this.showKSelect()
-      : null;
-  }
-
-  showEditKNN() {
-    return !this.state.showLearnMode ? (
-      <OverlayTrigger
-        trigger="hover"
-        placement="bottom"
-        overlay={
-          <Tooltip>
-            {this.state.isEdit ? "Save Configurations" : "Edit Features"}
-          </Tooltip>
-        }
-      >
-        <Nav.Link
-          onClick={() => {
-            if (this.state.isEdit) this.randomizeData();
-            this.setState({
-              isEdit: !this.state.isEdit,
-              showLearnMode: false
-            });
-          }}
-        >
-          <Image src={this.state.isEdit ? Save : Edit} style={{ width: 40 }} />
-        </Nav.Link>
-      </OverlayTrigger>
-    ) : null;
+    return this.state.undeterminedData.length > 0 ? this.showKSelect() : null;
   }
 
   showKNNNavBar() {
@@ -293,19 +247,9 @@ class KNN extends React.Component {
         {this.showRandomizeUndeterminedDataButton()}
         {this.showRandomizeDataButton()}
         {this.showXandYInputBar()}
-        {this.showEditKNN()}
         {this.showKSelection()}
-        {showLearnModeIcon(this)}
       </Navbar>
     );
-  }
-
-  showLearnKNN() {
-    return this.state.showLearnMode ? <KNNLearn /> : null;
-  }
-
-  showEditPanel() {
-    return this.state.isEdit ? <EditKNN /> : null;
   }
 
   showLabeledMarkSeries() {
@@ -324,7 +268,7 @@ class KNN extends React.Component {
   }
 
   displayKNNExperiement() {
-    return !this.state.showLearnMode && !this.state.isEdit ? (
+    return (
       <div>
         {displayInfoButton(
           "KNN Plot",
@@ -358,7 +302,7 @@ class KNN extends React.Component {
           />
         </XYPlot>
       </div>
-    ) : null;
+    );
   }
 
   render() {
@@ -367,8 +311,6 @@ class KNN extends React.Component {
         <div className="App-header">
           {this.showKNNNavBar()}
           {this.displayKNNExperiement()}
-          {this.showLearnKNN()}
-          {this.showEditPanel()}
         </div>
       </div>
     );
