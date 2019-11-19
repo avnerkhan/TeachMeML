@@ -13,11 +13,13 @@ import { Provider } from "react-redux";
 import { createStore, combineReducers } from "redux";
 import { DTreeReducer } from "./reducers/DTreeReducer";
 import { KNNReducer } from "./reducers/KNNReducer";
+import { AssociationReducer } from "./reducers/AssociationReducer";
 
 const store = createStore(
   combineReducers({
     DTree: DTreeReducer,
-    KNN: KNNReducer
+    KNN: KNNReducer,
+    Association: AssociationReducer
   })
 );
 

@@ -10,11 +10,11 @@ export function generateRandomTransaction(
   for (let i = 0; i < lengthPerTransaction; i++) {
     let transaction = [];
     const transactionLength =
-      Math.floor(Math.random() * transactionItems.length) + 1;
+      Math.floor(Math.random() * transactionItems.size) + 1;
 
     for (let c = 0; c < transactionLength; c++) {
       const item = Math.round(Math.random() * transaction.length);
-      const pushedItem = transactionItems[item];
+      const pushedItem = transactionItems.get(item);
       if (!transaction.includes(pushedItem)) transaction.push(pushedItem);
     }
 

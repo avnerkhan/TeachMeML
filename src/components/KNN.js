@@ -9,10 +9,10 @@ import {
 } from "react-vis";
 import Image from "react-bootstrap/Image";
 import Save from "../Images/save.png";
+import Edit from "../Images/edit.png";
 import Navbar from "react-bootstrap/Navbar";
 import Shuffle from "../Images/shuffle.png";
 import Add from "../Images/add.png";
-import Edit from "../Images/edit.png";
 import KNNLearn from "./learn/KNNLearn";
 import {
   Nav,
