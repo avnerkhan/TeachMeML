@@ -52,7 +52,7 @@ class Pick extends React.Component {
   render() {
     return (
       <div className="App">
-        <header className="App-header-low">
+        <header className="App-header-low background-image">
           {this.showOverallNavBar()}
           <h1>Teach Me ML</h1>
           <p>

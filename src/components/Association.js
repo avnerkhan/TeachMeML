@@ -42,6 +42,7 @@ class Association extends React.Component {
       isFPTree: false,
       minSup: 2,
       frequentItemSet: [],
+      reorderedDB: [],
       transactions: generateRandomTransaction(this.props.transactionItems)
     };
   }
