@@ -26,6 +26,7 @@ export function generateRandomTransaction(
 
 export function generateOneItemsets(transactions, transactionItems, minSup) {
   let oneItemSet = {};
+  let minSupPrune = new Set();
 
   for (let transaction of transactions) {
     for (let item of transactionItems) {
@@ -37,10 +38,12 @@ export function generateOneItemsets(transactions, transactionItems, minSup) {
   }
 
   for (let item in oneItemSet) {
-    if (oneItemSet[item] < minSup) delete oneItemSet[item];
+    if (oneItemSet[item] < minSup) {
+      minSupPrune.add(item);
+    }
   }
 
-  return [oneItemSet];
+  return [oneItemSet, minSupPrune];
 }
 
 function isSuperset(compareSet, checkSet) {
@@ -128,9 +131,57 @@ export function findAllPaths(allPaths, currentPath, curr, toFind) {
   }
 }
 
-// Prune by counting transacitons here (Apriori principle later?)
-export function filterFreqSets(newFrequentSet, transactions, minsup) {
+function getAllCombos(list) {
+  let toReturn = [];
+
+  for (let i = 0; i < list.length; i++) {
+    toReturn.push(
+      list.filter((entry, index) => {
+        return index !== i;
+      })
+    );
+  }
+
+  return toReturn;
+}
+
+export function filterApriori(
+  newFrequentSet,
+  minSupPruned,
+  aprioriPrunedBefore
+) {
+  let aprioriPruned = new Set([]);
+
+  for (const newFreq in newFrequentSet) {
+    const split = newFreq.split(",");
+    const perms = getAllCombos(split);
+    let filter = false;
+    for (const perm of perms) {
+      const previousSplit = perm.toString();
+      if (
+        minSupPruned.has(previousSplit) ||
+        aprioriPrunedBefore.has(previousSplit)
+      ) {
+        filter = true;
+        break;
+      }
+    }
+    if (filter) {
+      aprioriPruned.add(newFreq);
+    }
+  }
+
+  return aprioriPruned;
+}
+
+export function filterFreqSets(
+  newFrequentSet,
+  aprioriPruned,
+  transactions,
+  minsup
+) {
   let frequentSetCopy = newFrequentSet;
+  let minSupPruned = new Set();
 
   for (let transaction of transactions) {
     const compareSet = new Set(transaction);
@@ -143,12 +194,18 @@ export function filterFreqSets(newFrequentSet, transactions, minsup) {
     }
   }
 
+  debugger;
+
   for (let frequentSet in frequentSetCopy) {
-    if (frequentSetCopy[frequentSet] < minsup)
-      delete frequentSetCopy[frequentSet];
+    if (
+      frequentSetCopy[frequentSet] < minsup &&
+      !aprioriPruned.has(frequentSet)
+    ) {
+      minSupPruned.add(frequentSet);
+    }
   }
 
-  return frequentSetCopy;
+  return [frequentSetCopy, minSupPruned];
 }
 
 export function getFrequentItemsets(currentPaths, minsup) {
@@ -286,19 +343,29 @@ function generateConfs(
   return generatedConfs;
 }
 
-export function getStrongRules(frequentItemsets, minConf) {
+export function getStrongRules(
+  frequentItemsets,
+  minConf,
+  aprioriPruned = new Set(),
+  minSupPruned = new Set()
+) {
   let strongRules = [];
 
   for (let i = 1; i < frequentItemsets.length; i++) {
     const kThItemset = frequentItemsets[i];
     for (const frequentItemset in kThItemset) {
-      const generatedConfs = generateConfs(
-        frequentItemsets,
-        frequentItemset,
-        kThItemset[frequentItemset],
-        minConf
-      );
-      strongRules = strongRules.concat(generatedConfs);
+      if (
+        !aprioriPruned.has(frequentItemset) &&
+        !minSupPruned.has(frequentItemset)
+      ) {
+        const generatedConfs = generateConfs(
+          frequentItemsets,
+          frequentItemset,
+          kThItemset[frequentItemset],
+          minConf
+        );
+        strongRules = strongRules.concat(generatedConfs);
+      }
     }
   }
 

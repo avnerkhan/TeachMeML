@@ -19,6 +19,7 @@ import {
   reorderDB,
   buildTree,
   filterFreqSets,
+  filterApriori,
   mineFreqItemsets,
   formatSets,
   getStrongRules
@@ -44,6 +45,8 @@ class Association extends React.Component {
       minSup: 2,
       minConf: 40,
       frequentItemSet: [],
+      minSupPruned: new Set(),
+      aprioriPruned: new Set(),
       strongRules: [],
       reorderedDB: [],
       transactions: generateRandomTransaction(this.props.transactionItems)
@@ -125,12 +128,14 @@ class Association extends React.Component {
     const minSup = this.state.minSup;
 
     if (frequentItemSet.length === 0) {
+      const oneItemSetPair = generateOneItemsets(
+        transactions,
+        transactionItems,
+        minSup
+      );
       this.setState({
-        frequentItemSet: generateOneItemsets(
-          transactions,
-          transactionItems,
-          minSup
-        ),
+        frequentItemSet: [oneItemSetPair[0]],
+        minSupPruned: oneItemSetPair[1],
         isApriori: true
       });
     } else {
@@ -138,38 +143,73 @@ class Association extends React.Component {
       const lastFrequentSet = frequentItemSet[frequentItemSet.length - 1];
       oneItemSet.sort();
       let newFrequentSet = {};
+      let currentLength = 0;
+      let currentMinSupPruned = this.state.minSupPruned;
+      let currentAprioriPruned = this.state.aprioriPruned;
 
       for (let frequentSet in lastFrequentSet) {
-        const splitString = frequentSet.split(",");
-        const lastItem = splitString[splitString.length - 1];
-        let index = oneItemSet.indexOf(lastItem) + 1;
+        if (
+          !currentMinSupPruned.has(frequentSet) &&
+          !currentAprioriPruned.has(frequentSet)
+        ) {
+          const splitString = frequentSet.split(",");
+          currentLength = splitString.length;
+          const lastItem = splitString[currentLength - 1];
+          let index = oneItemSet.indexOf(lastItem) + 1;
 
-        while (index < oneItemSet.length) {
-          let newFrequentPattern = frequentSet;
-          newFrequentPattern += "," + oneItemSet[index];
-          newFrequentSet[newFrequentPattern] = 0;
-          index++;
+          while (index < oneItemSet.length) {
+            let newFrequentPattern = frequentSet;
+            newFrequentPattern += "," + oneItemSet[index];
+            newFrequentSet[newFrequentPattern] = 0;
+            index++;
+          }
         }
       }
 
-      newFrequentSet = filterFreqSets(
+      let aprioriPruned = new Set();
+
+      if (currentLength >= 3) {
+        aprioriPruned = filterApriori(
+          newFrequentSet,
+          currentMinSupPruned,
+          currentAprioriPruned
+        );
+      }
+
+      const minSupPair = filterFreqSets(
         newFrequentSet,
+        aprioriPruned,
         this.state.transactions,
         this.state.minSup
       );
+
+      newFrequentSet = minSupPair[0];
+      let minSupPruned = minSupPair[1];
+      currentMinSupPruned = new Set([...currentMinSupPruned, ...minSupPruned]);
+      currentAprioriPruned = new Set([
+        ...currentAprioriPruned,
+        ...aprioriPruned
+      ]);
 
       frequentItemSet.push(newFrequentSet);
 
       const isDoneApriori = Object.keys(newFrequentSet).length === 0;
 
       const strongRules = isDoneApriori
-        ? getStrongRules(frequentItemSet, this.state.minConf)
+        ? getStrongRules(
+            frequentItemSet,
+            this.state.minConf,
+            this.state.aprioriPruned,
+            this.state.minSupPruned
+          )
         : [];
 
       this.setState({
         frequentItemSet: frequentItemSet,
         isApriori: true,
         isDoneApriori: isDoneApriori,
+        minSupPruned: currentMinSupPruned,
+        aprioriPruned: currentAprioriPruned,
         strongRules: strongRules
       });
     }
@@ -251,13 +291,24 @@ class Association extends React.Component {
           if (frequentSetKeys.length > 0) {
             return (
               <Col>
-                <div>Frequent {index + 1} itemsets</div>
+                <div>{index + 1} itemsets</div>
                 {frequentSetKeys.map(set => {
-                  return (
-                    <div>
-                      {set} : {frequentKSet[set]}
-                    </div>
-                  );
+                  const isMinSupPruned = this.state.minSupPruned.has(set);
+                  const isAprioriPruned = this.state.aprioriPruned.has(set);
+                  if (!isMinSupPruned && !isAprioriPruned) {
+                    return (
+                      <div>
+                        {set} : {frequentKSet[set]}
+                      </div>
+                    );
+                  } else {
+                    return (
+                      <div style={{ color: "red" }}>
+                        {set} : {frequentKSet[set]} -{" "}
+                        {isAprioriPruned ? "Apriori" : "Minsup"}
+                      </div>
+                    );
+                  }
                 })}
               </Col>
             );
@@ -424,7 +475,7 @@ class Association extends React.Component {
           {this.showAprioriNavBar()}
           {this.showDataTable()}
           {this.displayFrequentItemsets()}
-          <h1>Strong Rules</h1>
+          {this.state.strongRules.length > 0 ? <h1>Strong Rules</h1> : null}
           {this.displayStrongRules()}
           {this.showTree()}
         </header>
