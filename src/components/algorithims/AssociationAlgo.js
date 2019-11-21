@@ -153,7 +153,6 @@ export function filterFreqSets(newFrequentSet, transactions, minsup) {
 
 export function getFrequentItemsets(currentPaths, minsup) {
   let frequentItemsets = {};
-  debugger;
 
   for (let pathKey in currentPaths) {
     let mappingForKey = {};
@@ -207,4 +206,101 @@ export function formatSets(freqItemsets, oneItemSet) {
   }
 
   return newFrequentSets;
+}
+
+function findSupportInFrequentItemsets(frequentItemsets, currentSet) {
+  for (const set of frequentItemsets) {
+    if (set[currentSet] != undefined) {
+      return set[currentSet];
+    }
+  }
+}
+
+function getOneConfs(frequentItemsets, items, overallSupportCount, minConf) {
+  let oneConfs = [];
+
+  for (let i = 0; i < items.length; i++) {
+    const currentSet = items
+      .filter((item, index) => {
+        return i !== index;
+      })
+      .toString();
+    const currConf =
+      overallSupportCount /
+      findSupportInFrequentItemsets(frequentItemsets, currentSet);
+    if (currConf >= minConf / 100) {
+      oneConfs.push([currentSet.split(","), [items[i]], currConf]);
+    }
+  }
+
+  return oneConfs;
+}
+
+function generateConfs(
+  frequentItemsets,
+  transaction,
+  overallSupportCount,
+  minConf
+) {
+  let generatedConfs = [];
+
+  const items = transaction.split(",");
+
+  let currentConfs = getOneConfs(
+    frequentItemsets,
+    items,
+    overallSupportCount,
+    minConf
+  );
+
+  while (currentConfs.length > 0) {
+    generatedConfs = generatedConfs.concat(currentConfs);
+    let newConfList = [];
+    for (let i = 0; i < currentConfs.length; i++) {
+      const consequence = currentConfs[i];
+      const antecedents = consequence[1];
+      for (let c = i + 1; c < currentConfs.length; c++) {
+        const otherConsequnce = currentConfs[c];
+        const otherAntecedents = otherConsequnce[1];
+        const combined = new Set(antecedents.concat(otherAntecedents));
+        const checkList = items.filter(item => {
+          return !combined.has(item);
+        });
+        if (checkList.length === 0) break;
+        const confAmount =
+          overallSupportCount /
+          findSupportInFrequentItemsets(frequentItemsets, checkList.toString());
+        const confOnThisRound = [checkList, [...combined], confAmount];
+        // will probably have to override comparator
+        if (
+          !newConfList.includes(confOnThisRound) &&
+          confAmount >= minConf / 100
+        ) {
+          newConfList.push(confOnThisRound);
+        }
+      }
+    }
+    currentConfs = newConfList;
+  }
+
+  return generatedConfs;
+}
+
+export function getStrongRules(frequentItemsets, minConf) {
+  let strongRules = [];
+
+  for (let i = 1; i < frequentItemsets.length; i++) {
+    const kThItemset = frequentItemsets[i];
+    for (const frequentItemset in kThItemset) {
+      const generatedConfs = generateConfs(
+        frequentItemsets,
+        frequentItemset,
+        kThItemset[frequentItemset],
+        minConf
+      );
+      strongRules = strongRules.concat(generatedConfs);
+    }
+  }
+
+  return strongRules;
 }

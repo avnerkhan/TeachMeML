@@ -20,7 +20,8 @@ import {
   buildTree,
   filterFreqSets,
   mineFreqItemsets,
-  formatSets
+  formatSets,
+  getStrongRules
 } from "./algorithims/AssociationAlgo";
 import Add from "../Images/add.png";
 import Trash from "../Images/trash.png";
@@ -41,7 +42,9 @@ class Association extends React.Component {
       isDoneApriori: false,
       isFPTree: false,
       minSup: 2,
+      minConf: 40,
       frequentItemSet: [],
+      strongRules: [],
       reorderedDB: [],
       transactions: generateRandomTransaction(this.props.transactionItems)
     };
@@ -159,10 +162,15 @@ class Association extends React.Component {
 
       const isDoneApriori = Object.keys(newFrequentSet).length === 0;
 
+      const strongRules = isDoneApriori
+        ? getStrongRules(frequentItemSet, this.state.minConf)
+        : [];
+
       this.setState({
         frequentItemSet: frequentItemSet,
         isApriori: true,
-        isDoneApriori: isDoneApriori
+        isDoneApriori: isDoneApriori,
+        strongRules: strongRules
       });
     }
   }
@@ -234,7 +242,7 @@ class Association extends React.Component {
 
   // Displays JSX of N frequent itemsets
   displayFrequentItemsets() {
-    let frequentSets = this.state.frequentItemSet;
+    const frequentSets = this.state.frequentItemSet;
 
     return (
       <Row>
@@ -285,13 +293,16 @@ class Association extends React.Component {
       sortable,
       this.state.minSup
     );
+    const formattedSets = formatSets(freqItemsets, oneItemSet);
+    const strongRules = getStrongRules(formattedSets, this.state.minConf);
 
     this.setState({
       isFPTree: true,
       transactions: reorderedDB,
       treeState: treeState,
       renderTree: true,
-      frequentItemSet: formatSets(freqItemsets, oneItemSet)
+      frequentItemSet: formattedSets,
+      strongRules: strongRules
     });
   }
 
@@ -346,7 +357,23 @@ class Association extends React.Component {
     ) : null;
   }
 
-  randomizeData() {}
+  showMinConfSelection() {
+    return this.state.frequentItemSet.length === 0 ? (
+      <Form>
+        <Form.Group>
+          <Form.Label>Select MinConf value</Form.Label>
+          <Form.Control
+            as="select"
+            onChange={e => this.setState({ minConf: e.target.value })}
+          >
+            {arrayRange(0, 100).map(num => {
+              return <option value={num}>{num}</option>;
+            })}
+          </Form.Control>
+        </Form.Group>
+      </Form>
+    ) : null;
+  }
 
   showAprioriNavBar() {
     return (
@@ -356,6 +383,7 @@ class Association extends React.Component {
         {this.showRunNextIterationBar()}
         {this.showShuffleDataBar()}
         {this.showMinSupSelection()}
+        {this.showMinConfSelection()}
       </Navbar>
     );
   }
@@ -378,6 +406,17 @@ class Association extends React.Component {
     return this.state != undefined ? this.displayTransactionTable() : null;
   }
 
+  displayStrongRules() {
+    const strongRules = this.state.strongRules;
+
+    return strongRules.map(strongRule => {
+      const precedent = strongRule[0].toString();
+      const antecedent = strongRule[1].toString();
+      const conf = strongRule[2];
+      return <Row>{precedent + " -> " + antecedent + " : " + conf}</Row>;
+    });
+  }
+
   render() {
     return (
       <div className="App">
@@ -385,6 +424,8 @@ class Association extends React.Component {
           {this.showAprioriNavBar()}
           {this.showDataTable()}
           {this.displayFrequentItemsets()}
+          <h1>Strong Rules</h1>
+          {this.displayStrongRules()}
           {this.showTree()}
         </header>
       </div>
