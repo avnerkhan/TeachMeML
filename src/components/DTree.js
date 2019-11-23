@@ -97,6 +97,7 @@ class DTree extends React.Component {
     );
     const bestSplit = information.currentHighestGainLabel;
     const gainAmount = information.currentHighestGain;
+    const threshold = information.currentThreshold;
     const classArr = getMap(
       bestSplit,
       data,
@@ -110,10 +111,14 @@ class DTree extends React.Component {
     }
 
     for (const classVal in splitDict) {
+      const isCategorical =
+        this.props.continousClasses.get(classVal) != undefined;
       let name =
         classVal === "undefined"
           ? determineMostLikelyLabel(data, this.props.label)
-          : classVal;
+          : isCategorical
+          ? classVal
+          : threshold;
 
       let newNode = {
         name: name,

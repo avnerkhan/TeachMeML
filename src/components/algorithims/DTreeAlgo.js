@@ -1,3 +1,5 @@
+import { is } from "immutable";
+
 // For determing ties when a node has multiple labels in its dataset
 export function determineMostLikelyLabel(data, labelName) {
   let labelMap = {};
@@ -27,8 +29,10 @@ export function determineBestSplit(
 ) {
   let currentHighestGainLabel = "";
   let currentHighestGain = 0.0;
+  let currentThreshold = 0.0;
 
   for (let i = 0; i < dataLabels.length; i++) {
+    const isCategorical = !continousMap[dataLabels[i]];
     const currGain = calculateGainRatio(
       dataLabels[i],
       continousMap,
@@ -37,22 +41,42 @@ export function determineBestSplit(
       labelName
     );
 
-    if (currGain > currentHighestGain) {
+    if (isCategorical && currGain > currentHighestGain) {
       currentHighestGain = currGain;
       currentHighestGainLabel = dataLabels[i];
     }
+    if (!isCategorical && currGain.gainValue > currentHighestGain) {
+      currentHighestGain = currGain.gainValue;
+      currentHighestGainLabel = dataLabels[i];
+      currentThreshold = currGain.threshold;
+    }
   }
-  return { currentHighestGainLabel, currentHighestGain };
+  return { currentHighestGainLabel, currentHighestGain, currentThreshold };
 }
 
 // Refer to practice exam 1 decision tree for algorithim.
 
 // Calculates gain ratio from splitting on feature
 function calculateGainRatio(feature, continousMap, data, isGini, labelName) {
-  const gain = calculateGain(feature, continousMap, data, isGini, labelName);
+  const isCategorical = !continousMap[feature];
+  const gainInfo = calculateGain(
+    feature,
+    continousMap,
+    data,
+    isGini,
+    labelName
+  );
   const splitInfo = calculateSplitInfo(feature, data);
-  if (splitInfo === 0) return 0;
-  return gain / splitInfo;
+  if (isCategorical) {
+    if (splitInfo === 0) return 0;
+    return gainInfo / splitInfo;
+  } else {
+    if (splitInfo === 0) return 0;
+    return {
+      threshold: gainInfo.threshold,
+      gainValue: gainInfo.gainValue / splitInfo
+    };
+  }
 }
 
 function calculateSplitInfo(feature, data) {
@@ -69,9 +93,76 @@ function calculateSplitInfo(feature, data) {
 
 // Calculates information gain from splitting on feature
 function calculateGain(feature, continousMap, data, isGini, labelName) {
+  const isCategorical = !continousMap[feature];
   const overallImpurity = calculateImpurityValue(data, isGini, labelName);
-  const splitValue = calculateSplit(feature, data, isGini);
-  return overallImpurity - splitValue;
+  if (isCategorical) {
+    return overallImpurity - calculateEntropy(feature, data, isGini);
+  } else {
+    const continousInfo = calculateEntropyContinous(
+      feature,
+      data,
+      isGini,
+      labelName
+    );
+    return {
+      threshold: continousInfo.smallestEntropyThreshold,
+      gainValue: overallImpurity - continousInfo.smallestEntropyValue
+    };
+  }
+}
+
+function calculateEntropyContinous(feature, data, isGini, labelName) {
+  const sortedArray = data;
+  sortedArray.sort((firstEntry, secondEntry) => {
+    return firstEntry[feature] - secondEntry[feature];
+  });
+
+  let smallestEntropyValue = Number.MAX_SAFE_INTEGER;
+  let smallestEntropyThreshold = -1;
+  for (let i = 0; i < sortedArray.length - 1; i++) {
+    const firstLabel = sortedArray[i][labelName];
+    const secondLabel = sortedArray[i + 1][labelName];
+
+    if (firstLabel !== secondLabel) {
+      const potentialSplit =
+        (sortedArray[i][feature] + sortedArray[i + 1][feature]) / 2;
+      const potentialEntropyValue = calculateContinousEntropy(
+        feature,
+        sortedArray,
+        potentialSplit,
+        isGini,
+        labelName
+      );
+      if (potentialEntropyValue < smallestEntropyValue) {
+        smallestEntropyValue = potentialEntropyValue;
+        smallestEntropyThreshold = potentialSplit;
+      }
+    }
+  }
+
+  return { smallestEntropyThreshold, smallestEntropyValue };
+}
+
+function calculateContinousEntropy(
+  feature,
+  sortedArray,
+  potentialSplit,
+  isGini,
+  labelName
+) {
+  const leftHalf = sortedArray.filter(entry => {
+    return entry[feature] <= potentialSplit;
+  });
+  const rightHalf = sortedArray.filter(entry => {
+    return entry[feature] > potentialSplit;
+  });
+
+  return (
+    (leftHalf.length / sortedArray.length) *
+      calculateImpurityValue(leftHalf, isGini, labelName) +
+    (rightHalf.length / sortedArray.length) *
+      calculateImpurityValue(rightHalf, isGini, labelName)
+  );
 }
 
 // Based on the currently given dataset, calculate the positive and negative
@@ -171,8 +262,8 @@ export function filteredData(classVal, feature, data) {
   return dataToReturn;
 }
 
-// Calculates split gini for feature
-function calculateSplit(feature, data, isGini) {
+// Calculates split gini for feature (Maybe add entropy version of this later)?
+function calculateEntropy(feature, data, isGini) {
   const featureMap = getMap(feature, data, false, isGini);
   let totalSplit = 0.0;
 

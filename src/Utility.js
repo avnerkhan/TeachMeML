@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  Popover,
-  OverlayTrigger,
-  Image,
-  Nav,
-  Tooltip,
-  Navbar
-} from "react-bootstrap";
+import { Popover, OverlayTrigger, Image, Nav, Navbar } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import Back from "./Images/back.png";
 import Icon from "./Images/icon.png";
