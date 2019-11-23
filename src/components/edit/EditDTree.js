@@ -12,7 +12,8 @@ import {
   addLabelClass,
   deleteLabelClass,
   changeLabelName,
-  editFeatureName
+  editFeatureName,
+  toggleContinousAttribute
 } from "../../actions/DTreeActions";
 import Trash from "../../Images/trash.png";
 import Add from "../../Images/add.png";
@@ -46,6 +47,7 @@ class EditDTree extends React.Component {
             </thead>
             <tbody>
               {features.map((feature, index) => {
+                const isCategorical = !this.props.continousClasses.get(feature);
                 return (
                   <tr>
                     <td>
@@ -57,42 +59,55 @@ class EditDTree extends React.Component {
                         }
                       />
                     </td>
-                    {this.props.featureClasses
-                      .get(feature)
-                      .map(featureClass => {
-                        return (
-                          <OverlayTrigger
-                            trigger="hover"
-                            placement="bottom"
-                            overlay={
-                              <Tooltip>{"Delete " + featureClass}</Tooltip>
-                            }
-                          >
-                            <td
-                              onClick={() =>
-                                this.props.deleteFeatureClass(
-                                  feature,
-                                  featureClass
-                                )
-                              }
-                            >
-                              {featureClass}
-                            </td>
-                          </OverlayTrigger>
-                        );
-                      })}
-                    <td>
-                      <input type="text" ref={"classInput" + index} />
-                    </td>
+                    {isCategorical
+                      ? this.props.featureClasses
+                          .get(feature)
+                          .map(featureClass => {
+                            return (
+                              <OverlayTrigger
+                                trigger="hover"
+                                placement="bottom"
+                                overlay={
+                                  <Tooltip>{"Delete " + featureClass}</Tooltip>
+                                }
+                              >
+                                <td
+                                  onClick={() =>
+                                    this.props.deleteFeatureClass(
+                                      feature,
+                                      featureClass
+                                    )
+                                  }
+                                >
+                                  {featureClass}
+                                </td>
+                              </OverlayTrigger>
+                            );
+                          })
+                      : null}
+                    {isCategorical ? (
+                      <td>
+                        <input type="text" ref={"classInput" + index} />
+                      </td>
+                    ) : null}
+                    {isCategorical ? (
+                      <td
+                        onClick={() =>
+                          this.props.addFeatureClass(
+                            feature,
+                            this.refs["classInput" + index].value
+                          )
+                        }
+                      >
+                        <Image src={Add} style={{ width: 40 }} />
+                      </td>
+                    ) : null}
                     <td
                       onClick={() =>
-                        this.props.addFeatureClass(
-                          feature,
-                          this.refs["classInput" + index].value
-                        )
+                        this.props.toggleContinousAttribute(feature)
                       }
                     >
-                      <Image src={Add} style={{ width: 40 }} />
+                      {isCategorical ? "Set continous" : "Set categorical"}
                     </td>
                     <td onClick={() => this.props.deleteFeature(feature)}>
                       <Image src={Trash} style={{ width: 40 }} />
@@ -124,6 +139,7 @@ class EditDTree extends React.Component {
 }
 
 const mapStateToProps = state => ({
+  continousClasses: state.DTree.continousClasses,
   featureClasses: state.DTree.featureClasses,
   label: state.DTree.label,
   labelClasses: state.DTree.labelClasses
@@ -137,7 +153,8 @@ const mapDispatchToProps = {
   addLabelClass,
   deleteLabelClass,
   changeLabelName,
-  editFeatureName
+  editFeatureName,
+  toggleContinousAttribute
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(EditDTree);

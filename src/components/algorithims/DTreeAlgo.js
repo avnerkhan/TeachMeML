@@ -18,12 +18,24 @@ export function determineMostLikelyLabel(data, labelName) {
 }
 
 // Determines best split based on comparing gain ratios of all entries
-export function determineBestSplit(dataLabels, data, isGini, labelName) {
+export function determineBestSplit(
+  dataLabels,
+  continousMap,
+  data,
+  isGini,
+  labelName
+) {
   let currentHighestGainLabel = "";
   let currentHighestGain = 0.0;
 
   for (let i = 0; i < dataLabels.length; i++) {
-    const currGain = calculateGainRatio(dataLabels[i], data, isGini, labelName);
+    const currGain = calculateGainRatio(
+      dataLabels[i],
+      continousMap,
+      data,
+      isGini,
+      labelName
+    );
 
     if (currGain > currentHighestGain) {
       currentHighestGain = currGain;
@@ -36,9 +48,8 @@ export function determineBestSplit(dataLabels, data, isGini, labelName) {
 // Refer to practice exam 1 decision tree for algorithim.
 
 // Calculates gain ratio from splitting on feature
-function calculateGainRatio(feature, data, isGini, labelName) {
-  // Problem in one of these two functions
-  const gain = calculateGain(feature, data, isGini, labelName);
+function calculateGainRatio(feature, continousMap, data, isGini, labelName) {
+  const gain = calculateGain(feature, continousMap, data, isGini, labelName);
   const splitInfo = calculateSplitInfo(feature, data);
   if (splitInfo === 0) return 0;
   return gain / splitInfo;
@@ -57,7 +68,7 @@ function calculateSplitInfo(feature, data) {
 }
 
 // Calculates information gain from splitting on feature
-function calculateGain(feature, data, isGini, labelName) {
+function calculateGain(feature, continousMap, data, isGini, labelName) {
   const overallImpurity = calculateImpurityValue(data, isGini, labelName);
   const splitValue = calculateSplit(feature, data, isGini);
   return overallImpurity - splitValue;
@@ -173,7 +184,7 @@ function calculateSplit(feature, data, isGini) {
   return totalSplit;
 }
 
-// Counts number of negative and positive labels in a dataset
+// Counts number of each label
 function countLabels(data, labelName) {
   let labelMap = {};
 

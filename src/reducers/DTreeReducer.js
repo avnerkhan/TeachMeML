@@ -2,6 +2,11 @@ import * as types from "../types/DTreeTypes";
 import { Map, List } from "immutable";
 
 const initialDtreeState = {
+  continousClasses: Map({
+    Passed: false,
+    GPA: false,
+    Language: false
+  }),
   featureClasses: Map({
     Passed: List(["Yes", "No"]),
     GPA: List(["4.0", "2.0"]),
@@ -40,9 +45,16 @@ export function DTreeReducer(prevState = initialDtreeState, action) {
         action.feature,
         List(["Sample"])
       );
+      newState.continousClasses = newState.continousClasses.set(
+        action.feature,
+        false
+      );
       return newState;
     case types.DELETE_FEATURE:
       newState.featureClasses = newState.featureClasses.delete(action.feature);
+      newState.continousClasses = newState.continousClasses.delete(
+        action.feature
+      );
       return newState;
     case types.ADD_LABEL_CLASS:
       newState.labelClasses = newState.labelClasses.push(action.className);
@@ -61,6 +73,20 @@ export function DTreeReducer(prevState = initialDtreeState, action) {
       newState.featureClasses = newState.featureClasses.set(
         action.newName,
         prevData
+      );
+      newState.continousClasses = newState.continousClasses.delete(
+        action.oldName
+      );
+      newState.continousClasses = newState.continousClasses.set(
+        action.newName,
+        false
+      );
+      return newState;
+    case types.TOGGLE_CONTINOUS_ATTRIBUTE:
+      const currentState = newState.continousClasses.get(action.feature);
+      newState.continousClasses = newState.continousClasses.set(
+        action.feature,
+        !currentState
       );
       return newState;
     default:

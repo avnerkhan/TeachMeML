@@ -90,6 +90,7 @@ class DTree extends React.Component {
 
     const information = determineBestSplit(
       this.props.featureClasses.keySeq().toArray(),
+      this.props.continousClasses,
       data,
       this.state.isGini,
       this.props.label
@@ -161,6 +162,7 @@ class DTree extends React.Component {
     let dataState = [];
     const features = this.props.featureClasses.keySeq().toArray();
     const featureClasses = this.props.featureClasses;
+    const continousClasses = this.props.continousClasses;
     const labelClasses = this.props.labelClasses;
 
     for (let count = 0; count < 10; count++) {
@@ -168,9 +170,12 @@ class DTree extends React.Component {
       for (let i = 0; i < features.length; i++) {
         if (features[i] !== "label") {
           const currentClassLabels = featureClasses.get(features[i]);
-          const randomEntry = currentClassLabels.get(
-            Math.floor(Math.random() * currentClassLabels.size)
-          );
+          const isCategorical = !continousClasses.get(features[i]);
+          const randomEntry = isCategorical
+            ? currentClassLabels.get(
+                Math.floor(Math.random() * currentClassLabels.size)
+              )
+            : Math.floor(Math.random() * 100.0);
           entry[features[i]] = randomEntry;
         }
       }
@@ -198,7 +203,17 @@ class DTree extends React.Component {
         ? this.props.featureClasses.get(key)
         : this.props.labelClasses;
 
-    return (
+    const isContinous =
+      this.props.continousClasses.get(key) != undefined
+        ? this.props.continousClasses.get(key)
+        : false;
+
+    return isContinous ? (
+      <input
+        value={value}
+        onChange={e => this.changeDataRow(e, key, dataIndex)}
+      />
+    ) : (
       <select
         value={value}
         onChange={e => this.changeDataRow(e, key, dataIndex)}
@@ -449,6 +464,7 @@ class DTree extends React.Component {
   }
 }
 const mapStateToProps = state => ({
+  continousClasses: state.DTree.continousClasses,
   featureClasses: state.DTree.featureClasses,
   label: state.DTree.label,
   labelClasses: state.DTree.labelClasses

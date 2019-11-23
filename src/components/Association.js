@@ -349,7 +349,6 @@ class Association extends React.Component {
 
     this.setState({
       isFPTree: true,
-      transactions: reorderedDB,
       treeState: treeState,
       renderTree: true,
       frequentItemSet: formattedSets,

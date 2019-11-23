@@ -58,3 +58,10 @@ export function editFeatureName(oldName, newName) {
     newName
   };
 }
+
+export function toggleContinousAttribute(feature) {
+  return {
+    type: types.TOGGLE_CONTINOUS_ATTRIBUTE,
+    feature
+  };
+}
