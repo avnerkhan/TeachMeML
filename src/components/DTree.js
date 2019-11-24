@@ -68,6 +68,17 @@ class DTree extends React.Component {
     });
   }
 
+  findInCategorical(classVal) {
+    for (const key of this.props.featureClasses.keySeq().toArray()) {
+      const classList = this.props.featureClasses.get(key);
+      for (const classLabel of classList) {
+        if (classLabel === classVal) return true;
+      }
+    }
+
+    return false;
+  }
+
   // Builds decision tree, with entropy as 0 as base case.
   buildTree(data, currTree, maxDepth = null, currDepth = 0) {
     if (maxDepth != null && currDepth >= maxDepth) {
@@ -111,10 +122,9 @@ class DTree extends React.Component {
     }
 
     for (const classVal in splitDict) {
-      const isCategorical =
-        this.props.continousClasses.get(classVal) != undefined;
+      const isCategorical = this.findInCategorical(classVal);
       let name =
-        classVal === "undefined"
+        classVal == "undefined"
           ? determineMostLikelyLabel(data, this.props.label)
           : isCategorical
           ? classVal
@@ -175,12 +185,16 @@ class DTree extends React.Component {
       for (let i = 0; i < features.length; i++) {
         if (features[i] !== "label") {
           const currentClassLabels = featureClasses.get(features[i]);
-          const isCategorical = !continousClasses.get(features[i]);
+          const isCategorical = !continousClasses.get(features[i]).get(0);
+          const bottomRange = continousClasses.get(features[i]).get(1);
+          const topRange = continousClasses.get(features[i]).get(2);
           const randomEntry = isCategorical
             ? currentClassLabels.get(
                 Math.floor(Math.random() * currentClassLabels.size)
               )
-            : Math.floor(Math.random() * 100.0);
+            : Math.floor(
+                Math.random() * (topRange - bottomRange) + bottomRange
+              );
           entry[features[i]] = randomEntry;
         }
       }
@@ -210,7 +224,7 @@ class DTree extends React.Component {
 
     const isContinous =
       this.props.continousClasses.get(key) != undefined
-        ? this.props.continousClasses.get(key)
+        ? this.props.continousClasses.get(key).get(0)
         : false;
 
     return isContinous ? (

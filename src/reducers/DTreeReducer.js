@@ -3,9 +3,9 @@ import { Map, List } from "immutable";
 
 const initialDtreeState = {
   continousClasses: Map({
-    Passed: false,
-    GPA: false,
-    Language: false
+    Passed: List([false, 0, 100]),
+    GPA: List([false, 0, 100]),
+    Language: List([false, 0, 100])
   }),
   featureClasses: Map({
     Passed: List(["Yes", "No"]),
@@ -47,7 +47,7 @@ export function DTreeReducer(prevState = initialDtreeState, action) {
       );
       newState.continousClasses = newState.continousClasses.set(
         action.feature,
-        false
+        [0, 100]
       );
       return newState;
     case types.DELETE_FEATURE:
@@ -69,6 +69,7 @@ export function DTreeReducer(prevState = initialDtreeState, action) {
       return newState;
     case types.EDIT_FEATURE_NAME:
       const prevData = newState.featureClasses.get(action.oldName);
+      const prevContinousData = newState.continousClasses.get(action.oldName);
       newState.featureClasses = newState.featureClasses.delete(action.oldName);
       newState.featureClasses = newState.featureClasses.set(
         action.newName,
@@ -79,16 +80,36 @@ export function DTreeReducer(prevState = initialDtreeState, action) {
       );
       newState.continousClasses = newState.continousClasses.set(
         action.newName,
-        false
+        prevContinousData
+      );
+      return newState;
+    case types.SET_CONTINOUS_ATTRIBUTE:
+      const currentToggleState = newState.continousClasses
+        .get(action.feature)
+        .get(0);
+      newState.continousClasses = newState.continousClasses.set(
+        action.feature,
+        List([currentToggleState, action.bottomRange, action.topRange])
       );
       return newState;
     case types.TOGGLE_CONTINOUS_ATTRIBUTE:
-      const currentState = newState.continousClasses.get(action.feature);
+      const currentToggleStateOther = newState.continousClasses
+        .get(action.feature)
+        .get(0);
+      const currentBottomRange = newState.continousClasses
+        .get(action.feature)
+        .get(1);
+      const currentTopRange = newState.continousClasses
+        .get(action.feature)
+        .get(2);
+
       newState.continousClasses = newState.continousClasses.set(
         action.feature,
-        !currentState
+        List([!currentToggleStateOther, currentBottomRange, currentTopRange])
       );
+
       return newState;
+
     default:
       break;
   }

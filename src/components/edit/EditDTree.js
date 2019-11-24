@@ -13,7 +13,8 @@ import {
   deleteLabelClass,
   changeLabelName,
   editFeatureName,
-  toggleContinousAttribute
+  toggleContinousAttribute,
+  setContinousAttribute
 } from "../../actions/DTreeActions";
 import Trash from "../../Images/trash.png";
 import Add from "../../Images/add.png";
@@ -47,7 +48,15 @@ class EditDTree extends React.Component {
             </thead>
             <tbody>
               {features.map((feature, index) => {
-                const isCategorical = !this.props.continousClasses.get(feature);
+                const isCategorical = !this.props.continousClasses
+                  .get(feature)
+                  .get(0);
+                const bottomRange = this.props.continousClasses
+                  .get(feature)
+                  .get(1);
+                const topRange = this.props.continousClasses
+                  .get(feature)
+                  .get(2);
                 return (
                   <tr>
                     <td>
@@ -59,32 +68,55 @@ class EditDTree extends React.Component {
                         }
                       />
                     </td>
-                    {isCategorical
-                      ? this.props.featureClasses
-                          .get(feature)
-                          .map(featureClass => {
-                            return (
-                              <OverlayTrigger
-                                trigger="hover"
-                                placement="bottom"
-                                overlay={
-                                  <Tooltip>{"Delete " + featureClass}</Tooltip>
+                    {isCategorical ? (
+                      this.props.featureClasses
+                        .get(feature)
+                        .map(featureClass => {
+                          return (
+                            <OverlayTrigger
+                              trigger="hover"
+                              placement="bottom"
+                              overlay={
+                                <Tooltip>{"Delete " + featureClass}</Tooltip>
+                              }
+                            >
+                              <td
+                                onClick={() =>
+                                  this.props.deleteFeatureClass(
+                                    feature,
+                                    featureClass
+                                  )
                                 }
                               >
-                                <td
-                                  onClick={() =>
-                                    this.props.deleteFeatureClass(
-                                      feature,
-                                      featureClass
-                                    )
-                                  }
-                                >
-                                  {featureClass}
-                                </td>
-                              </OverlayTrigger>
-                            );
-                          })
-                      : null}
+                                {featureClass}
+                              </td>
+                            </OverlayTrigger>
+                          );
+                        })
+                    ) : (
+                      <div>
+                        <input
+                          value={bottomRange}
+                          onChange={e =>
+                            this.props.setContinousAttribute(
+                              feature,
+                              e.target.value,
+                              topRange
+                            )
+                          }
+                        />
+                        <input
+                          value={topRange}
+                          onChange={e =>
+                            this.props.setContinousAttribute(
+                              feature,
+                              bottomRange,
+                              e.target.value
+                            )
+                          }
+                        />
+                      </div>
+                    )}
                     {isCategorical ? (
                       <td>
                         <input type="text" ref={"classInput" + index} />
@@ -154,7 +186,8 @@ const mapDispatchToProps = {
   deleteLabelClass,
   changeLabelName,
   editFeatureName,
-  toggleContinousAttribute
+  toggleContinousAttribute,
+  setContinousAttribute
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(EditDTree);

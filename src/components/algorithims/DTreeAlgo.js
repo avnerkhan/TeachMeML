@@ -32,7 +32,7 @@ export function determineBestSplit(
   let currentThreshold = 0.0;
 
   for (let i = 0; i < dataLabels.length; i++) {
-    const isCategorical = !continousMap[dataLabels[i]];
+    const isCategorical = !continousMap.get(dataLabels[i]).get(0);
     const currGain = calculateGainRatio(
       dataLabels[i],
       continousMap,
@@ -58,7 +58,7 @@ export function determineBestSplit(
 
 // Calculates gain ratio from splitting on feature
 function calculateGainRatio(feature, continousMap, data, isGini, labelName) {
-  const isCategorical = !continousMap[feature];
+  const isCategorical = !continousMap.get(feature).get(0);
   const gainInfo = calculateGain(
     feature,
     continousMap,
@@ -93,7 +93,7 @@ function calculateSplitInfo(feature, data) {
 
 // Calculates information gain from splitting on feature
 function calculateGain(feature, continousMap, data, isGini, labelName) {
-  const isCategorical = !continousMap[feature];
+  const isCategorical = !continousMap.get(feature).get(0);
   const overallImpurity = calculateImpurityValue(data, isGini, labelName);
   if (isCategorical) {
     return overallImpurity - calculateEntropy(feature, data, isGini);
@@ -125,7 +125,7 @@ function calculateEntropyContinous(feature, data, isGini, labelName) {
 
     if (firstLabel !== secondLabel) {
       const potentialSplit =
-        (sortedArray[i][feature] + sortedArray[i + 1][feature]) / 2;
+        (sortedArray[i][feature] + sortedArray[i + 1][feature]) / 2.0;
       const potentialEntropyValue = calculateContinousEntropy(
         feature,
         sortedArray,
