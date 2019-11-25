@@ -101,8 +101,6 @@ class DTree extends React.Component {
 
     if (entropy === 0) {
       let dataClass = data[0][this.props.label];
-      console.log(data[0]);
-      console.log(dataClass);
       currTree.children.push({ name: dataClass, gProps: {} });
       return currTree;
     }
@@ -154,13 +152,12 @@ class DTree extends React.Component {
                 currDepth
               )
           },
+          heldData: splitDict[classVal],
           children: []
         };
         this.buildTree(splitDict[classVal], newNode, maxDepth, currDepth + 1);
         currTree.children.push(newNode);
       } else {
-        console.log(data);
-        console.log(threshold);
         const lessThanHalf = data.filter(entry => entry[bestSplit] < threshold);
         const moreThanHalf = data.filter(
           entry => entry[bestSplit] >= threshold
@@ -178,6 +175,7 @@ class DTree extends React.Component {
                 currDepth
               )
           },
+          heldData: lessThanHalf,
           children: []
         };
         let newNodeMore = {
@@ -193,6 +191,7 @@ class DTree extends React.Component {
                 currDepth
               )
           },
+          heldData: moreThanHalf,
           children: []
         };
         this.buildTree(lessThanHalf, newNodeLess, maxDepth, currDepth + 1);
@@ -205,8 +204,35 @@ class DTree extends React.Component {
     return currTree;
   }
 
+  isContinous(childrenNodes) {
+    for (const child of childrenNodes) {
+      if (child.name.includes("<") || child.name.includes(">=")) return true;
+    }
+    return false;
+  }
+
   refineTree(unrefinedTree) {
-    return null;
+    if (this.isContinous(unrefinedTree.children)) {
+      const moreThanHeldData = unrefinedTree.children
+        .filter(child => {
+          return child.name.includes(">=");
+        })
+        .map(entries => {
+          return entries.heldData;
+        });
+      const lessThanHeldData = unrefinedTree.children
+        .filter(child => {
+          return child.name.includes("<");
+        })
+        .map(entries => {
+          return entries.heldData;
+        });
+      // Finish later
+    }
+    for (let i = 0; i < unrefinedTree.children.length; i++) {
+      unrefinedTree.children[i] = this.refineTree(unrefinedTree.children[i]);
+    }
+    return unrefinedTree;
   }
 
   // Method that allows the tree to be show and initializes/resets its state
