@@ -205,32 +205,82 @@ class DTree extends React.Component {
   }
 
   isContinous(childrenNodes) {
+    if (childrenNodes == undefined) return false;
     for (const child of childrenNodes) {
-      if (child.name.includes("<") || child.name.includes(">=")) return true;
+      if (child.name != undefined) {
+        if (child.name.includes("<") || child.name.includes(">=")) return true;
+      }
     }
     return false;
   }
 
+  getChildrenMap(childrenList) {
+    let nameMap = {};
+
+    for (const node of childrenList) {
+      if (nameMap[node.name] == undefined) {
+        nameMap[node.name] = [];
+      }
+    }
+  }
+
   refineTree(unrefinedTree) {
     if (this.isContinous(unrefinedTree.children)) {
-      const moreThanHeldData = unrefinedTree.children
-        .filter(child => {
-          return child.name.includes(">=");
-        })
-        .map(entries => {
-          return entries.heldData;
-        });
-      const lessThanHeldData = unrefinedTree.children
-        .filter(child => {
-          return child.name.includes("<");
-        })
-        .map(entries => {
-          return entries.heldData;
-        });
-      // Finish later
+      const baseName = unrefinedTree.children[0].name;
+      const baseThreshold =
+        baseName.substring(0, 1) === "<"
+          ? baseName.substring(1)
+          : baseName.substring(2);
+      const moreThanFiltered = unrefinedTree.children.filter(child => {
+        return child.name.includes(">=");
+      });
+      const lessThanFiltered = unrefinedTree.children.filter(child => {
+        return child.name.includes("<");
+      });
+
+      const moreThanHeldData = moreThanFiltered.map(entries => {
+        return entries.heldData;
+      });
+      const lessThanHeldData = lessThanFiltered.map(entries => {
+        return entries.heldData;
+      });
+      const moreThanChildrenList = moreThanFiltered.reduce((first, second) => {
+        if (first.children != undefined) {
+          return first.children.concat(second.children);
+        }
+        return [];
+      });
+      const lessThanChildrenList = lessThanFiltered.reduce((first, second) => {
+        if (first.children != undefined) {
+          return first.children.concat(second.children);
+        }
+        return [];
+      });
+      console.log(moreThanFiltered);
+      console.log(lessThanFiltered);
+
+      unrefinedTree.children = [
+        {
+          name: "<" + baseThreshold,
+          children: lessThanChildrenList,
+          gProps: {
+            className: "custom"
+          }
+        },
+        {
+          name: ">=" + baseThreshold,
+          children: moreThanChildrenList,
+          gProps: {
+            className: "custom"
+          }
+        }
+      ];
     }
-    for (let i = 0; i < unrefinedTree.children.length; i++) {
-      unrefinedTree.children[i] = this.refineTree(unrefinedTree.children[i]);
+
+    if (unrefinedTree.children != undefined) {
+      for (let i = 0; i < unrefinedTree.children.length; i++) {
+        unrefinedTree.children[i] = this.refineTree(unrefinedTree.children[i]);
+      }
     }
     return unrefinedTree;
   }
@@ -242,8 +292,9 @@ class DTree extends React.Component {
       children: []
     });
     const refinedTree = this.refineTree(unrefinedTree);
+    console.log(refinedTree);
     this.setState({
-      treeState: unrefinedTree
+      treeState: refinedTree
     });
   }
 
