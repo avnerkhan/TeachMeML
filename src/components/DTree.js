@@ -20,7 +20,6 @@ import {
   determineBestSplit,
   determineMostLikelyLabel,
   getMap,
-  filteredData,
   calculateImpurityValue
 } from "./algorithims/DTreeAlgo";
 import "../css_files/App.css";
@@ -84,7 +83,12 @@ class DTree extends React.Component {
   }
 
   // Builds decision tree, with entropy as 0 as base case.
-  buildTree(data, currTree, maxDepth = null, currDepth = 0) {
+  buildTree(
+    data,
+    currTree,
+    maxDepth = this.props.featureClasses.size + 1,
+    currDepth = 0
+  ) {
     if (maxDepth != null && currDepth >= maxDepth) {
       return currTree;
     }
@@ -136,7 +140,7 @@ class DTree extends React.Component {
           ? classVal
           : threshold;
 
-      if (isCategorical) {
+      if (isCategorical || classVal == "undefined") {
         let newNode = {
           name: name,
           gProps: {
@@ -155,6 +159,8 @@ class DTree extends React.Component {
         this.buildTree(splitDict[classVal], newNode, maxDepth, currDepth + 1);
         currTree.children.push(newNode);
       } else {
+        console.log(data);
+        console.log(threshold);
         const lessThanHalf = data.filter(entry => entry[bestSplit] < threshold);
         const moreThanHalf = data.filter(
           entry => entry[bestSplit] >= threshold

@@ -236,7 +236,7 @@ export function getMap(feature, data, returnOnlyClassMap, isGini, labelName) {
   for (const classVal in classMap) {
     const mapEntry = {
       impurityValue: calculateImpurityValue(
-        filteredData(classVal, feature, data),
+        data.filter(entry => entry[feature] === classVal),
         isGini,
         labelName
       ),
@@ -246,20 +246,6 @@ export function getMap(feature, data, returnOnlyClassMap, isGini, labelName) {
   }
 
   return returnMap;
-}
-
-// Filters data so that a new dataset is created for only that class
-// in a specific feature
-export function filteredData(classVal, feature, data) {
-  let dataToReturn = [];
-
-  for (const entry of data) {
-    if (entry[feature] === classVal) {
-      dataToReturn.push(entry);
-    }
-  }
-
-  return dataToReturn;
 }
 
 // Calculates split gini for feature (Maybe add entropy version of this later)?
