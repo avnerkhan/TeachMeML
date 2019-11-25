@@ -50,7 +50,7 @@ svg.custom .node circle{
 
 svg.custom path.link{
   fill: none;
-  stroke: #2593B8;
+  stroke: rgb(233, 233, 233);
   stroke-width: 1.5px;
 }
 

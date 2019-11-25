@@ -76,6 +76,10 @@ class DTree extends React.Component {
       }
     }
 
+    for (const label of this.props.labelClasses) {
+      if (label === classVal) return true;
+    }
+
     return false;
   }
 
@@ -93,6 +97,8 @@ class DTree extends React.Component {
 
     if (entropy === 0) {
       let dataClass = data[0][this.props.label];
+      console.log(data[0]);
+      console.log(dataClass);
       currTree.children.push({ name: dataClass, gProps: {} });
       return currTree;
     }
@@ -118,7 +124,7 @@ class DTree extends React.Component {
     );
 
     for (const classVal in classArr) {
-      splitDict[classVal] = filteredData(classVal, bestSplit, data);
+      splitDict[classVal] = data.filter(entry => entry[bestSplit] === classVal);
     }
 
     for (const classVal in splitDict) {
@@ -130,35 +136,82 @@ class DTree extends React.Component {
           ? classVal
           : threshold;
 
-      let newNode = {
-        name: name,
-        gProps: {
-          className: "custom",
-          onClick: () =>
-            this.presentData(
-              splitDict[classVal],
-              classVal,
-              entropy,
-              gainAmount,
-              currDepth
-            )
-        },
-        children: []
-      };
-      this.buildTree(splitDict[classVal], newNode, maxDepth, currDepth + 1);
-      currTree.children.push(newNode);
+      if (isCategorical) {
+        let newNode = {
+          name: name,
+          gProps: {
+            className: "custom",
+            onClick: () =>
+              this.presentData(
+                splitDict[classVal],
+                classVal,
+                entropy,
+                gainAmount,
+                currDepth
+              )
+          },
+          children: []
+        };
+        this.buildTree(splitDict[classVal], newNode, maxDepth, currDepth + 1);
+        currTree.children.push(newNode);
+      } else {
+        const lessThanHalf = data.filter(entry => entry[bestSplit] < threshold);
+        const moreThanHalf = data.filter(
+          entry => entry[bestSplit] >= threshold
+        );
+        let newNodeLess = {
+          name: "<" + name,
+          gProps: {
+            className: "custom",
+            onClick: () =>
+              this.presentData(
+                lessThanHalf,
+                classVal,
+                entropy,
+                gainAmount,
+                currDepth
+              )
+          },
+          children: []
+        };
+        let newNodeMore = {
+          name: ">=" + name,
+          gProps: {
+            className: "custom",
+            onClick: () =>
+              this.presentData(
+                moreThanHalf,
+                classVal,
+                entropy,
+                gainAmount,
+                currDepth
+              )
+          },
+          children: []
+        };
+        this.buildTree(lessThanHalf, newNodeLess, maxDepth, currDepth + 1);
+        this.buildTree(moreThanHalf, newNodeMore, maxDepth, currDepth + 1);
+        currTree.children.push(newNodeLess);
+        currTree.children.push(newNodeMore);
+      }
     }
 
     return currTree;
   }
 
+  refineTree(unrefinedTree) {
+    return null;
+  }
+
   // Method that allows the tree to be show and initializes/resets its state
   showTree() {
+    const unrefinedTree = this.buildTree(this.state.data, {
+      name: "Start",
+      children: []
+    });
+    const refinedTree = this.refineTree(unrefinedTree);
     this.setState({
-      treeState: this.buildTree(this.state.data, {
-        name: "Start",
-        children: []
-      })
+      treeState: unrefinedTree
     });
   }
 
