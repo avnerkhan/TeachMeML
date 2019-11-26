@@ -207,7 +207,7 @@ class DTree extends React.Component {
   isContinous(childrenNodes) {
     if (childrenNodes == undefined) return false;
     for (const child of childrenNodes) {
-      if (child.name != undefined) {
+      if (child != undefined && child.name != undefined) {
         if (child.name.includes("<") || child.name.includes(">=")) return true;
       }
     }
@@ -238,38 +238,42 @@ class DTree extends React.Component {
         return child.name.includes("<");
       });
 
-      const moreThanHeldData = moreThanFiltered.map(entries => {
-        return entries.heldData;
-      });
-      const lessThanHeldData = lessThanFiltered.map(entries => {
-        return entries.heldData;
-      });
       const moreThanChildrenList = moreThanFiltered.reduce((first, second) => {
-        if (first.children != undefined) {
+        if (
+          first != undefined &&
+          second != undefined &&
+          first.children != undefined
+        ) {
           return first.children.concat(second.children);
         }
-        return [];
       });
       const lessThanChildrenList = lessThanFiltered.reduce((first, second) => {
-        if (first.children != undefined) {
+        if (
+          first != undefined &&
+          second != undefined &&
+          first.children != undefined
+        ) {
           return first.children.concat(second.children);
         }
-        return [];
       });
-      console.log(moreThanFiltered);
-      console.log(lessThanFiltered);
 
       unrefinedTree.children = [
         {
           name: "<" + baseThreshold,
-          children: lessThanChildrenList,
+          children:
+            lessThanChildrenList != undefined
+              ? [lessThanChildrenList[0]]
+              : lessThanChildrenList,
           gProps: {
             className: "custom"
           }
         },
         {
           name: ">=" + baseThreshold,
-          children: moreThanChildrenList,
+          children:
+            moreThanChildrenList != undefined
+              ? [moreThanChildrenList[0]]
+              : moreThanChildrenList,
           gProps: {
             className: "custom"
           }
@@ -292,7 +296,7 @@ class DTree extends React.Component {
       children: []
     });
     const refinedTree = this.refineTree(unrefinedTree);
-    console.log(refinedTree);
+
     this.setState({
       treeState: refinedTree
     });
