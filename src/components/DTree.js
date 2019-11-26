@@ -21,7 +21,7 @@ import {
   determineMostLikelyLabel,
   getMap,
   calculateImpurityValue
-} from "./algorithims/DTreeAlgo";
+} from "../algorithims/DTreeAlgo";
 import "../css_files/App.css";
 import "react-table/react-table.css";
 import { connect } from "react-redux";

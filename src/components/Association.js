@@ -23,7 +23,7 @@ import {
   mineFreqItemsets,
   formatSets,
   getStrongRules
-} from "./algorithims/AssociationAlgo";
+} from "../algorithims/AssociationAlgo";
 import Add from "../Images/add.png";
 import Trash from "../Images/trash.png";
 import Shuffle from "../Images/shuffle.png";

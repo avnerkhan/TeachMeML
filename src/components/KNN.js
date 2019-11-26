@@ -19,7 +19,7 @@ import {
   OverlayTrigger,
   Tooltip
 } from "react-bootstrap";
-import { generateRandomData } from "./algorithims/KNNAlgo";
+import { generateRandomData } from "../algorithims/KNNAlgo";
 import { euclidFunction, comparator, arrayRange } from "../Utility";
 import "../css_files/App.css";
 import { showBackToAlgorithimPage, displayInfoButton } from "../Utility";
