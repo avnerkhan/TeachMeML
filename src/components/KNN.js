@@ -19,7 +19,11 @@ import {
   OverlayTrigger,
   Tooltip
 } from "react-bootstrap";
-import { generateRandomData } from "../algorithims/KNNAlgo";
+import {
+  generateRandomData,
+  getAllData,
+  relabelData
+} from "../algorithims/KNNAlgo";
 import { euclidFunction, comparator, arrayRange } from "../Utility";
 import "../css_files/App.css";
 import { showBackToAlgorithimPage, displayInfoButton } from "../Utility";
@@ -34,7 +38,7 @@ class KNN extends React.Component {
       HIGHLIGHT: "#FFFF00"
     };
 
-    let randomData = generateRandomData(30, 100, this.props.labels);
+    const randomData = generateRandomData(30, 100, this.props.labels);
 
     this.state = {
       k: 1,
@@ -62,22 +66,6 @@ class KNN extends React.Component {
 
     this.refs["xCoord"].value = "";
     this.refs["yCoord"].value = "";
-  }
-
-  findCorrelatedColor(point) {
-    const labeledData = this.state.labeledData;
-    for (const key in labeledData) {
-      if (labeledData[key].includes(point)) return key;
-    }
-    return null;
-  }
-
-  // Labels data as either positive or negative based on the state array that
-  // it orginally belongs to
-  relabelData(point) {
-    console.log(point);
-    point["class"] = this.findCorrelatedColor(point);
-    return point;
   }
 
   // Returns JSX for showing the input for x and y
@@ -113,27 +101,13 @@ class KNN extends React.Component {
     );
   }
 
-  getAllData() {
-    let allData = [];
-    const labeledData = this.state.labeledData;
-
-    for (const color in labeledData) {
-      const currentList = labeledData[color];
-      for (const point of currentList) {
-        allData.push(point);
-      }
-    }
-
-    return allData;
-  }
-
   // Highlights K on mouse over or determines point on click
   highlightK(datapoint, isChange) {
     let highlightPoints = [];
     let newData = this.state.labeledData;
     let newUnlabeled = this.state.undeterminedData;
-    let allData = this.getAllData();
-    allData = allData.map(point => this.relabelData(point));
+    let allData = getAllData(this.state.labeledData);
+    allData = allData.map(point => relabelData(point, this.state.labeledData));
     let euclidMap = allData.map(point => euclidFunction(point, datapoint));
     euclidMap.sort(comparator);
     let countMap = {};
@@ -175,14 +149,6 @@ class KNN extends React.Component {
     }
   }
 
-  randomizeData() {
-    const newRandomized = generateRandomData(30, 100, this.props.labels);
-
-    this.setState({
-      labeledData: newRandomized
-    });
-  }
-
   showRandomizeUndeterminedDataButton() {
     return Object.keys(this.state.labeledData).length > 0 ? (
       <OverlayTrigger
@@ -204,7 +170,13 @@ class KNN extends React.Component {
         placement="bottom"
         overlay={<Tooltip>Generate random labeled data</Tooltip>}
       >
-        <Nav.Link onClick={() => this.randomizeData()}>
+        <Nav.Link
+          onClick={() =>
+            this.setState({
+              labeledData: generateRandomData(30, 100, this.props.labels)
+            })
+          }
+        >
           <Image src={Shuffle} style={{ width: 40 }} />
         </Nav.Link>
       </OverlayTrigger>

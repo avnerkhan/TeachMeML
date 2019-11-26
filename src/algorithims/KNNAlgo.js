@@ -16,3 +16,30 @@ export function generateRandomData(length, max, labels) {
 
   return newData;
 }
+
+export function getAllData(labeledData) {
+  let allData = [];
+
+  for (const color in labeledData) {
+    const currentList = labeledData[color];
+    for (const point of currentList) {
+      allData.push(point);
+    }
+  }
+
+  return allData;
+}
+
+function findCorrelatedColor(point, labeledData) {
+  for (const key in labeledData) {
+    if (labeledData[key].includes(point)) return key;
+  }
+  return null;
+}
+
+// Labels data as either positive or negative based on the state array that
+// it orginally belongs to
+export function relabelData(point, labeledData) {
+  point["class"] = findCorrelatedColor(point, labeledData);
+  return point;
+}

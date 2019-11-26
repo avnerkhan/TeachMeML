@@ -1,5 +1,3 @@
-import { is } from "immutable";
-
 // For determing ties when a node has multiple labels in its dataset
 export function determineMostLikelyLabel(data, labelName) {
   let labelMap = {};
@@ -275,4 +273,301 @@ function countLabels(data, labelName) {
   }
 
   return labelMap;
+}
+
+export function findInCategorical(classVal, featureClasses, labelClasses) {
+  for (const key of featureClasses.keySeq().toArray()) {
+    const classList = featureClasses.get(key);
+    for (const classLabel of classList) {
+      if (classLabel === classVal) return true;
+    }
+  }
+
+  for (const label of labelClasses) {
+    if (label === classVal) return true;
+  }
+
+  return false;
+}
+
+export function determineClassLabel(classVal, featureClasses) {
+  for (const key of featureClasses.keySeq().toArray()) {
+    if (featureClasses.get(key).contains(classVal)) return key;
+  }
+}
+
+// Builds decision tree, with entropy as 0 as base case.
+export function buildTree(
+  data,
+  currTree,
+  maxDepth,
+  currDepth,
+  featureClasses,
+  isGini,
+  label,
+  continousClasses,
+  labelClasses,
+  component
+) {
+  if (maxDepth != null && currDepth >= maxDepth) {
+    return currTree;
+  }
+
+  let entropy = calculateImpurityValue(data, isGini, label);
+
+  if (entropy === 0) {
+    let dataClass = data[0][label];
+    currTree.children.push({ name: dataClass, gProps: {} });
+    return currTree;
+  }
+
+  let splitDict = {};
+
+  const information = determineBestSplit(
+    featureClasses.keySeq().toArray(),
+    continousClasses,
+    data,
+    isGini,
+    label
+  );
+  const bestSplit = information.currentHighestGainLabel;
+  const gainAmount = information.currentHighestGain;
+  const threshold = information.currentThreshold;
+  const classArr = getMap(bestSplit, data, true, isGini, label);
+
+  for (const classVal in classArr) {
+    splitDict[classVal] = data.filter(entry => entry[bestSplit] === classVal);
+  }
+
+  for (const classVal in splitDict) {
+    const isCategorical = findInCategorical(
+      classVal,
+      featureClasses,
+      labelClasses
+    );
+    let name =
+      classVal == "undefined"
+        ? determineMostLikelyLabel(data, label)
+        : isCategorical
+        ? classVal
+        : threshold;
+
+    if (isCategorical || classVal == "undefined") {
+      let newNode = {
+        name: name,
+        gProps: {
+          className: "custom",
+          onClick: () =>
+            component.presentData(
+              splitDict[classVal],
+              classVal,
+              entropy,
+              gainAmount,
+              currDepth
+            )
+        },
+        heldData: splitDict[classVal],
+        children: []
+      };
+      buildTree(
+        splitDict[classVal],
+        newNode,
+        maxDepth,
+        currDepth + 1,
+        featureClasses,
+        isGini,
+        label,
+        continousClasses,
+        labelClasses,
+        component
+      );
+      currTree.children.push(newNode);
+    } else {
+      const lessThanHalf = data.filter(entry => entry[bestSplit] < threshold);
+      const moreThanHalf = data.filter(entry => entry[bestSplit] >= threshold);
+      let newNodeLess = {
+        name: "<" + name,
+        gProps: {
+          className: "custom",
+          onClick: () =>
+            component.presentData(
+              lessThanHalf,
+              classVal,
+              entropy,
+              gainAmount,
+              currDepth
+            )
+        },
+        heldData: lessThanHalf,
+        children: []
+      };
+      let newNodeMore = {
+        name: ">=" + name,
+        gProps: {
+          className: "custom",
+          onClick: () =>
+            component.presentData(
+              moreThanHalf,
+              classVal,
+              entropy,
+              gainAmount,
+              currDepth
+            )
+        },
+        heldData: moreThanHalf,
+        children: []
+      };
+      buildTree(
+        lessThanHalf,
+        newNodeLess,
+        maxDepth,
+        currDepth + 1,
+        featureClasses,
+        isGini,
+        label,
+        continousClasses,
+        labelClasses,
+        component
+      );
+      buildTree(
+        moreThanHalf,
+        newNodeMore,
+        maxDepth,
+        currDepth + 1,
+        featureClasses,
+        isGini,
+        label,
+        continousClasses,
+        labelClasses,
+        component
+      );
+      currTree.children.push(newNodeLess);
+      currTree.children.push(newNodeMore);
+    }
+  }
+
+  return currTree;
+}
+
+function isContinous(childrenNodes) {
+  if (childrenNodes == undefined) return false;
+  for (const child of childrenNodes) {
+    if (child != undefined && child.name != undefined) {
+      if (child.name.includes("<") || child.name.includes(">=")) return true;
+    }
+  }
+  return false;
+}
+
+export function changeDataRow(e, key, dataIndex, data) {
+  data[dataIndex][key] = e.target.value;
+  return data;
+}
+
+export function generateRandomDataState(
+  featureClasses,
+  continousClasses,
+  labelClasses,
+  label
+) {
+  let dataState = [];
+  const features = featureClasses.keySeq().toArray();
+
+  for (let count = 0; count < 10; count++) {
+    let entry = {};
+    for (let i = 0; i < features.length; i++) {
+      if (features[i] !== "label") {
+        const currentClassLabels = featureClasses.get(features[i]);
+        const isCategorical = !continousClasses.get(features[i]).get(0);
+        const bottomRange = continousClasses.get(features[i]).get(1);
+        const topRange = continousClasses.get(features[i]).get(2);
+        const randomEntry = isCategorical
+          ? currentClassLabels.get(
+              Math.floor(Math.random() * currentClassLabels.size)
+            )
+          : Math.floor(Math.random() * (topRange - bottomRange) + bottomRange);
+        entry[features[i]] = randomEntry;
+      }
+    }
+    const randomLabel = labelClasses.get(
+      Math.floor(Math.random() * labelClasses.size)
+    );
+    entry[label] = randomLabel;
+    dataState.push(entry);
+  }
+
+  return dataState;
+}
+
+// Adds a row to the dataset, copy of first row
+export function addRow(data) {
+  const newData = data[0];
+  let newState = data;
+  newState.push(newData);
+  return newState;
+}
+
+export function refineTree(unrefinedTree) {
+  if (isContinous(unrefinedTree.children)) {
+    const baseName = unrefinedTree.children[0].name;
+    const baseThreshold =
+      baseName.substring(0, 1) === "<"
+        ? baseName.substring(1)
+        : baseName.substring(2);
+    const moreThanFiltered = unrefinedTree.children.filter(child => {
+      return child.name.includes(">=");
+    });
+    const lessThanFiltered = unrefinedTree.children.filter(child => {
+      return child.name.includes("<");
+    });
+
+    const moreThanChildrenList = moreThanFiltered.reduce((first, second) => {
+      if (
+        first != undefined &&
+        second != undefined &&
+        first.children != undefined
+      ) {
+        return first.children.concat(second.children);
+      }
+    });
+    const lessThanChildrenList = lessThanFiltered.reduce((first, second) => {
+      if (
+        first != undefined &&
+        second != undefined &&
+        first.children != undefined
+      ) {
+        return first.children.concat(second.children);
+      }
+    });
+
+    unrefinedTree.children = [
+      {
+        name: "<" + baseThreshold,
+        children:
+          lessThanChildrenList != undefined
+            ? [lessThanChildrenList[0]]
+            : lessThanChildrenList,
+        gProps: {
+          className: "custom"
+        }
+      },
+      {
+        name: ">=" + baseThreshold,
+        children:
+          moreThanChildrenList != undefined
+            ? [moreThanChildrenList[0]]
+            : moreThanChildrenList,
+        gProps: {
+          className: "custom"
+        }
+      }
+    ];
+  }
+
+  if (unrefinedTree.children != undefined) {
+    for (let i = 0; i < unrefinedTree.children.length; i++) {
+      unrefinedTree.children[i] = refineTree(unrefinedTree.children[i]);
+    }
+  }
+  return unrefinedTree;
 }

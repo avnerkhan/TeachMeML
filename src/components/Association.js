@@ -15,14 +15,12 @@ import { arrayRange } from "../Utility";
 import { showBackToAlgorithimPage, displayInfoButton } from "../Utility";
 import {
   generateRandomTransaction,
-  generateOneItemsets,
-  reorderDB,
-  buildTree,
-  filterFreqSets,
-  filterApriori,
-  mineFreqItemsets,
-  formatSets,
-  getStrongRules
+  changeTransactionState,
+  deleteTransaction,
+  addNewTransaction,
+  runFPTreeAlgorithim,
+  changeItemInTransaction,
+  runAprioriAlgorithim
 } from "../algorithims/AssociationAlgo";
 import Add from "../Images/add.png";
 import Trash from "../Images/trash.png";
@@ -71,166 +69,6 @@ class Association extends React.Component {
     ) : null;
   }
 
-  // Either adds or subtracts an element from a transaction
-  changeTransactionState(currentTransactionIndex, isAdd) {
-    let currentTransactionState = this.state.transactions;
-    const transactionItems = this.props.transactionItems;
-
-    if (isAdd) {
-      let index = 0;
-      while (
-        currentTransactionState[currentTransactionIndex].includes(
-          transactionItems.get(index)
-        ) ||
-        index === transactionItems.size
-      ) {
-        index++;
-      }
-      currentTransactionState[currentTransactionIndex].push(
-        transactionItems.get(index)
-      );
-    } else {
-      currentTransactionState[currentTransactionIndex].pop();
-    }
-
-    this.setState({ transaction: currentTransactionState });
-  }
-
-  // Changes an item in a transaction without adding or subtracting from transaction
-  changeItemInTransaction(transaction, item, itemIndexInTransaction) {
-    let currentTransactionState = this.state.transactions;
-    const transactionItems = this.props.transactionItems;
-    const currentTransactionIndex = currentTransactionState.indexOf(
-      transaction
-    );
-    const currentItemIndex = transactionItems.indexOf(item);
-    let nextItemIndex = (currentItemIndex + 1) % transactionItems.size;
-    while (
-      currentTransactionState[currentTransactionIndex].includes(
-        transactionItems.get(nextItemIndex)
-      ) ||
-      nextItemIndex === currentItemIndex
-    ) {
-      nextItemIndex = (nextItemIndex + 1) % transactionItems.size;
-    }
-    currentTransactionState[currentTransactionIndex][
-      itemIndexInTransaction
-    ] = transactionItems.get(nextItemIndex);
-
-    this.setState({ transactions: currentTransactionState });
-  }
-
-  // Runs apriori by generating next itemset
-  runAprioriAlgorithim() {
-    const frequentItemSet = this.state.frequentItemSet;
-    const transactionItems = this.props.transactionItems;
-    const transactions = this.state.transactions;
-    const minSup = this.state.minSup;
-
-    if (frequentItemSet.length === 0) {
-      const oneItemSetPair = generateOneItemsets(
-        transactions,
-        transactionItems,
-        minSup
-      );
-      this.setState({
-        frequentItemSet: [oneItemSetPair[0]],
-        minSupPruned: oneItemSetPair[1],
-        isApriori: true
-      });
-    } else {
-      let oneItemSet = Object.keys(frequentItemSet[0]);
-      const lastFrequentSet = frequentItemSet[frequentItemSet.length - 1];
-      oneItemSet.sort();
-      let newFrequentSet = {};
-      let currentLength = 0;
-      let currentMinSupPruned = this.state.minSupPruned;
-      let currentAprioriPruned = this.state.aprioriPruned;
-
-      for (let frequentSet in lastFrequentSet) {
-        if (
-          !currentMinSupPruned.has(frequentSet) &&
-          !currentAprioriPruned.has(frequentSet)
-        ) {
-          const splitString = frequentSet.split(",");
-          currentLength = splitString.length;
-          const lastItem = splitString[currentLength - 1];
-          let index = oneItemSet.indexOf(lastItem) + 1;
-
-          while (index < oneItemSet.length) {
-            let newFrequentPattern = frequentSet;
-            newFrequentPattern += "," + oneItemSet[index];
-            newFrequentSet[newFrequentPattern] = 0;
-            index++;
-          }
-        }
-      }
-
-      let aprioriPruned = new Set();
-
-      if (currentLength >= 3) {
-        aprioriPruned = filterApriori(
-          newFrequentSet,
-          currentMinSupPruned,
-          currentAprioriPruned
-        );
-      }
-
-      const minSupPair = filterFreqSets(
-        newFrequentSet,
-        aprioriPruned,
-        this.state.transactions,
-        this.state.minSup
-      );
-
-      newFrequentSet = minSupPair[0];
-      let minSupPruned = minSupPair[1];
-      currentMinSupPruned = new Set([...currentMinSupPruned, ...minSupPruned]);
-      currentAprioriPruned = new Set([
-        ...currentAprioriPruned,
-        ...aprioriPruned
-      ]);
-
-      frequentItemSet.push(newFrequentSet);
-
-      const isDoneApriori = Object.keys(newFrequentSet).length === 0;
-
-      const strongRules = isDoneApriori
-        ? getStrongRules(
-            frequentItemSet,
-            this.state.minConf,
-            this.state.aprioriPruned,
-            this.state.minSupPruned
-          )
-        : [];
-
-      this.setState({
-        frequentItemSet: frequentItemSet,
-        isApriori: true,
-        isDoneApriori: isDoneApriori,
-        minSupPruned: currentMinSupPruned,
-        aprioriPruned: currentAprioriPruned,
-        strongRules: strongRules
-      });
-    }
-  }
-
-  addNewTransaction() {
-    let currentTransactions = this.state.transactions;
-    currentTransactions.push([this.props.transactionItems.get(0)]);
-    this.setState({
-      transactions: currentTransactions
-    });
-  }
-
-  deleteTransaction(index) {
-    let currentTransactions = this.state.transactions;
-    currentTransactions.splice(index, 1);
-    this.setState({
-      transactions: currentTransactions
-    });
-  }
-
   // Displays the JSX for transaction table
   displayTransactionTable() {
     let transactions = this.state.transactions;
@@ -251,27 +89,75 @@ class Association extends React.Component {
                   return (
                     <td
                       onClick={() =>
-                        this.changeItemInTransaction(transaction, item, index)
+                        this.setState({
+                          transactions: changeItemInTransaction(
+                            transaction,
+                            item,
+                            index,
+                            this.state.transactions,
+                            this.props.transactionItems
+                          )
+                        })
                       }
                     >
                       {item}
                     </td>
                   );
                 })}
-                <td onClick={() => this.changeTransactionState(index, true)}>
+                <td
+                  onClick={() =>
+                    this.setState({
+                      transaction: changeTransactionState(
+                        index,
+                        true,
+                        this.state.transactions,
+                        this.props.transactionItems
+                      )
+                    })
+                  }
+                >
                   +
                 </td>
-                <td onClick={() => this.changeTransactionState(index, false)}>
+                <td
+                  onClick={() =>
+                    this.setState({
+                      transaction: changeTransactionState(
+                        index,
+                        false,
+                        this.state.transactions,
+                        this.props.transactionItems
+                      )
+                    })
+                  }
+                >
                   -
                 </td>
-                <td onClick={() => this.deleteTransaction(index)}>
+                <td
+                  onClick={() =>
+                    this.setState({
+                      transactions: deleteTransaction(
+                        index,
+                        this.state.transactions
+                      )
+                    })
+                  }
+                >
                   <Image src={Trash} style={{ width: 40 }} />
                 </td>
               </tr>
             );
           })}
           <tr>
-            <td onClick={() => this.addNewTransaction()}>
+            <td
+              onClick={() =>
+                this.setState({
+                  transactions: addNewTransaction(
+                    this.state.transactions,
+                    this.props.transactionItems
+                  )
+                })
+              }
+            >
               <Image src={Add} style={{ width: 40 }} />
             </td>
           </tr>
@@ -318,44 +204,6 @@ class Association extends React.Component {
     );
   }
 
-  runFPTreeAlgorithim() {
-    let oneItemSet = generateOneItemsets(
-      this.state.transactions,
-      this.props.transactionItems,
-      this.state.minSup
-    )[0];
-
-    let sortable = Object.keys(oneItemSet).map(key => {
-      return [key, oneItemSet[key]];
-    });
-
-    sortable.sort((firstPair, secondPair) => {
-      if (firstPair[0] != secondPair[0]) {
-        return secondPair[1] - firstPair[1];
-      }
-
-      return secondPair[0] - firstPair[0];
-    });
-
-    const reorderedDB = reorderDB(sortable, this.state.transactions);
-    const treeState = buildTree(reorderedDB);
-    const freqItemsets = mineFreqItemsets(
-      treeState,
-      sortable,
-      this.state.minSup
-    );
-    const formattedSets = formatSets(freqItemsets, oneItemSet);
-    const strongRules = getStrongRules(formattedSets, this.state.minConf);
-
-    this.setState({
-      isFPTree: true,
-      treeState: treeState,
-      renderTree: true,
-      frequentItemSet: formattedSets,
-      strongRules: strongRules
-    });
-  }
-
   showStartAlgorithimBar() {
     return !this.state.isApriori && !this.state.renderTree ? (
       <OverlayTrigger
@@ -363,7 +211,23 @@ class Association extends React.Component {
         placement="bottom"
         overlay={<Tooltip>Run FP Tree Algorithim</Tooltip>}
       >
-        <Nav.Link onClick={() => this.runFPTreeAlgorithim()}>
+        <Nav.Link
+          onClick={() => {
+            const [treeState, formattedSets, strongRules] = runFPTreeAlgorithim(
+              this.state.transactions,
+              this.props.transactionItems,
+              this.state.minSup,
+              this.state.minConf
+            );
+            this.setState({
+              isFPTree: true,
+              treeState: treeState,
+              renderTree: true,
+              frequentItemSet: formattedSets,
+              strongRules: strongRules
+            });
+          }}
+        >
           <Image src={SomeTree} style={{ width: 40 }} />
         </Nav.Link>
       </OverlayTrigger>
@@ -377,7 +241,33 @@ class Association extends React.Component {
         placement="bottom"
         overlay={<Tooltip>Run next Apriori iteration</Tooltip>}
       >
-        <Nav.Link onClick={() => this.runAprioriAlgorithim()}>
+        <Nav.Link
+          onClick={() => {
+            const [
+              frequentItemSet,
+              isApriori,
+              isDoneApriori,
+              currentMinSupPruned,
+              currentAprioriPruned,
+              strongRules
+            ] = runAprioriAlgorithim(
+              this.state.frequentItemSet,
+              this.props.transactionItems,
+              this.state.transactions,
+              this.state.minSup,
+              this.state.minSupPruned,
+              this.state.aprioriPruned
+            );
+            this.setState({
+              frequentItemSet: frequentItemSet,
+              isApriori: isApriori,
+              isDoneApriori: isDoneApriori,
+              minSupPruned: currentMinSupPruned,
+              aprioriPruned: currentAprioriPruned,
+              strongRules: strongRules
+            });
+          }}
+        >
           <Image src={Forward} style={{ width: 40 }} />
         </Nav.Link>
       </OverlayTrigger>

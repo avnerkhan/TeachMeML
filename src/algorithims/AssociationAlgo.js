@@ -371,3 +371,181 @@ export function getStrongRules(
 
   return strongRules;
 }
+
+// Either adds or subtracts an element from a transaction
+export function changeTransactionState(
+  currentTransactionIndex,
+  isAdd,
+  currentTransactionState,
+  transactionItems
+) {
+  if (isAdd) {
+    let index = 0;
+    while (
+      currentTransactionState[currentTransactionIndex].includes(
+        transactionItems.get(index)
+      ) ||
+      index === transactionItems.size
+    ) {
+      index++;
+    }
+    currentTransactionState[currentTransactionIndex].push(
+      transactionItems.get(index)
+    );
+  } else {
+    currentTransactionState[currentTransactionIndex].pop();
+  }
+  return currentTransactionState;
+}
+
+export function deleteTransaction(index, currentTransactions) {
+  currentTransactions.splice(index, 1);
+  return currentTransactions;
+}
+
+export function addNewTransaction(currentTransactions, transactionsItems) {
+  currentTransactions.push([transactionsItems.get(0)]);
+  return currentTransactions;
+}
+
+export function runFPTreeAlgorithim(
+  transactions,
+  transactionItems,
+  minSup,
+  minConf
+) {
+  let oneItemSet = generateOneItemsets(
+    transactions,
+    transactionItems,
+    minSup
+  )[0];
+
+  let sortable = Object.keys(oneItemSet).map(key => {
+    return [key, oneItemSet[key]];
+  });
+
+  sortable.sort((firstPair, secondPair) => {
+    if (firstPair[0] != secondPair[0]) {
+      return secondPair[1] - firstPair[1];
+    }
+
+    return secondPair[0] - firstPair[0];
+  });
+
+  const reorderedDB = reorderDB(sortable, transactions);
+  const treeState = buildTree(reorderedDB);
+
+  const freqItemsets = mineFreqItemsets(treeState, sortable, minSup);
+  const formattedSets = formatSets(freqItemsets, oneItemSet);
+  const strongRules = getStrongRules(formattedSets, minConf);
+
+  return [treeState, formattedSets, strongRules];
+}
+
+// Changes an item in a transaction without adding or subtracting from transaction
+export function changeItemInTransaction(
+  transaction,
+  item,
+  itemIndexInTransaction,
+  currentTransactionState,
+  transactionItems
+) {
+  const currentTransactionIndex = currentTransactionState.indexOf(transaction);
+  const currentItemIndex = transactionItems.indexOf(item);
+  let nextItemIndex = (currentItemIndex + 1) % transactionItems.size;
+  while (
+    currentTransactionState[currentTransactionIndex].includes(
+      transactionItems.get(nextItemIndex)
+    ) ||
+    nextItemIndex === currentItemIndex
+  ) {
+    nextItemIndex = (nextItemIndex + 1) % transactionItems.size;
+  }
+  currentTransactionState[currentTransactionIndex][
+    itemIndexInTransaction
+  ] = transactionItems.get(nextItemIndex);
+  return currentTransactionState;
+}
+
+// Runs apriori by generating next itemset
+export function runAprioriAlgorithim(
+  frequentItemSet,
+  transactionItems,
+  transactions,
+  minSup,
+  currentMinSupPruned,
+  currentAprioriPruned
+) {
+  if (frequentItemSet.length === 0) {
+    const oneItemSetPair = generateOneItemsets(
+      transactions,
+      transactionItems,
+      minSup
+    );
+    return [[oneItemSetPair[0]], true, false, oneItemSetPair[1], [], []];
+  } else {
+    let oneItemSet = Object.keys(frequentItemSet[0]);
+    const lastFrequentSet = frequentItemSet[frequentItemSet.length - 1];
+    oneItemSet.sort();
+    let newFrequentSet = {};
+    let currentLength = 0;
+
+    for (let frequentSet in lastFrequentSet) {
+      if (
+        !currentMinSupPruned.has(frequentSet) &&
+        !currentAprioriPruned.has(frequentSet)
+      ) {
+        const splitString = frequentSet.split(",");
+        currentLength = splitString.length;
+        const lastItem = splitString[currentLength - 1];
+        let index = oneItemSet.indexOf(lastItem) + 1;
+
+        while (index < oneItemSet.length) {
+          let newFrequentPattern = frequentSet;
+          newFrequentPattern += "," + oneItemSet[index];
+          newFrequentSet[newFrequentPattern] = 0;
+          index++;
+        }
+      }
+    }
+
+    let aprioriPruned = new Set();
+
+    if (currentLength >= 3) {
+      aprioriPruned = filterApriori(
+        newFrequentSet,
+        currentMinSupPruned,
+        currentAprioriPruned
+      );
+    }
+
+    const minSupPair = filterFreqSets(
+      newFrequentSet,
+      aprioriPruned,
+      transactions,
+      minSup
+    );
+
+    newFrequentSet = minSupPair[0];
+    let minSupPruned = minSupPair[1];
+    currentMinSupPruned = new Set([...currentMinSupPruned, ...minSupPruned]);
+    currentAprioriPruned = new Set([...currentAprioriPruned, ...aprioriPruned]);
+
+    frequentItemSet.push(newFrequentSet);
+
+    const isDoneApriori = Object.keys(newFrequentSet).length === 0;
+
+    const strongRules = isDoneApriori
+      ? getStrongRules(frequentItemSet, minConf, aprioriPruned, minSupPruned)
+      : [];
+
+    return [
+      frequentItemSet,
+      true,
+      isDoneApriori,
+      currentMinSupPruned,
+      currentAprioriPruned,
+      strongRules
+    ];
+  }
+}

@@ -17,10 +17,12 @@ import {
   Tooltip
 } from "react-bootstrap";
 import {
-  determineBestSplit,
-  determineMostLikelyLabel,
-  getMap,
-  calculateImpurityValue
+  determineClassLabel,
+  buildTree,
+  generateRandomDataState,
+  addRow,
+  refineTree,
+  changeDataRow
 } from "../algorithims/DTreeAlgo";
 import "../css_files/App.css";
 import "react-table/react-table.css";
@@ -43,7 +45,12 @@ class DTree extends React.Component {
       showFirstPage: true,
       displayedDepth: -1,
       treeState: {},
-      data: this.generateRandomDataState(),
+      data: generateRandomDataState(
+        this.props.featureClasses,
+        this.props.continousClasses,
+        this.props.labelClasses,
+        this.props.label
+      ),
       currentHighlight: null,
       shownData: [],
       shownEntropy: 0.0,
@@ -51,308 +58,40 @@ class DTree extends React.Component {
     };
   }
 
-  determineClassLabel(classVal) {
-    for (const key of this.props.featureClasses.keySeq().toArray()) {
-      if (this.props.featureClasses.get(key).contains(classVal)) return key;
-    }
-  }
-
   presentData(shownData, classVal, entropy, highestGainInfo, currDepth) {
     this.setState({
       displayedDepth: currDepth,
       shownData: shownData,
-      currentHighlight: this.determineClassLabel(classVal),
+      currentHighlight: determineClassLabel(
+        classVal,
+        this.props.featureClasses
+      ),
       shownEntropy: entropy,
       shownGain: highestGainInfo
     });
   }
 
-  findInCategorical(classVal) {
-    for (const key of this.props.featureClasses.keySeq().toArray()) {
-      const classList = this.props.featureClasses.get(key);
-      for (const classLabel of classList) {
-        if (classLabel === classVal) return true;
-      }
-    }
-
-    for (const label of this.props.labelClasses) {
-      if (label === classVal) return true;
-    }
-
-    return false;
-  }
-
-  // Builds decision tree, with entropy as 0 as base case.
-  buildTree(
-    data,
-    currTree,
-    maxDepth = this.props.featureClasses.size + 1,
-    currDepth = 0
-  ) {
-    if (maxDepth != null && currDepth >= maxDepth) {
-      return currTree;
-    }
-
-    let entropy = calculateImpurityValue(
-      data,
-      this.state.isGini,
-      this.props.label
-    );
-
-    if (entropy === 0) {
-      let dataClass = data[0][this.props.label];
-      currTree.children.push({ name: dataClass, gProps: {} });
-      return currTree;
-    }
-
-    let splitDict = {};
-
-    const information = determineBestSplit(
-      this.props.featureClasses.keySeq().toArray(),
-      this.props.continousClasses,
-      data,
-      this.state.isGini,
-      this.props.label
-    );
-    const bestSplit = information.currentHighestGainLabel;
-    const gainAmount = information.currentHighestGain;
-    const threshold = information.currentThreshold;
-    const classArr = getMap(
-      bestSplit,
-      data,
-      true,
-      this.state.isGini,
-      this.props.label
-    );
-
-    for (const classVal in classArr) {
-      splitDict[classVal] = data.filter(entry => entry[bestSplit] === classVal);
-    }
-
-    for (const classVal in splitDict) {
-      const isCategorical = this.findInCategorical(classVal);
-      let name =
-        classVal == "undefined"
-          ? determineMostLikelyLabel(data, this.props.label)
-          : isCategorical
-          ? classVal
-          : threshold;
-
-      if (isCategorical || classVal == "undefined") {
-        let newNode = {
-          name: name,
-          gProps: {
-            className: "custom",
-            onClick: () =>
-              this.presentData(
-                splitDict[classVal],
-                classVal,
-                entropy,
-                gainAmount,
-                currDepth
-              )
-          },
-          heldData: splitDict[classVal],
-          children: []
-        };
-        this.buildTree(splitDict[classVal], newNode, maxDepth, currDepth + 1);
-        currTree.children.push(newNode);
-      } else {
-        const lessThanHalf = data.filter(entry => entry[bestSplit] < threshold);
-        const moreThanHalf = data.filter(
-          entry => entry[bestSplit] >= threshold
-        );
-        let newNodeLess = {
-          name: "<" + name,
-          gProps: {
-            className: "custom",
-            onClick: () =>
-              this.presentData(
-                lessThanHalf,
-                classVal,
-                entropy,
-                gainAmount,
-                currDepth
-              )
-          },
-          heldData: lessThanHalf,
-          children: []
-        };
-        let newNodeMore = {
-          name: ">=" + name,
-          gProps: {
-            className: "custom",
-            onClick: () =>
-              this.presentData(
-                moreThanHalf,
-                classVal,
-                entropy,
-                gainAmount,
-                currDepth
-              )
-          },
-          heldData: moreThanHalf,
-          children: []
-        };
-        this.buildTree(lessThanHalf, newNodeLess, maxDepth, currDepth + 1);
-        this.buildTree(moreThanHalf, newNodeMore, maxDepth, currDepth + 1);
-        currTree.children.push(newNodeLess);
-        currTree.children.push(newNodeMore);
-      }
-    }
-
-    return currTree;
-  }
-
-  isContinous(childrenNodes) {
-    if (childrenNodes == undefined) return false;
-    for (const child of childrenNodes) {
-      if (child != undefined && child.name != undefined) {
-        if (child.name.includes("<") || child.name.includes(">=")) return true;
-      }
-    }
-    return false;
-  }
-
-  getChildrenMap(childrenList) {
-    let nameMap = {};
-
-    for (const node of childrenList) {
-      if (nameMap[node.name] == undefined) {
-        nameMap[node.name] = [];
-      }
-    }
-  }
-
-  refineTree(unrefinedTree) {
-    if (this.isContinous(unrefinedTree.children)) {
-      const baseName = unrefinedTree.children[0].name;
-      const baseThreshold =
-        baseName.substring(0, 1) === "<"
-          ? baseName.substring(1)
-          : baseName.substring(2);
-      const moreThanFiltered = unrefinedTree.children.filter(child => {
-        return child.name.includes(">=");
-      });
-      const lessThanFiltered = unrefinedTree.children.filter(child => {
-        return child.name.includes("<");
-      });
-
-      const moreThanChildrenList = moreThanFiltered.reduce((first, second) => {
-        if (
-          first != undefined &&
-          second != undefined &&
-          first.children != undefined
-        ) {
-          return first.children.concat(second.children);
-        }
-      });
-      const lessThanChildrenList = lessThanFiltered.reduce((first, second) => {
-        if (
-          first != undefined &&
-          second != undefined &&
-          first.children != undefined
-        ) {
-          return first.children.concat(second.children);
-        }
-      });
-
-      unrefinedTree.children = [
-        {
-          name: "<" + baseThreshold,
-          children:
-            lessThanChildrenList != undefined
-              ? [lessThanChildrenList[0]]
-              : lessThanChildrenList,
-          gProps: {
-            className: "custom"
-          }
-        },
-        {
-          name: ">=" + baseThreshold,
-          children:
-            moreThanChildrenList != undefined
-              ? [moreThanChildrenList[0]]
-              : moreThanChildrenList,
-          gProps: {
-            className: "custom"
-          }
-        }
-      ];
-    }
-
-    if (unrefinedTree.children != undefined) {
-      for (let i = 0; i < unrefinedTree.children.length; i++) {
-        unrefinedTree.children[i] = this.refineTree(unrefinedTree.children[i]);
-      }
-    }
-    return unrefinedTree;
-  }
-
   // Method that allows the tree to be show and initializes/resets its state
   showTree() {
-    const unrefinedTree = this.buildTree(this.state.data, {
-      name: "Start",
-      children: []
-    });
-    const refinedTree = this.refineTree(unrefinedTree);
+    const unrefinedTree = buildTree(
+      this.state.data,
+      {
+        name: "Start",
+        children: []
+      },
+      this.props.featureClasses.size + 1,
+      0,
+      this.props.featureClasses,
+      this.state.isGini,
+      this.props.label,
+      this.props.continousClasses,
+      this.props.labelClasses,
+      this
+    );
+    const refinedTree = refineTree(unrefinedTree);
 
     this.setState({
       treeState: refinedTree
-    });
-  }
-
-  // Adds a row to the dataset, copy of first row
-  addRow() {
-    const newData = this.state.data[0];
-    let newState = this.state.data;
-    newState.push(newData);
-
-    this.setState({
-      data: newState
-    });
-  }
-
-  generateRandomDataState() {
-    let dataState = [];
-    const features = this.props.featureClasses.keySeq().toArray();
-    const featureClasses = this.props.featureClasses;
-    const continousClasses = this.props.continousClasses;
-    const labelClasses = this.props.labelClasses;
-
-    for (let count = 0; count < 10; count++) {
-      let entry = {};
-      for (let i = 0; i < features.length; i++) {
-        if (features[i] !== "label") {
-          const currentClassLabels = featureClasses.get(features[i]);
-          const isCategorical = !continousClasses.get(features[i]).get(0);
-          const bottomRange = continousClasses.get(features[i]).get(1);
-          const topRange = continousClasses.get(features[i]).get(2);
-          const randomEntry = isCategorical
-            ? currentClassLabels.get(
-                Math.floor(Math.random() * currentClassLabels.size)
-              )
-            : Math.floor(
-                Math.random() * (topRange - bottomRange) + bottomRange
-              );
-          entry[features[i]] = randomEntry;
-        }
-      }
-      const randomLabel = labelClasses.get(
-        Math.floor(Math.random() * labelClasses.size)
-      );
-      entry[this.props.label] = randomLabel;
-      dataState.push(entry);
-    }
-
-    return dataState;
-  }
-
-  changeDataRow(e, key, dataIndex) {
-    const data = this.state.data;
-    data[dataIndex][key] = e.target.value;
-    this.setState({
-      data: data
     });
   }
 
@@ -370,27 +109,26 @@ class DTree extends React.Component {
     return isContinous ? (
       <input
         value={value}
-        onChange={e => this.changeDataRow(e, key, dataIndex)}
+        onChange={e =>
+          this.setState({
+            data: changeDataRow(e, key, dataIndex, this.state.data)
+          })
+        }
       />
     ) : (
       <select
         value={value}
-        onChange={e => this.changeDataRow(e, key, dataIndex)}
+        onChange={e =>
+          this.setState({
+            data: changeDataRow(e, key, dataIndex, this.state.data)
+          })
+        }
       >
         {valueClasses.map(entry => {
           return <option value={entry}>{entry}</option>;
         })}
       </select>
     );
-  }
-
-  deleteRow(dataIndex) {
-    const data = this.state.data.filter((row, index) => {
-      return index !== dataIndex;
-    });
-    this.setState({
-      data: data
-    });
   }
 
   showCustomDataTable(showNormalMode = true) {
@@ -428,7 +166,15 @@ class DTree extends React.Component {
                   );
                 })}
                 {showNormalMode ? (
-                  <td onClick={() => this.deleteRow(dataIndex)}>
+                  <td
+                    onClick={() =>
+                      this.setState({
+                        data: this.state.data.filter((row, index) => {
+                          return index !== dataIndex;
+                        })
+                      })
+                    }
+                  >
                     <Image src={Trash} style={{ width: 40 }} />
                   </td>
                 ) : null}
@@ -438,15 +184,6 @@ class DTree extends React.Component {
         </tbody>
       </Table>
     );
-  }
-
-  // Exit out of edit table page and go back to the tree generator page
-  saveEditState() {
-    this.setState({
-      data: this.generateRandomDataState(),
-      showFirstPage: true,
-      renderTree: false
-    });
   }
 
   showEntropyAndGain() {
@@ -524,7 +261,13 @@ class DTree extends React.Component {
         placement="bottom"
         overlay={<Tooltip>Add a data row</Tooltip>}
       >
-        <Nav.Link onClick={() => this.addRow()}>
+        <Nav.Link
+          onClick={() =>
+            this.setState({
+              data: addRow(this.state.data)
+            })
+          }
+        >
           <Image src={Add} style={{ width: 40 }} />
         </Nav.Link>
       </OverlayTrigger>
@@ -540,7 +283,14 @@ class DTree extends React.Component {
       >
         <Nav.Link
           onClick={() =>
-            this.setState({ data: this.generateRandomDataState() })
+            this.setState({
+              data: generateRandomDataState(
+                this.props.featureClasses,
+                this.props.continousClasses,
+                this.props.labelClasses,
+                this.props.label
+              )
+            })
           }
         >
           <Image src={Shuffle} style={{ width: 40 }} />
