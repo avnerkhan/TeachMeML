@@ -25,7 +25,8 @@ import {
   runDBScan,
   unclusterData,
   pushIntoCentroid,
-  smallClusterDrop
+  smallClusterDrop,
+  runIteration
 } from "../algorithims/ClusteringAlgo";
 import { arrayRange, displayInfoButton } from "../Utility";
 import "../css_files/App.css";
@@ -331,10 +332,12 @@ class Clustering extends React.Component {
             this.state.pointNum,
             this.state.unlabeledData
           );
-          this.setState({
-            unlabeledData: newData,
-            readyToStartState: true
-          });
+          if (newData != undefined) {
+            this.setState({
+              unlabeledData: newData,
+              readyToStartState: true
+            });
+          }
         }}
         xDomain={[0, 100]}
         yDomain={[0, 100]}
