@@ -19,7 +19,9 @@ class Pick extends React.Component {
     return (
       <Navbar fixed="top" bg="dark" variant="dark">
         <Nav.Link>
-          <Link to="/Intro">What is Machine Learning/Data Mining?</Link>
+          <Link to="/Intro" style={{ color: "white", fontSize: "20px" }}>
+            What is Machine Learning/Data Mining?
+          </Link>
         </Nav.Link>
         <Nav.Link>{this.showDropdown("Play")}</Nav.Link>
         <Nav.Link>{this.showDropdown("Edit")}</Nav.Link>
@@ -31,7 +33,7 @@ class Pick extends React.Component {
   showDropdown(type) {
     return (
       <Dropdown>
-        <Dropdown.Toggle>{type}</Dropdown.Toggle>
+        <Dropdown.Toggle variant="secondary">{type}</Dropdown.Toggle>
         <Dropdown.Menu>
           {this.state.algorithims.map(algo => {
             return !(algo === "Clustering" && type === "Edit") ? (
@@ -54,10 +56,14 @@ class Pick extends React.Component {
       <div className="App">
         <header className="App-header-low background-image">
           {this.showOverallNavBar()}
-          <h1>Teach Me ML</h1>
-          <p>
-            Teach Me ML is a webiste that dedicates itself to teaching people
-            machine learning in the easiest, most fun way possible
+          <h1 className="line-1 anim-typewriter-2">Teach Me ML</h1>
+          <p className="line-2 anim-typewriter">
+            {" "}
+            Teach Me ML is a webiste that dedicates itself to teaching{" "}
+          </p>
+          <p className="line-2 anim-typewriter">
+            {" "}
+            people machine learning in the easiest, most fun way possible{" "}
           </p>
         </header>
       </div>
