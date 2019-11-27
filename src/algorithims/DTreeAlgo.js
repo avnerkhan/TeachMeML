@@ -508,6 +508,7 @@ export function addRow(data) {
 }
 
 export function refineTree(unrefinedTree) {
+  if (unrefinedTree == undefined) return unrefinedTree;
   if (isContinous(unrefinedTree.children)) {
     const baseName = unrefinedTree.children[0].name;
     const baseThreshold =
@@ -521,32 +522,38 @@ export function refineTree(unrefinedTree) {
       return child.name.includes("<");
     });
 
-    const moreThanChildrenList = moreThanFiltered.reduce((first, second) => {
-      if (
-        first != undefined &&
-        second != undefined &&
-        first.children != undefined
-      ) {
-        return first.children.concat(second.children);
-      }
-    });
-    const lessThanChildrenList = lessThanFiltered.reduce((first, second) => {
-      if (
-        first != undefined &&
-        second != undefined &&
-        first.children != undefined
-      ) {
-        return first.children.concat(second.children);
-      }
-    });
+    const moreThanChildrenList =
+      moreThanFiltered.length > 0
+        ? moreThanFiltered.reduce((first, second) => {
+            if (
+              first != undefined &&
+              second != undefined &&
+              first.children != undefined
+            ) {
+              return first.children.concat(second.children);
+            }
+          })
+        : [];
+    const lessThanChildrenList =
+      lessThanFiltered.length > 0
+        ? lessThanFiltered.reduce((first, second) => {
+            if (
+              first != undefined &&
+              second != undefined &&
+              first.children != undefined
+            ) {
+              return first.children.concat(second.children);
+            }
+          })
+        : [];
 
     unrefinedTree.children = [
       {
         name: "<" + baseThreshold,
         children:
-          lessThanChildrenList != undefined
+          lessThanChildrenList != undefined && lessThanChildrenList.length > 0
             ? [lessThanChildrenList[0]]
-            : lessThanChildrenList,
+            : undefined,
         gProps: {
           className: "custom"
         }
@@ -554,9 +561,9 @@ export function refineTree(unrefinedTree) {
       {
         name: ">=" + baseThreshold,
         children:
-          moreThanChildrenList != undefined
+          moreThanChildrenList != undefined && moreThanChildrenList.length > 0
             ? [moreThanChildrenList[0]]
-            : moreThanChildrenList,
+            : undefined,
         gProps: {
           className: "custom"
         }
