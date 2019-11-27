@@ -87,6 +87,14 @@ svg.custom path.link{
 }
 
 
+.large-photo {
+  width: 160px;
+}
+
+.small-photo {
+  width: 40px;
+}
+
 /* Animation */
 .anim-typewriter{
   animation: typewriter 4s steps(44) 1s 1 normal both,

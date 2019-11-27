@@ -223,7 +223,7 @@ class Clustering extends React.Component {
         overlay={<Tooltip>Finished choosing centroids</Tooltip>}
       >
         <Nav.Link onClick={() => this.checkCentroidPick()}>
-          <Image src={Check} style={{ width: 40 }} />
+          <Image src={Check} className="small-photo" />
         </Nav.Link>
       </OverlayTrigger>
     ) : null;
@@ -250,7 +250,7 @@ class Clustering extends React.Component {
             });
           }}
         >
-          <Image src={Forward} style={{ width: 40 }} />
+          <Image src={Forward} className="small-photo" />
         </Nav.Link>
       </OverlayTrigger>
     ) : null;
@@ -264,7 +264,7 @@ class Clustering extends React.Component {
         overlay={<Tooltip>Start from beginning</Tooltip>}
       >
         <Nav.Link onClick={() => this.clearSlate()}>
-          <Image src={Eraser} style={{ width: 40 }} />
+          <Image src={Eraser} className="small-photo" />
         </Nav.Link>
       </OverlayTrigger>
     ) : null;
@@ -290,7 +290,7 @@ class Clustering extends React.Component {
             })
           }
         >
-          <Image src={Reset} style={{ width: 40 }} />
+          <Image src={Reset} className="small-photo" />
         </Nav.Link>
       </OverlayTrigger>
     ) : null;
@@ -299,7 +299,7 @@ class Clustering extends React.Component {
   showRunDBScanAgainBar() {
     return this.state.runningDBScan ? (
       <Nav.Link onClick={() => this.startRespectiveAlgorithim()}>
-        <Image src={Check} style={{ width: 40 }} />
+        <Image src={Check} className="small-photo" />
       </Nav.Link>
     ) : null;
   }

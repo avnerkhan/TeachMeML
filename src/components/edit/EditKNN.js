@@ -75,7 +75,7 @@ class EditKNN extends React.Component {
                       />
                     </td>
                     <td onClick={() => this.props.deleteLabelClass(color)}>
-                      <Image src={Trash} style={{ width: 40 }} />
+                      <Image src={Trash} className="small-photo" />
                     </td>
                   </tr>
                 );
@@ -108,7 +108,7 @@ class EditKNN extends React.Component {
                       this.props.addLabelClass(this.state.addColor)
                     }
                   >
-                    <Image src={Add} style={{ width: 40 }} />
+                    <Image src={Add} className="small-photo" />
                   </td>
                 </tr>
               </tr>

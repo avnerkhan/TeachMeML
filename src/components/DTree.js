@@ -175,7 +175,7 @@ class DTree extends React.Component {
                       })
                     }
                   >
-                    <Image src={Trash} style={{ width: 40 }} />
+                    <Image src={Trash} className="small-photo" />
                   </td>
                 ) : null}
               </tr>
@@ -248,7 +248,7 @@ class DTree extends React.Component {
             this.showTree();
           }}
         >
-          <Image src={SomeTree} style={{ width: 40 }} />
+          <Image src={SomeTree} className="small-photo" />
         </Nav.Link>
       </OverlayTrigger>
     ) : null;
@@ -268,7 +268,7 @@ class DTree extends React.Component {
             })
           }
         >
-          <Image src={Add} style={{ width: 40 }} />
+          <Image src={Add} className="small-photo" />
         </Nav.Link>
       </OverlayTrigger>
     ) : null;
@@ -293,7 +293,7 @@ class DTree extends React.Component {
             })
           }
         >
-          <Image src={Shuffle} style={{ width: 40 }} />
+          <Image src={Shuffle} className="small-photo" />
         </Nav.Link>
       </OverlayTrigger>
     ) : null;
@@ -309,7 +309,7 @@ class DTree extends React.Component {
           })
         }
       >
-        <Image src={Back} style={{ width: 40 }} />
+        <Image src={Back} className="small-photo" />
       </Nav.Link>
     ) : null;
   }

@@ -59,7 +59,7 @@ export function showBackToAlgorithimPage() {
   return (
     <Link to="/">
       <Nav>
-        <Image src={Back} style={{ width: 40 }} />
+        <Image src={Back} className="small-photo" />
       </Nav>
     </Link>
   );

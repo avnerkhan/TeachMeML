@@ -131,7 +131,7 @@ class EditDTree extends React.Component {
                           )
                         }
                       >
-                        <Image src={Add} style={{ width: 40 }} />
+                        <Image src={Add} className="small-photo" />
                       </td>
                     ) : null}
                     <td
@@ -142,7 +142,7 @@ class EditDTree extends React.Component {
                       {isCategorical ? "Set continous" : "Set categorical"}
                     </td>
                     <td onClick={() => this.props.deleteFeature(feature)}>
-                      <Image src={Trash} style={{ width: 40 }} />
+                      <Image src={Trash} className="small-photo" />
                     </td>
                   </tr>
                 );
@@ -158,7 +158,7 @@ class EditDTree extends React.Component {
                       this.props.addFeature(this.refs["featureInput"].value)
                     }
                   >
-                    <Image src={Add} style={{ width: 40 }} />
+                    <Image src={Add} className="small-photo" />
                   </td>
                 </tr>
               </tr>

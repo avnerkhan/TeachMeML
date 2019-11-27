@@ -40,7 +40,7 @@ class EditAssociation extends React.Component {
                         this.props.deleteTransactionType(transaction)
                       }
                     >
-                      <Image src={Trash} style={{ width: 40 }} />
+                      <Image src={Trash} className="small-photo" />
                     </td>
                   </tr>
                 );
@@ -56,7 +56,7 @@ class EditAssociation extends React.Component {
                       this.props.addTransactionType(this.refs["input"].value)
                     }
                   >
-                    <Image src={Add} style={{ width: 40 }} />
+                    <Image src={Add} className="small-photo" />
                   </td>
                 </tr>
               </tr>

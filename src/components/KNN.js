@@ -157,7 +157,7 @@ class KNN extends React.Component {
         overlay={<Tooltip>Generate random undetermined points</Tooltip>}
       >
         <Nav.Link onClick={() => this.generateRandomUndetermined()}>
-          <Image src={Shuffle} style={{ width: 40 }} />
+          <Image src={Shuffle} className="small-photo" />
         </Nav.Link>
       </OverlayTrigger>
     ) : null;
@@ -177,7 +177,7 @@ class KNN extends React.Component {
             })
           }
         >
-          <Image src={Shuffle} style={{ width: 40 }} />
+          <Image src={Shuffle} className="small-photo" />
         </Nav.Link>
       </OverlayTrigger>
     );
@@ -195,7 +195,7 @@ class KNN extends React.Component {
             this.addPoint(this.refs["xCoord"].value, this.refs["yCoord"].value)
           }
         >
-          <Image src={Add} style={{ width: 40 }} />
+          <Image src={Add} className="small-photo" />
         </Nav.Link>
       </OverlayTrigger>
     ) : null;

@@ -473,6 +473,7 @@ export function runAprioriAlgorithim(
   transactionItems,
   transactions,
   minSup,
+  minConf,
   currentMinSupPruned,
   currentAprioriPruned
 ) {
@@ -482,7 +483,14 @@ export function runAprioriAlgorithim(
       transactionItems,
       minSup
     );
-    return [[oneItemSetPair[0]], true, false, oneItemSetPair[1], [], []];
+    return [
+      [oneItemSetPair[0]],
+      true,
+      false,
+      oneItemSetPair[1],
+      new Set([]),
+      []
+    ];
   } else {
     let oneItemSet = Object.keys(frequentItemSet[0]);
     const lastFrequentSet = frequentItemSet[frequentItemSet.length - 1];

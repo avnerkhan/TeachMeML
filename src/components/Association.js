@@ -142,7 +142,7 @@ class Association extends React.Component {
                     })
                   }
                 >
-                  <Image src={Trash} style={{ width: 40 }} />
+                  <Image src={Trash} className="small-photo" />
                 </td>
               </tr>
             );
@@ -158,7 +158,7 @@ class Association extends React.Component {
                 })
               }
             >
-              <Image src={Add} style={{ width: 40 }} />
+              <Image src={Add} className="small-photo" />
             </td>
           </tr>
         </tbody>
@@ -228,7 +228,7 @@ class Association extends React.Component {
             });
           }}
         >
-          <Image src={SomeTree} style={{ width: 40 }} />
+          <Image src={SomeTree} className="small-photo" />
         </Nav.Link>
       </OverlayTrigger>
     ) : null;
@@ -255,6 +255,7 @@ class Association extends React.Component {
               this.props.transactionItems,
               this.state.transactions,
               this.state.minSup,
+              this.state.minConf,
               this.state.minSupPruned,
               this.state.aprioriPruned
             );
@@ -268,7 +269,7 @@ class Association extends React.Component {
             });
           }}
         >
-          <Image src={Forward} style={{ width: 40 }} />
+          <Image src={Forward} className="small-photo" />
         </Nav.Link>
       </OverlayTrigger>
     ) : null;
@@ -291,7 +292,7 @@ class Association extends React.Component {
             })
           }
         >
-          <Image src={Shuffle} style={{ width: 40 }} />
+          <Image src={Shuffle} className="small-photo" />
         </Nav.Link>
       </OverlayTrigger>
     ) : null;
