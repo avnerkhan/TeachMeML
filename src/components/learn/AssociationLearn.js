@@ -22,7 +22,7 @@ class AprioriLearn extends React.Component {
             that we have seen before. Instead of having features and labels,
             time series data looks like this.
           </p>
-          <Image src={Timeseries} />
+          <Image src={Timeseries} className="large-photo" />
           <p>
             You can imagine this entire table to represent the transactions of a
             singular customer. The TID column simply stands for transaction ID.
@@ -42,12 +42,12 @@ class AprioriLearn extends React.Component {
             Treat every item in your dataset as it’s own set, and then get the
             supports for these 1-itemsets. Discard anything that is below minsup
           </p>
-          <Image src={OneSet} />
+          <Image src={OneSet} className="large-photo" />
           <p>
             Now, we generate the 2-itemsets by generating all combos from these.
             Once again, we count and discard anything below minsup.
           </p>
-          <Image src={TwoSet} />
+          <Image src={TwoSet} className="large-photo" />
           <p>
             Now we generate the k-itemset, but we pay attention to these sets
             particularly. Before we count the support of these itemsets, we can
@@ -56,7 +56,7 @@ class AprioriLearn extends React.Component {
             frequent, then that entire set is not frequent. Take the following
             example.
           </p>
-          <Image src={ThreeSet} />
+          <Image src={ThreeSet} className="large-photo" />
           <p>
             We removed the Bread, Diaper, Beer itemset via apriori because the
             Bread, Beer set was not present in the Frequent 2-itemsets.
@@ -84,12 +84,12 @@ class AprioriLearn extends React.Component {
             transaction is sorted by it’s most frequent item, and infrequent
             items are removed
           </p>
-          <Image src={Conditonal} />
+          <Image src={Conditonal} className="large-photo" />
           <p>
             From here, we build our FP Tree by iterating through all the
             transactions in our sorted data
           </p>
-          <Image src={FPTree} />
+          <Image src={FPTree} className="large-photo" />
           <p>
             From here, we find what is called the conditional pattern bases and
             conditional FP Trees, and from there we can create our frequent
@@ -100,7 +100,7 @@ class AprioriLearn extends React.Component {
             item, and keeping a count of those, and then counting them to find
             the frequent itemsets. Example is shown below
           </p>
-          <Image src={Sorted} />
+          <Image src={Sorted} className="large-photo" />
           <h2>When to use FPTree vs Apriori</h2>
           <p>
             Although FPTree and Apriori come out to the same result, the one

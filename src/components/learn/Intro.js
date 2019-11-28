@@ -38,8 +38,8 @@ class Intro extends React.Component {
             Basically, supervised learning is when our data is given to us
             classified. Take the example below.
           </p>
-          <Image src={Labeled} />
-          <Image src={Unlabeled} />
+          <Image src={Labeled} className="large-photo" />
+          <Image src={Unlabeled} className="large-photo" />
           <p>
             The last column in the row is the classification given to each row.
             This is usually called the label. All the other columns are called
@@ -53,13 +53,13 @@ class Intro extends React.Component {
             our goal is to find some classification between the existing data.
             The easiest way to visualize this is using this plot.
           </p>
-          <Image src={Unlabeled_cluster} />
+          <Image src={Unlabeled_cluster} className="large-photo" />
           <p>
             There is an obvious classification between these data points, as
             they are in two distinct groups. An unsupervised learning model aims
             to label these points, like this.
           </p>
-          <Image src={Labeled_cluster} />
+          <Image src={Labeled_cluster} className="large-photo" />
           <p>
             Note that even though this data set has only two feature types (X
             values and Y values), the same logic can be applied to

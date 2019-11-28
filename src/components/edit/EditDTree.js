@@ -148,6 +148,31 @@ class EditDTree extends React.Component {
                 );
               })}
               <tr>
+                <td>
+                  <input
+                    value={this.props.label}
+                    onChange={e => this.props.changeLabelName(e.target.value)}
+                  />
+                </td>
+                {this.props.labelClasses.map(labelClass => {
+                  return (
+                    <td onClick={() => this.props.deleteLabelClass(labelClass)}>
+                      <tr>{labelClass}</tr>
+                    </td>
+                  );
+                })}
+                <td>
+                  <input type="text" ref="labelClass" />
+                </td>
+                <td
+                  onClick={() =>
+                    this.props.addLabelClass(this.refs["labelClass"].value)
+                  }
+                >
+                  <Image src={Add} className="small-photo" />
+                </td>
+              </tr>
+              <tr>
                 <td>Add</td>
                 <td>
                   <input type="text" ref="featureInput" />

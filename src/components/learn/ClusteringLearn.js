@@ -32,18 +32,18 @@ class ClusteringLearn extends React.Component {
             centroids. A centroid is a point in our graph that is the center of
             a cluster. The black Xs are centroids in this example
           </p>
-          <Image src={UnlabeledCluster} />
+          <Image src={UnlabeledCluster} className="large-photo" />
           <p>
             Now, assign each point to its nearest cluster, and label it
             accordingly.
           </p>
-          <Image src={LabeledFirst} />
+          <Image src={LabeledFirst} className="large-photo" />
           <p>
             Now, recalculate the centroids based on the mean of the current
             labels, and then relabel the points based on the new closest
             centroids
           </p>
-          <Image src={LabeledSecond} />
+          <Image src={LabeledSecond} className="large-photo" />
           <p>
             We keep doing this until the positions of the centroids don’t
             change. At this point, our algorithm will have classified our
@@ -84,9 +84,9 @@ class ClusteringLearn extends React.Component {
             KMeans works in most scenarios, but there are specific scenarios
             where it wouldn’t be smart to use it
           </p>
-          <Image src={Graphs} />
+          <Image src={Graphs} className="large-photo" />
           <p>Here are some characteristics of DBScan</p>
-          <Image src={BulletPoints} />
+          <Image src={BulletPoints} className="large-photo" />
         </div>
       </div>
     );

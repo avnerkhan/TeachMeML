@@ -31,8 +31,8 @@ class DTreeLearn extends React.Component {
             Let’s say we are given the following decision tree and we would like
             to classify the following piece of data.
           </p>
-          <Image src={Tree} />
-          <Image src={Data} />
+          <Image src={Tree} className="large-photo" />
+          <Image src={Data} className="large-photo" />
           <p>
             From the start, we would traverse to the 4.0 Node, since that is the
             Node in our dataset. From there, we would then traverse to the
@@ -58,9 +58,9 @@ class DTreeLearn extends React.Component {
             fractions of each class label in the dataset and plug into the given
             function, called Gini or Entropy.
           </p>
-          <Image src={Entropy} />
-          <Image src={Gini} />
-          <Image src={Impurities} />
+          <Image src={Entropy} className="large-photo" />
+          <Image src={Gini} className="large-photo" />
+          <Image src={Impurities} className="large-photo" />
           <p>
             To calculate the impurity of each feature in the dataset, we still
             look at the class label, but only look at the pieces of the dataset
@@ -71,19 +71,19 @@ class DTreeLearn extends React.Component {
             Now that we have this, we can calculate the “Gain split ” for each
             feature, which is shown in the formula below
           </p>
-          <Image src={Split} />
+          <Image src={Split} className="large-photo" />
           <p>
             We also need what is called the “split info” which is a measure of
             how many “branches” can be split on that feature, or how many
             distinct values the feature has. This can be calculated like this.
           </p>
-          <Image src={SplitInfo} />
+          <Image src={SplitInfo} className="large-photo" />
           <p>
             Now that we have these two calculations, we can calculate gain ratio
             for this dataset, and then we pick whatever value has the best gain
             ratio
           </p>
-          <Image src={GainRatio} />
+          <Image src={GainRatio} className="large-photo" />
           <p>
             Once we pick the feature, we split our dataset by the feature we
             splitted on, and do the calculations again multiple times, until are
