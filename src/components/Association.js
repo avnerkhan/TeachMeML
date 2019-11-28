@@ -166,6 +166,15 @@ class Association extends React.Component {
     );
   }
 
+  displaySlowWarning() {
+    return this.state.frequentItemSet.length >= 3 ? (
+      <div style={{ color: "red" }}>
+        Strong rules will load very slowly for frequent itemsets over 3. Be
+        cautious
+      </div>
+    ) : null;
+  }
+
   // Displays JSX of N frequent itemsets
   displayFrequentItemsets() {
     const frequentSets = this.state.frequentItemSet;
@@ -367,6 +376,7 @@ class Association extends React.Component {
       <div className="App">
         <header className="App-header">
           {this.showAprioriNavBar()}
+          {this.displaySlowWarning()}
           {this.showDataTable()}
           {this.displayFrequentItemsets()}
           {this.state.strongRules.length > 0 ? <h1>Strong Rules</h1> : null}

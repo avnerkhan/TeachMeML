@@ -523,7 +523,6 @@ export function refineTree(unrefinedTree) {
     const lessThanFiltered = unrefinedTree.children.filter(child => {
       return child.name.includes("<");
     });
-
     const moreThanChildrenList =
       moreThanFiltered.length > 0
         ? moreThanFiltered.reduce((first, second) => {
