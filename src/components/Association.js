@@ -181,7 +181,11 @@ class Association extends React.Component {
                 {frequentSetKeys.map(set => {
                   const isMinSupPruned = this.state.minSupPruned.has(set);
                   const isAprioriPruned = this.state.aprioriPruned.has(set);
-                  if (!isMinSupPruned && !isAprioriPruned) {
+                  if (
+                    !isMinSupPruned &&
+                    !isAprioriPruned &&
+                    frequentKSet[set] >= this.state.minSup
+                  ) {
                     return (
                       <div>
                         {set} : {frequentKSet[set]}

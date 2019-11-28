@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { euclidFunction, comparator } from "../Utility";
 
 export function generateEmptyCluster() {

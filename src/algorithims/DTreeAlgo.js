@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 // For determing ties when a node has multiple labels in its dataset
 export function determineMostLikelyLabel(data, labelName) {
   let labelMap = {};
