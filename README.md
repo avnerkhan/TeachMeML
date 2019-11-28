@@ -30,6 +30,6 @@ Contains actual algorithim visualizations and subdirectories to edit/ and learn/
 
 Contains components for edit functionality
 
-## components/learn/
+### components/learn/
 
 Contains informational components
