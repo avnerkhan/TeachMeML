@@ -25,6 +25,7 @@ import {
 import Add from "../Images/add.png";
 import Trash from "../Images/trash.png";
 import Shuffle from "../Images/shuffle.png";
+import Reset from "../Images/reset.png";
 import "../css_files/App.css";
 import "react-table/react-table.css";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
@@ -67,6 +68,27 @@ class Association extends React.Component {
         </Form.Group>
       </Form>
     ) : null;
+  }
+
+  displayReorderedDB() {
+    let reorderedDB = this.state.reorderedDB;
+
+    return (
+      <Table responsive="sm">
+        <tbody>
+          {reorderedDB.map((transaction, index) => {
+            return (
+              <tr>
+                <td>{index + 1}</td>
+                {transaction.map(item => {
+                  return <td>{item}</td>;
+                })}
+              </tr>
+            );
+          })}
+        </tbody>
+      </Table>
+    );
   }
 
   // Displays the JSX for transaction table
@@ -226,7 +248,12 @@ class Association extends React.Component {
       >
         <Nav.Link
           onClick={() => {
-            const [treeState, formattedSets, strongRules] = runFPTreeAlgorithim(
+            const [
+              treeState,
+              formattedSets,
+              strongRules,
+              reorderedDB
+            ] = runFPTreeAlgorithim(
               this.state.transactions,
               this.props.transactionItems,
               this.state.minSup,
@@ -237,7 +264,8 @@ class Association extends React.Component {
               treeState: treeState,
               renderTree: true,
               frequentItemSet: formattedSets,
-              strongRules: strongRules
+              strongRules: strongRules,
+              reorderedDB: reorderedDB
             });
           }}
         >
@@ -329,6 +357,35 @@ class Association extends React.Component {
     ) : null;
   }
 
+  showResetBar() {
+    return this.state.frequentItemSet.length > 0 ? (
+      <OverlayTrigger
+        trigger="hover"
+        placement="bottom"
+        overlay={<Tooltip>Reset State</Tooltip>}
+      >
+        <Nav.Link
+          onClick={() =>
+            this.setState({
+              treeState: {},
+              renderTree: false,
+              isApriori: false,
+              isDoneApriori: false,
+              isFPTree: false,
+              frequentItemSet: [],
+              minSupPruned: new Set(),
+              aprioriPruned: new Set(),
+              strongRules: [],
+              reorderedDB: []
+            })
+          }
+        >
+          <Image src={Reset} className="small-photo" />
+        </Nav.Link>
+      </OverlayTrigger>
+    ) : null;
+  }
+
   showAprioriNavBar() {
     return (
       <Navbar fixed="top" bg="dark" variant="dark">
@@ -336,6 +393,7 @@ class Association extends React.Component {
         {this.showStartAlgorithimBar()}
         {this.showRunNextIterationBar()}
         {this.showShuffleDataBar()}
+        {this.showResetBar()}
         {this.showMinSupSelection()}
         {this.showMinConfSelection()}
       </Navbar>
@@ -378,6 +436,8 @@ class Association extends React.Component {
           {this.showAprioriNavBar()}
           {this.displaySlowWarning()}
           {this.showDataTable()}
+          {this.state.reorderedDB.length > 0 ? <h1>Reordered DB</h1> : null}
+          {this.state.reorderedDB.length > 0 ? this.displayReorderedDB() : null}
           {this.displayFrequentItemsets()}
           {this.state.strongRules.length > 0 ? <h1>Strong Rules</h1> : null}
           {this.displayStrongRules()}

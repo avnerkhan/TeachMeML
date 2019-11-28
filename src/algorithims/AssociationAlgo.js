@@ -439,7 +439,7 @@ export function runFPTreeAlgorithim(
   const formattedSets = formatSets(freqItemsets, oneItemSet);
   const strongRules = getStrongRules(formattedSets, minConf);
 
-  return [treeState, formattedSets, strongRules];
+  return [treeState, formattedSets, strongRules, reorderedDB];
 }
 
 // Changes an item in a transaction without adding or subtracting from transaction
