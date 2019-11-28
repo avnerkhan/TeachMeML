@@ -26,7 +26,6 @@ class EditDTree extends React.Component {
   }
 
   canToggle(featureToCheck) {
-    debugger;
     let isToggledCount = 0;
     for (const feature of this.props.continousClasses.keySeq().toArray()) {
       isToggledCount += this.props.continousClasses.get(feature).get(0) ? 1 : 0;
@@ -47,7 +46,7 @@ class EditDTree extends React.Component {
       <div className="App">
         <div className="App-header-low">
           {showBasicBackNavBar()}
-          <Table size="sm">
+          <Table size="sm" style={{ fontSize: "20px" }} responsive="sm">
             {displayInfoButton(
               "Table Editing Page",
               "This is the page where you can edit the configuration of your data. For example, you can add another feature, delete it, or add/delete another class label to an existing feature",
@@ -131,7 +130,11 @@ class EditDTree extends React.Component {
                     )}
                     {isCategorical ? (
                       <td>
-                        <input type="text" ref={"classInput" + index} />
+                        <input
+                          type="text"
+                          ref={"classInput" + index}
+                          placeholder="Enter new class"
+                        />
                       </td>
                     ) : null}
                     {isCategorical ? (
@@ -174,13 +177,25 @@ class EditDTree extends React.Component {
                 </td>
                 {this.props.labelClasses.map(labelClass => {
                   return (
-                    <td onClick={() => this.props.deleteLabelClass(labelClass)}>
-                      <tr>{labelClass}</tr>
-                    </td>
+                    <OverlayTrigger
+                      trigger="hover"
+                      placement="bottom"
+                      overlay={<Tooltip>{"Delete " + labelClass}</Tooltip>}
+                    >
+                      <td
+                        onClick={() => this.props.deleteLabelClass(labelClass)}
+                      >
+                        <tr>{labelClass}</tr>
+                      </td>
+                    </OverlayTrigger>
                   );
                 })}
                 <td>
-                  <input type="text" ref="labelClass" />
+                  <input
+                    type="text"
+                    ref="labelClass"
+                    placeholder="Enter new class"
+                  />
                 </td>
                 <td
                   onClick={() =>
@@ -191,9 +206,13 @@ class EditDTree extends React.Component {
                 </td>
               </tr>
               <tr>
-                <td>Add</td>
+                <td>Add Another Feature</td>
                 <td>
-                  <input type="text" ref="featureInput" />
+                  <input
+                    type="text"
+                    ref="featureInput"
+                    placeholder="Enter new feature"
+                  />
                 </td>
                 <tr>
                   <td

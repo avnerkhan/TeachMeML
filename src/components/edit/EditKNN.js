@@ -88,7 +88,7 @@ class EditKNN extends React.Component {
                     })
                   }
                 >
-                  Add
+                  Add Label
                 </td>
                 {this.state.renderColorWheelAdd ? (
                   <SketchPicker
@@ -100,6 +100,7 @@ class EditKNN extends React.Component {
                     type="text"
                     value={this.state.addColor}
                     onChange={e => this.setState({ addColor: e.target.value })}
+                    placeholder="Enter hex color"
                   />
                 </td>
                 <tr>

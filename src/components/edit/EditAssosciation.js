@@ -48,7 +48,7 @@ class EditAssociation extends React.Component {
               <tr>
                 <td>Add</td>
                 <td>
-                  <input type="text" ref="input" />
+                  <input type="text" ref="input" placeholder="Add new type" />
                 </td>
                 <tr>
                   <td
