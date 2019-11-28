@@ -186,12 +186,12 @@ class DTree extends React.Component {
     );
   }
 
-  showEntropyAndGain() {
+  showImpurityAndGain() {
     return (
       <div>
         <h3 as="h3">At level {this.state.displayedDepth}</h3>
         <h3 as="h3">
-          Entropy of parent: {roundToTwoDecimalPlaces(this.state.shownEntropy)}
+          Impurity of parent: {roundToTwoDecimalPlaces(this.state.shownEntropy)}
         </h3>
         <h3 as="h3">
           Gain of parent: {roundToTwoDecimalPlaces(this.state.shownGain)}
@@ -226,7 +226,7 @@ class DTree extends React.Component {
         </Col>
         <Col>
           <Row>{this.showCustomDataTable(false)}</Row>
-          <Row>{this.showEntropyAndGain()}</Row>
+          <Row>{this.showImpurityAndGain()}</Row>
         </Col>
       </Row>
     ) : null;

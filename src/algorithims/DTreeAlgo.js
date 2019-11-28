@@ -368,7 +368,6 @@ export function buildTree(
               currDepth
             )
         },
-        heldData: splitDict[classVal],
         children: []
       };
       buildTree(
@@ -400,7 +399,6 @@ export function buildTree(
               currDepth
             )
         },
-        heldData: lessThanHalf,
         children: []
       };
       let newNodeMore = {
@@ -416,7 +414,6 @@ export function buildTree(
               currDepth
             )
         },
-        heldData: moreThanHalf,
         children: []
       };
       buildTree(
