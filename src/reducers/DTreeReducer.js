@@ -83,7 +83,7 @@ export function DTreeReducer(prevState = initialDtreeState, action) {
         prevContinousData
       );
       return newState;
-    case types.SET_CONTINOUS_ATTRIBUTE:
+    case types.SET_CONTINOUS_ATTRIBUTE_RANGE:
       const currentToggleState = newState.continousClasses
         .get(action.feature)
         .get(0);

@@ -59,9 +59,9 @@ export function editFeatureName(oldName, newName) {
   };
 }
 
-export function setContinousAttribute(feature, bottomRange, topRange) {
+export function setContinousAttributeRange(feature, bottomRange, topRange) {
   return {
-    type: types.SET_CONTINOUS_ATTRIBUTE,
+    type: types.SET_CONTINOUS_ATTRIBUTE_RANGE,
     feature,
     bottomRange,
     topRange

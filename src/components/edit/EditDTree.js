@@ -14,7 +14,7 @@ import {
   changeLabelName,
   editFeatureName,
   toggleContinousAttribute,
-  setContinousAttribute
+  setContinousAttributeRange
 } from "../../actions/DTreeActions";
 import Trash from "../../Images/trash.png";
 import Add from "../../Images/add.png";
@@ -23,6 +23,18 @@ import { Table, OverlayTrigger, Tooltip, Image } from "react-bootstrap";
 class EditDTree extends React.Component {
   constructor(props) {
     super(props);
+  }
+
+  canToggle(featureToCheck) {
+    debugger;
+    let isToggledCount = 0;
+    for (const feature of this.props.continousClasses.keySeq().toArray()) {
+      isToggledCount += this.props.continousClasses.get(feature).get(0) ? 1 : 0;
+    }
+    return (
+      isToggledCount === 0 ||
+      this.props.continousClasses.get(featureToCheck).get(0)
+    );
   }
 
   render() {
@@ -98,7 +110,7 @@ class EditDTree extends React.Component {
                         <input
                           value={bottomRange}
                           onChange={e =>
-                            this.props.setContinousAttribute(
+                            this.props.setContinousAttributeRange(
                               feature,
                               e.target.value,
                               topRange
@@ -108,7 +120,7 @@ class EditDTree extends React.Component {
                         <input
                           value={topRange}
                           onChange={e =>
-                            this.props.setContinousAttribute(
+                            this.props.setContinousAttributeRange(
                               feature,
                               bottomRange,
                               e.target.value
@@ -135,9 +147,15 @@ class EditDTree extends React.Component {
                       </td>
                     ) : null}
                     <td
-                      onClick={() =>
-                        this.props.toggleContinousAttribute(feature)
-                      }
+                      onClick={() => {
+                        if (this.canToggle(feature)) {
+                          this.props.toggleContinousAttribute(feature);
+                        } else {
+                          alert(
+                            "There cannot be more than one continous attribute at a time"
+                          );
+                        }
+                      }}
                     >
                       {isCategorical ? "Set continous" : "Set categorical"}
                     </td>
@@ -212,7 +230,7 @@ const mapDispatchToProps = {
   changeLabelName,
   editFeatureName,
   toggleContinousAttribute,
-  setContinousAttribute
+  setContinousAttributeRange
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(EditDTree);
