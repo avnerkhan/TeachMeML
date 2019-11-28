@@ -30,10 +30,11 @@ export function determineBestSplit(
   let currentHighestGainLabel = "";
   let currentHighestGain = 0.0;
   let currentThreshold = 0.0;
+  let currentSplitInfo = 0.0;
+  let currentGainSplit = 0.0;
 
   for (let i = 0; i < dataLabels.length; i++) {
-    const isCategorical = !continousMap.get(dataLabels[i]).get(0);
-    const currGain = calculateGainRatio(
+    const [currGain, threshold, splitInfo, gainSplit] = calculateGainRatio(
       dataLabels[i],
       continousMap,
       data,
@@ -41,25 +42,26 @@ export function determineBestSplit(
       labelName
     );
 
-    if (isCategorical && currGain > currentHighestGain) {
+    if (currGain > currentHighestGain) {
       currentHighestGain = currGain;
       currentHighestGainLabel = dataLabels[i];
-    }
-    if (!isCategorical && currGain.gainValue > currentHighestGain) {
-      currentHighestGain = currGain.gainValue;
-      currentHighestGainLabel = dataLabels[i];
-      currentThreshold = currGain.threshold;
+      currentThreshold = threshold;
+      currentSplitInfo = splitInfo;
+      currentGainSplit = gainSplit;
     }
   }
-  return { currentHighestGainLabel, currentHighestGain, currentThreshold };
+  return [
+    currentHighestGainLabel,
+    currentHighestGain,
+    currentThreshold,
+    currentSplitInfo,
+    currentGainSplit
+  ];
 }
-
-// Refer to practice exam 1 decision tree for algorithim.
 
 // Calculates gain ratio from splitting on feature
 function calculateGainRatio(feature, continousMap, data, isGini, labelName) {
-  const isCategorical = !continousMap.get(feature).get(0);
-  const gainInfo = calculateGain(
+  const [gainInfo, threshold] = calculateGain(
     feature,
     continousMap,
     data,
@@ -67,16 +69,8 @@ function calculateGainRatio(feature, continousMap, data, isGini, labelName) {
     labelName
   );
   const splitInfo = calculateSplitInfo(feature, data);
-  if (isCategorical) {
-    if (splitInfo === 0) return 0;
-    return gainInfo / splitInfo;
-  } else {
-    if (splitInfo === 0) return 0;
-    return {
-      threshold: gainInfo.threshold,
-      gainValue: gainInfo.gainValue / splitInfo
-    };
-  }
+  const gainRatio = splitInfo === 0 ? 0 : gainInfo / splitInfo;
+  return [gainRatio, threshold, splitInfo, gainInfo];
 }
 
 function calculateSplitInfo(feature, data) {
@@ -95,20 +89,20 @@ function calculateSplitInfo(feature, data) {
 function calculateGain(feature, continousMap, data, isGini, labelName) {
   const isCategorical = !continousMap.get(feature).get(0);
   const overallImpurity = calculateImpurityValue(data, isGini, labelName);
+  let entropyValue = 0.0;
+  let threshold = 0.0;
+
   if (isCategorical) {
-    return overallImpurity - calculateEntropy(feature, data, isGini);
+    entropyValue = overallImpurity - calculateEntropy(feature, data, isGini);
   } else {
-    const continousInfo = calculateEntropyContinous(
-      feature,
-      data,
-      isGini,
-      labelName
-    );
-    return {
-      threshold: continousInfo.smallestEntropyThreshold,
-      gainValue: overallImpurity - continousInfo.smallestEntropyValue
-    };
+    const [
+      smallestEntropyThreshold,
+      smallestEntropyValue
+    ] = calculateEntropyContinous(feature, data, isGini, labelName);
+    entropyValue = overallImpurity - smallestEntropyValue;
+    threshold = smallestEntropyThreshold;
   }
+  return [entropyValue, threshold];
 }
 
 function calculateEntropyContinous(feature, data, isGini, labelName) {
@@ -140,7 +134,7 @@ function calculateEntropyContinous(feature, data, isGini, labelName) {
     }
   }
 
-  return { smallestEntropyThreshold, smallestEntropyValue };
+  return [smallestEntropyThreshold, smallestEntropyValue];
 }
 
 function calculateContinousEntropy(
@@ -325,16 +319,20 @@ export function buildTree(
 
   let splitDict = {};
 
-  const information = determineBestSplit(
+  const [
+    bestSplit,
+    gainAmount,
+    threshold,
+    splitInfo,
+    gainSplit
+  ] = determineBestSplit(
     featureClasses.keySeq().toArray(),
     continousClasses,
     data,
     isGini,
     label
   );
-  const bestSplit = information.currentHighestGainLabel;
-  const gainAmount = information.currentHighestGain;
-  const threshold = information.currentThreshold;
+
   const classArr = getMap(bestSplit, data, true, isGini, label);
 
   for (const classVal in classArr) {
@@ -365,7 +363,9 @@ export function buildTree(
               classVal,
               entropy,
               gainAmount,
-              currDepth
+              currDepth,
+              splitInfo,
+              gainSplit
             )
         },
         children: []

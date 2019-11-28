@@ -54,11 +54,21 @@ class DTree extends React.Component {
       currentHighlight: null,
       shownData: [],
       shownEntropy: 0.0,
-      shownGain: 0.0
+      shownGain: 0.0,
+      showGainSplit: 0.0,
+      shownSplitInfo: 0.0
     };
   }
 
-  presentData(shownData, classVal, entropy, highestGainInfo, currDepth) {
+  presentData(
+    shownData,
+    classVal,
+    entropy,
+    highestGainInfo,
+    currDepth,
+    splitInfo,
+    gainSplit
+  ) {
     this.setState({
       displayedDepth: currDepth,
       shownData: shownData,
@@ -67,7 +77,9 @@ class DTree extends React.Component {
         this.props.featureClasses
       ),
       shownEntropy: entropy,
-      shownGain: highestGainInfo
+      shownGain: highestGainInfo,
+      showGainSplit: gainSplit,
+      shownSplitInfo: splitInfo
     });
   }
 
@@ -195,6 +207,14 @@ class DTree extends React.Component {
         </h3>
         <h3 as="h3">
           Gain of parent: {roundToTwoDecimalPlaces(this.state.shownGain)}
+        </h3>
+        <h3 as="h3">
+          Split info of parent:{" "}
+          {roundToTwoDecimalPlaces(this.state.shownSplitInfo)}
+        </h3>
+        <h3 as="h3">
+          Gain Split of parent:{" "}
+          {roundToTwoDecimalPlaces(this.state.showGainSplit)}
         </h3>
       </div>
     );
