@@ -21,75 +21,90 @@ export function DTreeReducer(prevState = initialDtreeState, action) {
 
   switch (action.type) {
     case types.ADD_FEATURE_CLASS:
-      debugger;
-      let newEntry = newState.featureClasses
-        .get(action.feature)
-        .push(action.modify);
+      const newClass = action.modify.length > 0 ? action.modify : "Blank";
+      let newEntry = newState.featureClasses.get(action.feature).push(newClass);
       newState.featureClasses = newState.featureClasses.set(
         action.feature,
         newEntry
       );
       return newState;
     case types.DELETE_FEATURE_CLASS:
-      newState.featureClasses = newState.featureClasses.set(
-        action.feature,
-        newState.featureClasses
-          .get(action.feature)
-          .filter(modValue => modValue !== action.modify)
-      );
-      if (newState.featureClasses.get(action.feature).length === 0)
-        newState.featureClasses.delete(action.feature);
+      if (newState.featureClasses.get(action.feature).size > 1) {
+        newState.featureClasses = newState.featureClasses.set(
+          action.feature,
+          newState.featureClasses
+            .get(action.feature)
+            .filter(modValue => modValue !== action.modify)
+        );
+        if (newState.featureClasses.get(action.feature).size === 0)
+          newState.featureClasses.delete(action.feature);
+      }
       return newState;
     case types.ADD_FEATURE:
+      const newFeatureName =
+        action.feature.length > 0 ? action.feature : "Blank";
       newState.featureClasses = newState.featureClasses.set(
-        action.feature,
+        newFeatureName,
         List(["Sample"])
       );
       newState.continousClasses = newState.continousClasses.set(
-        action.feature,
-        [0, 100]
+        newFeatureName,
+        List([0, 100])
       );
       return newState;
     case types.DELETE_FEATURE:
-      newState.featureClasses = newState.featureClasses.delete(action.feature);
-      newState.continousClasses = newState.continousClasses.delete(
-        action.feature
-      );
+      if (newState.featureClasses.size > 1) {
+        newState.featureClasses = newState.featureClasses.delete(
+          action.feature
+        );
+        newState.continousClasses = newState.continousClasses.delete(
+          action.feature
+        );
+      }
       return newState;
     case types.ADD_LABEL_CLASS:
-      newState.labelClasses = newState.labelClasses.push(action.className);
+      const newLabelClassName =
+        action.className > 0 ? action.className : "Blank";
+      newState.labelClasses = newState.labelClasses.push(newLabelClassName);
       return newState;
     case types.DELETE_LABEL_CLASS:
-      newState.labelClasses = newState.labelClasses.filter(
-        className => className !== action.className
-      );
+      if (newState.labelClasses.size > 1) {
+        newState.labelClasses = newState.labelClasses.filter(
+          className => className !== action.className
+        );
+      }
       return newState;
     case types.CHANGE_LABEL_NAME:
-      newState.label = action.newName;
+      const newName = action.newName.length > 0 ? action.newName : "Blank";
+      newState.label = newName;
       return newState;
     case types.EDIT_FEATURE_NAME:
+      const newNameEdit = action.newName.length > 0 ? action.newName : "Blank";
       const prevData = newState.featureClasses.get(action.oldName);
       const prevContinousData = newState.continousClasses.get(action.oldName);
       newState.featureClasses = newState.featureClasses.delete(action.oldName);
       newState.featureClasses = newState.featureClasses.set(
-        action.newName,
+        newNameEdit,
         prevData
       );
       newState.continousClasses = newState.continousClasses.delete(
         action.oldName
       );
       newState.continousClasses = newState.continousClasses.set(
-        action.newName,
+        newNameEdit,
         prevContinousData
       );
       return newState;
     case types.SET_CONTINOUS_ATTRIBUTE_RANGE:
+      const bottomRange =
+        action.bottomRange.length > 0 ? action.bottomRange : 0;
+      const topRange = action.topRange.length > 0 ? action.topRange : 100;
       const currentToggleState = newState.continousClasses
         .get(action.feature)
         .get(0);
       newState.continousClasses = newState.continousClasses.set(
         action.feature,
-        List([currentToggleState, action.bottomRange, action.topRange])
+        List([currentToggleState, bottomRange, topRange])
       );
       return newState;
     case types.TOGGLE_CONTINOUS_ATTRIBUTE:

@@ -13,22 +13,28 @@ export function AssociationReducer(
 
   switch (action.type) {
     case types.ADD_TRANSACTION_TYPE:
-      if (!newState.transactionItems.includes(action.transactionItem)) {
+      const newTransactionItem =
+        action.transactionItem.length > 0 ? action.transactionItem : "Z";
+      if (!newState.transactionItems.includes(newTransactionItem)) {
         newState.transactionItems = newState.transactionItems.push(
-          action.transactionItem
+          newTransactionItem
         );
       }
       return newState;
     case types.DELETE_TRANSACTION_TYPE:
-      newState.transactionItems = newState.transactionItems.filter(
-        transactionItem => transactionItem !== action.transactionItem
-      );
+      if (newState.transactionItems.size > 1) {
+        newState.transactionItems = newState.transactionItems.filter(
+          transactionItem => transactionItem !== action.transactionItem
+        );
+      }
       return newState;
     case types.EDIT_TRANSACTION_TYPE:
-      if (!newState.transactionItems.includes(action.transactionItem)) {
+      const newTransactionItemEdit =
+        action.transactionItem.length > 0 ? action.transactionItem : "Z";
+      if (!newState.transactionItems.includes(newTransactionItemEdit)) {
         newState.transactionItems = newState.transactionItems.set(
           action.index,
-          action.transactionItem
+          newTransactionItemEdit
         );
       }
       return newState;
