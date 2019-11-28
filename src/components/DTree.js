@@ -6,6 +6,7 @@ import Back from "../Images/back.png";
 import Add from "../Images/add.png";
 import SomeTree from "../Images/SomeTree.png";
 import Trash from "../Images/trash.png";
+import CSVReader from "react-csv-reader";
 import {
   Image,
   Navbar,
@@ -365,6 +366,10 @@ class DTree extends React.Component {
     );
   }
 
+  translateToTable(data) {
+    console.log(data);
+  }
+
   showInformationBar() {
     return this.state.showFirstPage ? (
       <Col>
@@ -373,6 +378,7 @@ class DTree extends React.Component {
           "This data is the data we use to generate our decision tree. You can change the values on each column on each row, delete rows with the trashcan, randomize data with the shuffle button.",
           "left"
         )}
+        <CSVReader onFileLoaded={data => this.translateToTable(data)} />
         {this.showCustomDataTable()}
       </Col>
     ) : null;
