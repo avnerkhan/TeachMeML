@@ -26,7 +26,6 @@ import Add from "../Images/add.png";
 import Trash from "../Images/trash.png";
 import Shuffle from "../Images/shuffle.png";
 import Reset from "../Images/reset.png";
-import CSVReader from "react-csv-reader";
 import "../css_files/App.css";
 import "react-table/react-table.css";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
@@ -102,9 +101,6 @@ class Association extends React.Component {
 
     return (
       <div>
-        <CSVReader
-          onFileLoaded={data => this.translateToTableAssociation(data)}
-        />
         <Table responsive="sm">
           {displayInfoButton(
             "TimeSeries data",

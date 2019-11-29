@@ -576,18 +576,3 @@ export function refineTree(unrefinedTree) {
   }
   return unrefinedTree;
 }
-
-export function readCSV(data) {
-  let toReturn = [];
-  const headers = data[0];
-  const rowNum = data.length;
-  const colNum = headers.length;
-  for (let i = 1; i < rowNum; i++) {
-    let currentDataPiece = {};
-    for (let c = 0; c < colNum; c++) {
-      currentDataPiece[headers[c]] = data[i][c];
-    }
-    toReturn.push(currentDataPiece);
-  }
-  return toReturn;
-}

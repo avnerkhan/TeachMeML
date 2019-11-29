@@ -6,7 +6,6 @@ import Back from "../Images/back.png";
 import Add from "../Images/add.png";
 import SomeTree from "../Images/SomeTree.png";
 import Trash from "../Images/trash.png";
-import CSVReader from "react-csv-reader";
 import {
   Image,
   Navbar,
@@ -23,8 +22,7 @@ import {
   generateRandomDataState,
   addRow,
   refineTree,
-  changeDataRow,
-  readCSV
+  changeDataRow
 } from "../algorithims/DTreeAlgo";
 import "../css_files/App.css";
 import "react-table/react-table.css";
@@ -34,13 +32,6 @@ import {
   showBackToAlgorithimPage,
   roundToTwoDecimalPlaces
 } from "../Utility";
-import {
-  clearAllAttributes,
-  addFeature,
-  changeLabelName,
-  addLabelClass
-} from "../actions/DTreeActions";
-import { List } from "immutable";
 
 class DTree extends React.Component {
   constructor(props) {
@@ -373,57 +364,6 @@ class DTree extends React.Component {
       </Navbar>
     );
   }
-
-  changeReducerState(truncatedData) {
-    const rowNum = truncatedData.length;
-    const colNum = truncatedData[0].length;
-    for (let i = 0; i < colNum; i++) {
-      const headerForRow = truncatedData[0][i];
-      const isCategorical = isNaN(truncatedData[1][i]);
-      let minForRange = Number.MAX_SAFE_INTEGER;
-      let maxForRange = Number.MIN_SAFE_INTEGER;
-      let classLabels = [];
-
-      for (let c = 1; c < rowNum; c++) {
-        const newDataPoint = truncatedData[i][c];
-        if (isCategorical) {
-          if (!classLabels.includes(newDataPoint)) {
-            classLabels.push(newDataPoint);
-          }
-        } else {
-          minForRange = Math.min(minForRange, parseInt(newDataPoint));
-          maxForRange = Math.max(maxForRange, parseInt(newDataPoint));
-        }
-      }
-
-      if (i < colNum - 1) {
-        if (isCategorical) {
-          this.props.addFeature(headerForRow, List(classLabels));
-        } else {
-          this.props.addFeature(
-            headerForRow,
-            List(["Sample"]),
-            List([true, minForRange, maxForRange])
-          );
-        }
-      } else {
-        this.props.changeLabelName(headerForRow);
-        for (const label of classLabels) {
-          this.props.addLabelClass(label);
-        }
-      }
-    }
-  }
-
-  translateToTableDTree(data) {
-    this.props.clearAllAttributes();
-    const truncatedData = data.splice(0, 20);
-    this.changeReducerState(truncatedData);
-    this.setState({
-      data: readCSV(truncatedData)
-    });
-  }
-
   showInformationBar() {
     return this.state.showFirstPage ? (
       <Col>
@@ -432,7 +372,6 @@ class DTree extends React.Component {
           "This data is the data we use to generate our decision tree. You can change the values on each column on each row, delete rows with the trashcan, randomize data with the shuffle button.",
           "left"
         )}
-        <CSVReader onFileLoaded={data => this.translateToTableDTree(data)} />
         {this.showCustomDataTable()}
       </Col>
     ) : null;
@@ -453,13 +392,6 @@ class DTree extends React.Component {
   }
 }
 
-const mapDispatchToProps = {
-  clearAllAttributes,
-  addFeature,
-  changeLabelName,
-  addLabelClass
-};
-
 const mapStateToProps = state => ({
   continousClasses: state.DTree.continousClasses,
   featureClasses: state.DTree.featureClasses,
@@ -467,4 +399,4 @@ const mapStateToProps = state => ({
   labelClasses: state.DTree.labelClasses
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(DTree);
+export default connect(mapStateToProps)(DTree);
