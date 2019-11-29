@@ -9,14 +9,14 @@ export function KNNReducer(prevState = initialKNNState, action) {
   const newState = Object.create(prevState, {});
 
   switch (action.type) {
-    case types.ADD_LABEL_CLASS:
+    case types.ADD_LABEL_COLOR:
       const newColor =
         action.classColor.length > 0 ? action.classColor : "#FFFFFF";
       if (!newState.labels.includes(newColor)) {
         newState.labels = newState.labels.push(newColor);
       }
       return newState;
-    case types.DELETE_LABEL_CLASS:
+    case types.DELETE_LABEL_COLOR:
       if (newState.labels.size > 1) {
         newState.labels = newState.labels.filter(
           classColor => classColor !== action.classColor

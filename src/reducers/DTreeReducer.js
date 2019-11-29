@@ -45,11 +45,11 @@ export function DTreeReducer(prevState = initialDtreeState, action) {
         action.feature.length > 0 ? action.feature : "Blank";
       newState.featureClasses = newState.featureClasses.set(
         newFeatureName,
-        List(["Sample"])
+        action.classes
       );
       newState.continousClasses = newState.continousClasses.set(
         newFeatureName,
-        List([0, 100])
+        action.continousClasses
       );
       return newState;
     case types.DELETE_FEATURE:
@@ -125,6 +125,12 @@ export function DTreeReducer(prevState = initialDtreeState, action) {
 
       return newState;
 
+    case types.CLEAR_ALL_ATTRIBUTES:
+      newState.continousClasses = Map({});
+      newState.featureClasses = Map({});
+      newState.label = "";
+      newState.labelClasses = List([]);
+      return newState;
     default:
       break;
   }

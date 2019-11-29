@@ -1,9 +1,16 @@
 import * as types from "../types/DTreeTypes";
+import { List } from "immutable";
 
-export function addFeature(feature) {
+export function addFeature(
+  feature,
+  classes = List(["Sample"]),
+  continousClasses = List([false, 0, 100])
+) {
   return {
     type: types.ADD_FEATURE,
-    feature
+    feature,
+    classes,
+    continousClasses
   };
 }
 
@@ -72,5 +79,11 @@ export function toggleContinousAttribute(feature) {
   return {
     type: types.TOGGLE_CONTINOUS_ATTRIBUTE,
     feature
+  };
+}
+
+export function clearAllAttributes() {
+  return {
+    type: types.CLEAR_ALL_ATTRIBUTES
   };
 }

@@ -1,15 +1,15 @@
 import * as types from "../types/KNNTypes";
 
-export function deleteLabelClass(classColor) {
+export function deleteLabelColor(classColor) {
   return {
-    type: types.DELETE_LABEL_CLASS,
+    type: types.DELETE_LABEL_COLOR,
     classColor
   };
 }
 
-export function addLabelClass(classColor) {
+export function addLabelColor(classColor) {
   return {
-    type: types.ADD_LABEL_CLASS,
+    type: types.ADD_LABEL_COLOR,
     classColor
   };
 }

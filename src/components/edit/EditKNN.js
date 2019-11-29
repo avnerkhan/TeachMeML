@@ -1,7 +1,7 @@
 import React from "react";
 import {
-  addLabelClass,
-  deleteLabelClass,
+  addLabelColor,
+  deleteLabelColor,
   changeLabelColor
 } from "../../actions/KNNActions";
 import { Table, Image } from "react-bootstrap";
@@ -74,7 +74,7 @@ class EditKNN extends React.Component {
                         }
                       />
                     </td>
-                    <td onClick={() => this.props.deleteLabelClass(color)}>
+                    <td onClick={() => this.props.deleteLabelColor(color)}>
                       <Image src={Trash} className="small-photo" />
                     </td>
                   </tr>
@@ -106,7 +106,7 @@ class EditKNN extends React.Component {
                 <tr>
                   <td
                     onClick={() =>
-                      this.props.addLabelClass(this.state.addColor)
+                      this.props.addLabelColor(this.state.addColor)
                     }
                   >
                     <Image src={Add} className="small-photo" />
@@ -126,8 +126,8 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = {
-  addLabelClass,
-  deleteLabelClass,
+  addLabelColor,
+  deleteLabelColor,
   changeLabelColor
 };
 
