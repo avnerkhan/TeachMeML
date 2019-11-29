@@ -26,6 +26,7 @@ import Add from "../Images/add.png";
 import Trash from "../Images/trash.png";
 import Shuffle from "../Images/shuffle.png";
 import Reset from "../Images/reset.png";
+import CSVReader from "react-csv-reader";
 import "../css_files/App.css";
 import "react-table/react-table.css";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
@@ -91,100 +92,109 @@ class Association extends React.Component {
     );
   }
 
+  translateToTableAssociation(data) {
+    console.log(data);
+  }
+
   // Displays the JSX for transaction table
   displayTransactionTable() {
     let transactions = this.state.transactions;
 
     return (
-      <Table responsive="sm">
-        {displayInfoButton(
-          "TimeSeries data",
-          "Represents the list of transactions. To modify a row, press the letter inside to change its value. To add a column to the row, press plus. To delete a column from a row, press minus. If you want to run Apriori, press the right arrow to run a single iteration, until it cannot generate frequent itemsets anymore. If you want to run FP tree, press the button that does so.",
-          "left"
-        )}
-        <tbody>
-          {transactions.map((transaction, index) => {
-            return (
-              <tr>
-                <td>{index + 1}</td>
-                {transaction.map((item, index) => {
-                  return (
-                    <td
-                      onClick={() =>
-                        this.setState({
-                          transactions: changeItemInTransaction(
-                            transaction,
-                            item,
-                            index,
-                            this.state.transactions,
-                            this.props.transactionItems
-                          )
-                        })
-                      }
-                    >
-                      {item}
-                    </td>
-                  );
-                })}
-                <td
-                  onClick={() =>
-                    this.setState({
-                      transaction: changeTransactionState(
-                        index,
-                        true,
-                        this.state.transactions,
-                        this.props.transactionItems
-                      )
-                    })
-                  }
-                >
-                  +
-                </td>
-                <td
-                  onClick={() =>
-                    this.setState({
-                      transaction: changeTransactionState(
-                        index,
-                        false,
-                        this.state.transactions,
-                        this.props.transactionItems
-                      )
-                    })
-                  }
-                >
-                  -
-                </td>
-                <td
-                  onClick={() =>
-                    this.setState({
-                      transactions: deleteTransaction(
-                        index,
-                        this.state.transactions
-                      )
-                    })
-                  }
-                >
-                  <Image src={Trash} className="small-photo" />
-                </td>
-              </tr>
-            );
-          })}
-          <tr>
-            <td
-              onClick={() =>
-                this.setState({
-                  transactions: addNewTransaction(
-                    this.state.transactions,
-                    this.props.transactionItems
-                  )
-                })
-              }
-            >
-              <Image src={Add} className="small-photo" />
-            </td>
-          </tr>
-        </tbody>
-      </Table>
+      <div>
+        <CSVReader
+          onFileLoaded={data => this.translateToTableAssociation(data)}
+        />
+        <Table responsive="sm">
+          {displayInfoButton(
+            "TimeSeries data",
+            "Represents the list of transactions. To modify a row, press the letter inside to change its value. To add a column to the row, press plus. To delete a column from a row, press minus. If you want to run Apriori, press the right arrow to run a single iteration, until it cannot generate frequent itemsets anymore. If you want to run FP tree, press the button that does so.",
+            "left"
+          )}
+          <tbody>
+            {transactions.map((transaction, index) => {
+              return (
+                <tr>
+                  <td>{index + 1}</td>
+                  {transaction.map((item, index) => {
+                    return (
+                      <td
+                        onClick={() =>
+                          this.setState({
+                            transactions: changeItemInTransaction(
+                              transaction,
+                              item,
+                              index,
+                              this.state.transactions,
+                              this.props.transactionItems
+                            )
+                          })
+                        }
+                      >
+                        {item}
+                      </td>
+                    );
+                  })}
+                  <td
+                    onClick={() =>
+                      this.setState({
+                        transaction: changeTransactionState(
+                          index,
+                          true,
+                          this.state.transactions,
+                          this.props.transactionItems
+                        )
+                      })
+                    }
+                  >
+                    +
+                  </td>
+                  <td
+                    onClick={() =>
+                      this.setState({
+                        transaction: changeTransactionState(
+                          index,
+                          false,
+                          this.state.transactions,
+                          this.props.transactionItems
+                        )
+                      })
+                    }
+                  >
+                    -
+                  </td>
+                  <td
+                    onClick={() =>
+                      this.setState({
+                        transactions: deleteTransaction(
+                          index,
+                          this.state.transactions
+                        )
+                      })
+                    }
+                  >
+                    <Image src={Trash} className="small-photo" />
+                  </td>
+                </tr>
+              );
+            })}
+            <tr>
+              <td
+                onClick={() =>
+                  this.setState({
+                    transactions: addNewTransaction(
+                      this.state.transactions,
+                      this.props.transactionItems
+                    )
+                  })
+                }
+              >
+                <Image src={Add} className="small-photo" />
+              </td>
+            </tr>
+          </tbody>
+        </Table>
+      </div>
     );
   }
 

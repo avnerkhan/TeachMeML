@@ -366,7 +366,7 @@ class DTree extends React.Component {
     );
   }
 
-  translateToTable(data) {
+  translateToTableDTree(data) {
     console.log(data);
   }
 
@@ -378,7 +378,7 @@ class DTree extends React.Component {
           "This data is the data we use to generate our decision tree. You can change the values on each column on each row, delete rows with the trashcan, randomize data with the shuffle button.",
           "left"
         )}
-        <CSVReader onFileLoaded={data => this.translateToTable(data)} />
+        <CSVReader onFileLoaded={data => this.translateToTableDTree(data)} />
         {this.showCustomDataTable()}
       </Col>
     ) : null;
