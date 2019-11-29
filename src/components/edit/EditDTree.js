@@ -139,12 +139,14 @@ class EditDTree extends React.Component {
                     ) : null}
                     {isCategorical ? (
                       <td
-                        onClick={() =>
+                        onClick={() => {
+                          const refValue = "classInput" + index;
                           this.props.addFeatureClass(
                             feature,
-                            this.refs["classInput" + index].value
-                          )
-                        }
+                            this.refs[refValue].value
+                          );
+                          this.refs[refValue].value = "";
+                        }}
                       >
                         <Image src={Add} className="small-photo" />
                       </td>
@@ -198,9 +200,10 @@ class EditDTree extends React.Component {
                   />
                 </td>
                 <td
-                  onClick={() =>
-                    this.props.addLabelClass(this.refs["labelClass"].value)
-                  }
+                  onClick={() => {
+                    this.props.addLabelClass(this.refs["labelClass"].value);
+                    this.refs["labelClass"].value = "";
+                  }}
                 >
                   <Image src={Add} className="small-photo" />
                 </td>
@@ -216,9 +219,10 @@ class EditDTree extends React.Component {
                 </td>
                 <tr>
                   <td
-                    onClick={() =>
-                      this.props.addFeature(this.refs["featureInput"].value)
-                    }
+                    onClick={() => {
+                      this.props.addFeature(this.refs["featureInput"].value);
+                      this.refs["featureInput"].value = "";
+                    }}
                   >
                     <Image src={Add} className="small-photo" />
                   </td>

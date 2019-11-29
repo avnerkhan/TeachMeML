@@ -105,9 +105,12 @@ class EditKNN extends React.Component {
                 </td>
                 <tr>
                   <td
-                    onClick={() =>
-                      this.props.addLabelColor(this.state.addColor)
-                    }
+                    onClick={() => {
+                      this.props.addLabelColor(this.state.addColor);
+                      this.setState({
+                        addColor: ""
+                      });
+                    }}
                   >
                     <Image src={Add} className="small-photo" />
                   </td>

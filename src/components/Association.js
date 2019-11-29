@@ -91,10 +91,6 @@ class Association extends React.Component {
     );
   }
 
-  translateToTableAssociation(data) {
-    console.log(data);
-  }
-
   // Displays the JSX for transaction table
   displayTransactionTable() {
     let transactions = this.state.transactions;

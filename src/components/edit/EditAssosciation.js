@@ -52,9 +52,10 @@ class EditAssociation extends React.Component {
                 </td>
                 <tr>
                   <td
-                    onClick={() =>
-                      this.props.addTransactionType(this.refs["input"].value)
-                    }
+                    onClick={() => {
+                      this.props.addTransactionType(this.refs["input"].value);
+                      this.refs["input"].value = "";
+                    }}
                   >
                     <Image src={Add} className="small-photo" />
                   </td>
