@@ -1,3 +1,7 @@
+/*
+  This is the page that is presented on the startup of the application, and has links to pretty much all other pages
+*/
+
 import React from "react";
 import "../css_files/App.css";
 import { Navbar, Nav, Dropdown } from "react-bootstrap";
@@ -15,6 +19,8 @@ class Pick extends React.Component {
       ]
     };
   }
+
+  // Shows top nav bar with links to "What is" page, and other dropdowns
   showOverallNavBar() {
     return (
       <Navbar fixed="top" bg="dark" variant="dark">
@@ -30,6 +36,7 @@ class Pick extends React.Component {
     );
   }
 
+  // Shows each dropdown component, with link to corresponding page
   showDropdown(type) {
     return (
       <Dropdown>
@@ -51,6 +58,7 @@ class Pick extends React.Component {
     );
   }
 
+  // Top level of page
   render() {
     return (
       <div className="App">

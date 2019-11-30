@@ -1,7 +1,11 @@
+/*
+Reducer logic for KNN. Reducers handle state management throughout application
+*/
 import * as types from "../types/KNNTypes";
 import { List } from "immutable";
 
 const initialKNNState = {
+  // List of colors that represents our labels
   labels: List(["#32CD32", "#FF6347", "#0000FF"])
 };
 

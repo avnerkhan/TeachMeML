@@ -1,18 +1,26 @@
+/*
+Reducer logic for decision tree. Reducers handle state management throughout application
+*/
+
 import * as types from "../types/DTreeTypes";
 import { Map, List } from "immutable";
 
 const initialDtreeState = {
+  // Holds bottom and top ranges for each attribute, and whether or not is currently toggled to continous
   continousClasses: Map({
     Passed: List([false, 0, 100]),
     GPA: List([false, 0, 100]),
     Language: List([false, 0, 100])
   }),
+  // Holds all potential labels for each feature, if categorical
   featureClasses: Map({
     Passed: List(["Yes", "No"]),
     GPA: List(["4.0", "2.0"]),
     Language: List(["Python", "Java", "C++"])
   }),
+  // Current name of label
   label: "Good Student",
+  // Classifcations of label
   labelClasses: List(["Yes", "No"])
 };
 

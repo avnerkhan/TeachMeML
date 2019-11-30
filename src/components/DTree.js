@@ -1,4 +1,8 @@
 /* eslint-disable */
+
+/*
+  DTree Play Page
+*/
 import React from "react";
 import Tree from "react-tree-graph";
 import Shuffle from "../Images/shuffle.png";
@@ -37,33 +41,44 @@ class DTree extends React.Component {
   constructor(props) {
     super(props);
 
-    // State contains data. features are categorical, and label is last
-    // Feature keys are ints so they are easily indexable
     this.state = {
+      // Determines whether we use gini or entropy function
       isGini: true,
+      // Determines whether we should render the tree
       renderTree: false,
+      // Determines whether we should show the first page
       showFirstPage: true,
+      // The displayed depth shown on the tree page when clicking a node
       displayedDepth: -1,
+      // The current state of the tree
       treeState: {},
+      // Data shown in table
       data: generateRandomDataState(
         this.props.featureClasses,
         this.props.continousClasses,
         this.props.labelClasses,
         this.props.label
       ),
+      // Currently highlited column when clicking a node
       currentHighlight: null,
+      // Shown data when clicking a node
       shownData: [],
-      shownEntropy: 0.0,
+      // Shown impurity when clicking a node
+      shownImpurity: 0.0,
+      // Shown information gain ratio when clicking a node
       shownGain: 0.0,
+      // Shown gain split when clicking a node
       showGainSplit: 0.0,
+      // Shown splitinfo when clicking a node
       shownSplitInfo: 0.0
     };
   }
 
+  // Presents the data seen when clicking a node on the rendered tree
   presentData(
     shownData,
     classVal,
-    entropy,
+    impurity,
     highestGainInfo,
     currDepth,
     splitInfo,
@@ -76,7 +91,7 @@ class DTree extends React.Component {
         classVal,
         this.props.featureClasses
       ),
-      shownEntropy: entropy,
+      shownImpurity: impurity,
       shownGain: highestGainInfo,
       showGainSplit: gainSplit,
       shownSplitInfo: splitInfo
@@ -107,6 +122,7 @@ class DTree extends React.Component {
     });
   }
 
+  // Shows selectable values for each data point on data table
   showSelectionForRow(value, key, dataIndex) {
     const valueClasses =
       this.props.featureClasses.get(key) != undefined
@@ -198,12 +214,14 @@ class DTree extends React.Component {
     );
   }
 
+  // Shows the level, impurity, gain , split info, and other info when clicking on a node
   showImpurityAndGain() {
     return (
       <div>
         <h3 as="h3">At level {this.state.displayedDepth}</h3>
         <h3 as="h3">
-          Impurity of parent: {roundToTwoDecimalPlaces(this.state.shownEntropy)}
+          Impurity of parent:{" "}
+          {roundToTwoDecimalPlaces(this.state.shownImpurity)}
         </h3>
         <h3 as="h3">
           Gain of parent: {roundToTwoDecimalPlaces(this.state.shownGain)}
@@ -220,6 +238,7 @@ class DTree extends React.Component {
     );
   }
 
+  // Basically shows the page once the decision tree has been created
   displayTreeInformation() {
     return this.state.renderTree ? (
       <Row>
@@ -252,6 +271,7 @@ class DTree extends React.Component {
     ) : null;
   }
 
+  // The generate tree button on the nav bar
   showDisplayButton() {
     return this.state.showFirstPage ? (
       <OverlayTrigger
@@ -274,6 +294,7 @@ class DTree extends React.Component {
     ) : null;
   }
 
+  // The add row button on the nav bar
   showAddRowButton() {
     return this.state.showFirstPage && !this.state.showLearnMode ? (
       <OverlayTrigger
@@ -294,6 +315,7 @@ class DTree extends React.Component {
     ) : null;
   }
 
+  // The randomize data button on the nav bar
   showRandomizeDataButton() {
     return this.state.showFirstPage && !this.state.showLearnMode ? (
       <OverlayTrigger
@@ -319,6 +341,7 @@ class DTree extends React.Component {
     ) : null;
   }
 
+  // The back to data button on the nav bar
   showBackToDataButton() {
     return this.state.renderTree ? (
       <Nav.Link
@@ -334,10 +357,12 @@ class DTree extends React.Component {
     ) : null;
   }
 
+  // A custom back to algorithim page
   showBackToAlgorithimPageCustom() {
     return this.state.showFirstPage ? showBackToAlgorithimPage() : null;
   }
 
+  // Entropy or gini selection on nav bar
   showEntropyOrGiniSelection() {
     return !this.state.renderTree ? (
       <div>
@@ -352,6 +377,7 @@ class DTree extends React.Component {
     ) : null;
   }
 
+  // Shows overall nav bar for devision tree
   showDecisionTreeNavBar() {
     return (
       <Navbar fixed="top" bg="dark" variant="dark">
@@ -364,7 +390,9 @@ class DTree extends React.Component {
       </Navbar>
     );
   }
-  showInformationBar() {
+
+  // Shows first page before decision tree
+  showFirstPage() {
     return this.state.showFirstPage ? (
       <Col>
         {displayInfoButton(
@@ -383,7 +411,7 @@ class DTree extends React.Component {
         <div className="App-header">
           {this.showDecisionTreeNavBar()}
           <Row>
-            {this.showInformationBar()}
+            {this.showFirstPage()}
             <Col>{this.displayTreeInformation()}</Col>
           </Row>
         </div>

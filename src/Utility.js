@@ -14,7 +14,7 @@ export function euclidFunction(pointOne, pointTwo) {
   return { orginalPoint: pointOne, distance: totalDistance };
 }
 
-// Comparator for KNN
+// Comparator function for KNN and Clustering
 export function comparator(entryOne, entryTwo) {
   if (entryOne.distance < entryTwo.distance) {
     return -1;
@@ -26,10 +26,12 @@ export function comparator(entryOne, entryTwo) {
   return 0;
 }
 
+// Just returns an array of ints from lowerBound to upperBound
 export function arrayRange(lowerBound, upperBound) {
   return Array.from(new Array(upperBound), (x, i) => i + lowerBound);
 }
 
+// Content for info button
 function showInformationSlide(title, text) {
   return (
     <Popover id="popover-basic">
@@ -43,6 +45,7 @@ export function roundToTwoDecimalPlaces(num) {
   return Math.round(num * 100) / 100;
 }
 
+// Displays the info button
 export function displayInfoButton(title, text, placement) {
   return (
     <OverlayTrigger
@@ -55,6 +58,7 @@ export function displayInfoButton(title, text, placement) {
   );
 }
 
+// Link/button back to base page
 export function showBackToAlgorithimPage() {
   return (
     <Link to="/">
@@ -65,6 +69,7 @@ export function showBackToAlgorithimPage() {
   );
 }
 
+// Link/button back to base page, but is an entire nav bar itself
 export function showBasicBackNavBar() {
   return (
     <Navbar fixed="top" bg="dark" variant="dark">

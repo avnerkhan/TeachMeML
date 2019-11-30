@@ -1,7 +1,11 @@
+/*
+Reducer logic for Association. Reducers handle state management throughout application
+*/
 import * as types from "../types/AssociationTypes";
 import { List } from "immutable";
 
 const initialAssociationState = {
+  // List of all potential transactions
   transactionItems: List(["A", "B", "C", "D", "E"])
 };
 

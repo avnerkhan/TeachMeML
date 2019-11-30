@@ -1,4 +1,9 @@
 /* eslint-disable */
+
+/*
+  KNN play page
+*/
+
 import React from "react";
 import {
   XYPlot,
@@ -42,9 +47,13 @@ class KNN extends React.Component {
     const randomData = generateRandomData(30, 100, this.props.labels);
 
     this.state = {
+      // What our "K" in KNN is set to
       k: 1,
+      // Data on the plot that is currently labeled
       labeledData: randomData,
+      // Data on the plot that is undetermined
       undeterminedData: [],
+      // Data on the plot that is highlighted (user is hovering over an undetermined, and highlights what our algorithim will pick)
       currentHighlightData: []
     };
   }
@@ -142,6 +151,7 @@ class KNN extends React.Component {
     });
   }
 
+  // Generates random underterimend data and adds them to the plot
   generateRandomUndetermined(length = 20, max = 100) {
     for (let i = 0; i < length; i++) {
       const randomX = Math.floor(Math.random() * max);
@@ -150,6 +160,7 @@ class KNN extends React.Component {
     }
   }
 
+  // Shows the randomize undeterimened data button
   showRandomizeUndeterminedDataButton() {
     return Object.keys(this.state.labeledData).length > 0 ? (
       <OverlayTrigger
@@ -164,6 +175,7 @@ class KNN extends React.Component {
     ) : null;
   }
 
+  // Shows the randomize data button (labeled data)
   showRandomizeDataButton() {
     return (
       <OverlayTrigger
@@ -184,6 +196,7 @@ class KNN extends React.Component {
     );
   }
 
+  // Shows add button
   showAddButton() {
     return Object.keys(this.state.labeledData).length > 0 ? (
       <OverlayTrigger
@@ -202,16 +215,19 @@ class KNN extends React.Component {
     ) : null;
   }
 
+  // Shows X and Y input bar for entry of point
   showXandYInputBar() {
     return Object.keys(this.state.labeledData).length > 0
       ? this.showXandYInput()
       : null;
   }
 
+  // Shows dropdown selection for K
   showKSelection() {
     return this.state.undeterminedData.length > 0 ? this.showKSelect() : null;
   }
 
+  // Shows nav bar for this component
   showKNNNavBar() {
     return (
       <Navbar fixed="top" bg="dark" variant="dark">
@@ -225,6 +241,7 @@ class KNN extends React.Component {
     );
   }
 
+  // Shows the points on the plot that are labeled
   showLabeledMarkSeries() {
     return Object.keys(this.state.labeledData).map(color => {
       return (
@@ -240,6 +257,36 @@ class KNN extends React.Component {
     });
   }
 
+  showUnlabeledMarkSeries() {
+    return (
+      <MarkSeries
+        className="mark-series-example"
+        strokeWidth={2}
+        opacity="0.8"
+        sizeRange={[0, 100]}
+        onValueMouseOut={() => this.setState({ currentHighlightData: [] })}
+        onValueMouseOver={datapoint => this.highlightK(datapoint, false)}
+        onValueClick={datapoint => this.highlightK(datapoint, true)}
+        color={this.stateEnum.UNLABELED}
+        data={this.state.undeterminedData}
+      />
+    );
+  }
+
+  showHighlightedMarkSeries() {
+    return (
+      <MarkSeries
+        className="mark-series-example"
+        strokeWidth={2}
+        opacity="0.8"
+        sizeRange={[0, 100]}
+        color={this.stateEnum.HIGHLIGHT}
+        data={this.state.currentHighlightData}
+      />
+    );
+  }
+
+  // Shows all mark series together, as one plot
   displayKNNExperiement() {
     return (
       <div>
@@ -254,25 +301,8 @@ class KNN extends React.Component {
           <XAxis />
           <YAxis />
           {this.showLabeledMarkSeries()}
-          <MarkSeries
-            className="mark-series-example"
-            strokeWidth={2}
-            opacity="0.8"
-            sizeRange={[0, 100]}
-            onValueMouseOut={() => this.setState({ currentHighlightData: [] })}
-            onValueMouseOver={datapoint => this.highlightK(datapoint, false)}
-            onValueClick={datapoint => this.highlightK(datapoint, true)}
-            color={this.stateEnum.UNLABELED}
-            data={this.state.undeterminedData}
-          />
-          <MarkSeries
-            className="mark-series-example"
-            strokeWidth={2}
-            opacity="0.8"
-            sizeRange={[0, 100]}
-            color={this.stateEnum.HIGHLIGHT}
-            data={this.state.currentHighlightData}
-          />
+          {this.showUnlabeledMarkSeries()}
+          {this.showHighlightedMarkSeries()}
         </XYPlot>
       </div>
     );
