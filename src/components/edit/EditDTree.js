@@ -25,6 +25,7 @@ class EditDTree extends React.Component {
     super(props);
   }
 
+  // Checks whether we are allowed to toggle a specific feature
   canToggle(featureToCheck) {
     let isToggledCount = 0;
     for (const feature of this.props.continousClasses.keySeq().toArray()) {

@@ -22,11 +22,11 @@ export function generateRandomColors() {
 
 // Generates a single random hex color
 function newRandomColor() {
-  let potential = "ABCDEF0123456789";
+  const potential = "ABCDEF0123456789";
   let toReturn = "#";
 
   for (let i = 0; i < 6; i++) {
-    let randomHexIndex = Math.floor(Math.random() * potential.length);
+    const randomHexIndex = Math.floor(Math.random() * potential.length);
     toReturn += potential.substring(randomHexIndex, randomHexIndex + 1);
   }
 
@@ -59,13 +59,13 @@ export function runDBScan(
 
           if (newPoint.label == undefined) {
             newPoint.label = clusters;
-            let newNeighbhors = unlabeled.filter(
+            const newNeighbhors = unlabeled.filter(
               comparePoint =>
                 euclidFunction(newPoint, comparePoint).distance <= minEps
             );
 
             if (newNeighbhors.length >= minPts) {
-              for (let nextDoor of newNeighbhors) neighbhors.push(nextDoor);
+              for (const nextDoor of newNeighbhors) neighbhors.push(nextDoor);
             }
           }
         }
@@ -80,7 +80,7 @@ export function runDBScan(
 
 // Takes data and places into clusters based on label
 function relabelData(newData, clusterData, outlierData) {
-  for (let point of newData) {
+  for (const point of newData) {
     if (point.label === 0) {
       outlierData.push(point);
     } else {
@@ -94,13 +94,13 @@ function relabelData(newData, clusterData, outlierData) {
 
 // Restarts DBScan by making all points unlabeled again
 export function unclusterData(unlabeled, outliers, clusters) {
-  for (let cluster of clusters) {
-    for (let point of cluster) {
+  for (const cluster of clusters) {
+    for (const point of cluster) {
       unlabeled.push({ x: point.x, y: point.y });
     }
   }
 
-  for (let outlier of outliers) {
+  for (const outlier of outliers) {
     unlabeled.push({ x: outlier.x, y: outlier.y });
   }
 
@@ -117,17 +117,17 @@ export function runIteration(centroidData, clusterData, unlabeledData) {
           euclidFunction(centroid, point)
         );
         nearestMap.sort(comparator);
-        let nearestCentroid = nearestMap[0].orginalPoint;
+        const nearestCentroid = nearestMap[0].orginalPoint;
         clusterData[centroidData.indexOf(nearestCentroid)].push(point);
       }
     }
   } else {
     for (let count = 0; count < clusterData.length; count++) {
-      let cluster = clusterData[count];
+      const cluster = clusterData[count];
       let xAvg = 0.0;
       let yAvg = 0.0;
 
-      for (let point of cluster) {
+      for (const point of cluster) {
         xAvg += point.x;
         yAvg += point.y;
         unlabeledData.push(point);
@@ -136,7 +136,7 @@ export function runIteration(centroidData, clusterData, unlabeledData) {
       xAvg = xAvg / cluster.length;
       yAvg = yAvg / cluster.length;
 
-      let newCentroid = { x: xAvg, y: yAvg };
+      const newCentroid = { x: xAvg, y: yAvg };
       centroidData[count] = newCentroid;
       clusterData[count] = [];
     }
@@ -160,12 +160,12 @@ export function smallClusterDrop(
   newData
 ) {
   if (!choosingCentroidState && !runningKMeans) {
-    let xCoord = Math.floor((e.screenX - 315) / 5.5);
-    let yCoord = Math.floor(100 - (e.screenY - 170) / 5.5);
+    const xCoord = Math.floor((e.screenX - 315) / 5.5);
+    const yCoord = Math.floor(100 - (e.screenY - 170) / 5.5);
 
     if (newData[0].x === 0 && newData[0].y === 0) newData.shift();
 
-    let cardinal = [
+    const cardinal = [
       [0, 0],
       [-1, 0],
       [0, -1],
@@ -178,7 +178,7 @@ export function smallClusterDrop(
     ];
 
     for (let i = 0; i < numberPoints; i++) {
-      let direction = cardinal[i];
+      const direction = cardinal[i];
       newData.push({
         x: xCoord + direction[0] * factor,
         y: yCoord + direction[1] * factor

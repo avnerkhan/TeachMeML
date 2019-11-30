@@ -36,18 +36,31 @@ class Association extends React.Component {
     super(props);
 
     this.state = {
+      // Current state of FPTree
       treeState: {},
+      // Whether we are currently rendering the tree or not
       renderTree: false,
+      // Whether our currently selected algorihtim is apriori
       isApriori: false,
+      // If our entire apriori algorihtim has finished
       isDoneApriori: false,
+      // Whether our currnetl selected algorithim is FPTree
       isFPTree: false,
+      // Minsup value
       minSup: 2,
+      // Minconf value
       minConf: 40,
+      // List of frequent itemsets
       frequentItemSet: [],
+      // Which members of our frequent itemset have been pruned via minsup
       minSupPruned: new Set(),
+      // Which members of our frequent itemset have been pruned via apriori
       aprioriPruned: new Set(),
+      // Strong rules generated from our algorithim
       strongRules: [],
+      // Reordered DB for FP Growth
       reorderedDB: [],
+      // Transactions data table
       transactions: generateRandomTransaction(this.props.transactionItems)
     };
   }

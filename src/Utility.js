@@ -1,3 +1,7 @@
+/*
+  Utility functions used throughout the application
+*/
+
 import React from "react";
 import { Popover, OverlayTrigger, Image, Nav, Navbar } from "react-bootstrap";
 import { Link } from "react-router-dom";

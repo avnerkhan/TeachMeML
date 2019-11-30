@@ -16,8 +16,11 @@ class EditKNN extends React.Component {
     super(props);
 
     this.state = {
+      // Array to determine whether we show the color wheel for a particular color
       renderColorWheel: this.generateFalseArray(this.props.labels.size),
+      // Determine to show color wheel for new color
       renderColorWheelAdd: false,
+      // Current color of new color
       addColor: ""
     };
   }

@@ -36,6 +36,7 @@ class Clustering extends React.Component {
   constructor(props) {
     super(props);
 
+    // Enum for hold state representations and colors
     this.stateEnum = {
       UNLABELED: "#FFFFFF",
       CENTROID: "#000000",
@@ -46,17 +47,29 @@ class Clustering extends React.Component {
     };
 
     this.state = {
+      // Currently selected algorithim
       algorithim: this.stateEnum.KMEANS,
+      // Current value for spacing
       spacing: 1,
+      // Current number of points deployed per click
       pointNum: 1,
+      // Current minEps value
       minEps: 3,
+      // Current minPts value
       minPts: 3,
+      // Whether we have started running DBScan
       runningDBScan: false,
+      // Whether we are ready to start running KMeans
       readyToStartState: false,
+      // Whether we are in choosing centroid state for KMeans
       choosingCentroidState: false,
+      // Whether we are currently running KMeans
       runningKMeans: false,
+      // Current unlabeled data
       unlabeledData: [{ x: 0, y: 0 }],
+      // Current data that has already been cluster
       clusteredData: generateEmptyCluster(),
+      // Current centroid datapoints
       centroidData: []
     };
   }
@@ -317,7 +330,6 @@ class Clustering extends React.Component {
       </Navbar>
     );
   }
-
   displayClusterDeploymentArea() {
     return (
       <XYPlot
