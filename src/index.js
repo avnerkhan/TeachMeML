@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
+import RegressionLearn from "./components/learn/RegressionLearn";
 import DTreeLearn from "./components/learn/DTreeLearn";
 import KNNLearn from "./components/learn/KNNLearn";
 import ClusteringLearn from "./components/learn/ClusteringLearn";
@@ -12,6 +13,7 @@ import Pick from "./components/Pick";
 import DTree from "./components/DTree";
 import KNN from "./components/KNN";
 import Association from "./components/Association";
+import Regression from "./components/Regression";
 import Intro from "./components/learn/Intro";
 import * as serviceWorker from "./serviceWorker";
 import { BrowserRouter, Route } from "react-router-dom";
@@ -36,6 +38,7 @@ const webroutes = (
       <div>
         <Route exact path="/" component={Pick} />
         <Route exact path="/Intro" component={Intro} />
+        <Route exact path="/RegressionPlay" component={Regression} />
         <Route exact path="/DecisionTreePlay" component={DTree} />
         <Route exact path="/K-NearestNeighborsPlay" component={KNN} />
         <Route exact path="/ClusteringPlay" component={Clustering} />
@@ -43,6 +46,7 @@ const webroutes = (
         <Route exact path="/DecisionTreeEdit" component={DTreeEdit} />
         <Route exact path="/K-NearestNeighborsEdit" component={KNNEdit} />
         <Route exact path="/AssociationEdit" component={AssociationEdit} />
+        <Route exact path="/RegressionLearn" component={RegressionLearn} />
         <Route exact path="/DecisionTreeLearn" component={DTreeLearn} />
         <Route exact path="/K-NearestNeighborsLearn" component={KNNLearn} />
         <Route exact path="/ClusteringLearn" component={ClusteringLearn} />
