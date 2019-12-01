@@ -46,6 +46,8 @@ class Clustering extends React.Component {
       OUTLIER: 0
     };
 
+    this.XYPlotRef = null;
+
     this.state = {
       // Currently selected algorithim
       algorithim: this.stateEnum.KMEANS,

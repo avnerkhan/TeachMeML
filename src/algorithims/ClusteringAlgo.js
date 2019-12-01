@@ -160,8 +160,8 @@ export function smallClusterDrop(
   newData
 ) {
   if (!choosingCentroidState && !runningKMeans) {
-    const xCoord = Math.floor((e.screenX - 315) / 5.5);
-    const yCoord = Math.floor(100 - (e.screenY - 170) / 5.5);
+    const xCoord = Math.floor((e.pageX - 260) / 5.5);
+    const yCoord = Math.floor(100 - (e.pageY - 170) / 5.5);
 
     if (newData[0].x === 0 && newData[0].y === 0) newData.shift();
 
