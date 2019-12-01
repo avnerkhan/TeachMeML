@@ -335,8 +335,8 @@ class Clustering extends React.Component {
   displayClusterDeploymentArea() {
     return (
       <XYPlot
-        width={600}
-        height={600}
+        width={550}
+        height={550}
         onClick={e => {
           const newData = smallClusterDrop(
             e,

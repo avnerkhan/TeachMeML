@@ -71,7 +71,7 @@ class Pick extends React.Component {
           </p>
           <p className="line-2 anim-typewriter">
             {" "}
-            people machine learning in the easiest, most fun way possible{" "}
+            people machine learning algorithims in an easy and fun way.{" "}
           </p>
         </header>
       </div>
