@@ -15,6 +15,7 @@ class Intro extends React.Component {
         <div className="App-header-low">
           {showBasicBackNavBar()}
           <h2>What is Data Mining?</h2>
+          <br />
           <p>
             In general, Data Mining is taking a bunch of previous data, passing
             it into a Machine Learning algorithm, creating a model from that
@@ -24,11 +25,10 @@ class Intro extends React.Component {
             new to Data Mining learn some of the fundamental algorithms in an
             interactive way. For each model presented, there is an interactive
             playground for the model, and an informational page that gives a
-            brief summary of what is going on in building the model. But before
-            you even get started with that, keep reading this page to learn
-            more.
+            brief summary of how that model is built. But before you even get
+            started with that, keep reading this page to learn more.
           </p>
-          <h2>Supervised and Unsupervised</h2>
+          <h2>Supervised and Unsupervised algorithms</h2>
           <p>
             There are two general categories of Machine Learning that we will
             focus on in this website, Supervised and Unsupervised.
@@ -41,11 +41,12 @@ class Intro extends React.Component {
           <Image src={Labeled} className="large-photo" />
           <Image src={Unlabeled} className="large-photo" />
           <p>
-            The last column in the row is the classification given to each row.
-            This is usually called the label. All the other columns are called
-            Features. Our goal is to create a model using the first four rows
-            and using that model, we can correctly classify the label of the
-            last row.
+            The last column in the row is the classification given to each row
+            (i.e. mammal, reptile, fish). This is usually called the label. All
+            the other columns are called Features. Our goal is to create a model
+            using the first four rows of each entry in the dataset and using
+            that model, we can correctly classify the label for any future
+            pieces of data.
           </p>
           <h3>Unsupervised</h3>
           <p>

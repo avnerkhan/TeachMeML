@@ -7,6 +7,7 @@ import ThreeSet from "../../Images/3-set.png";
 import Conditonal from "../../Images/Conditional.png";
 import FPTree from "../../Images/FPTree.png";
 import Sorted from "../../Images/Sorted.png";
+import Conf from "../../Images/Conf.png";
 import { showBasicBackNavBar } from "../../Utility";
 
 class AprioriLearn extends React.Component {
@@ -101,6 +102,21 @@ class AprioriLearn extends React.Component {
             the frequent itemsets. Example is shown below
           </p>
           <Image src={Sorted} className="large-photo" />
+          <h2>Strong Rules</h2>
+          <p>
+            Once we have our frequent itemsets, we may want to find which
+            itemsets lead to other itemsets. For example, seeing "Bread" in our
+            transaction set can lead us to have a 60% confidence of seeing a set
+            of "Milk and Beer". Take the following photo for a better example.
+          </p>
+          <Image src={Conf} className="large-photo" />
+          <p>
+            The confidence of getting "Milk" from "Bread and Diapers" is 75%. We
+            calculate this by taking the support count of the entire set of
+            transactions together "Milk, Bread, and Diapers" is 3, while the
+            support count of the antecendent is "Bread and Diapers". is 4. We
+            plug it into this formula to acheive our 3/4, which is 75%.
+          </p>
           <h2>When to use FPTree vs Apriori</h2>
           <p>
             Although FPTree and Apriori come out to the same result, the one

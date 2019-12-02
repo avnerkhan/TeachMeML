@@ -51,7 +51,8 @@ class DTreeLearn extends React.Component {
             at that feature. To calculate gain, we have to calculate the
             “impurity” of the current overall dataset and the “impurity” of each
             of the feature in the dataset. Impurity is basically a measure of
-            how pure the dataset is by the class label
+            how pure the dataset is by the class label. For example, a
+            completely pure dataset would have all the same labels.
           </p>
           <p>
             To calculate impurity of the overall dataset, we basically take the
