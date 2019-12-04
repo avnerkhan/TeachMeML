@@ -15,7 +15,9 @@ class Pick extends React.Component {
         "Decision Tree",
         "K-Nearest Neighbors",
         "Clustering",
-        "Association"
+        "Association",
+        "Regression",
+        "Anomaly"
       ]
     };
   }
@@ -43,7 +45,12 @@ class Pick extends React.Component {
         <Dropdown.Toggle variant="secondary">{type}</Dropdown.Toggle>
         <Dropdown.Menu>
           {this.state.algorithims.map(algo => {
-            return !(algo === "Clustering" && type === "Edit") ? (
+            return !(
+              (algo === "Clustering" ||
+                algo === "Anomaly" ||
+                algo === "Regression") &&
+              type === "Edit"
+            ) ? (
               <Dropdown.Item
                 onClick={() =>
                   this.props.history.push("/" + algo.replace(/\s+/g, "") + type)

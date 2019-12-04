@@ -6,6 +6,7 @@ import DTreeLearn from "./components/learn/DTreeLearn";
 import KNNLearn from "./components/learn/KNNLearn";
 import ClusteringLearn from "./components/learn/ClusteringLearn";
 import AssociationLearn from "./components/learn/AssociationLearn";
+import AnomalyLearn from "./components/learn/AnomalyLearn";
 import DTreeEdit from "./components/edit/EditDTree";
 import KNNEdit from "./components/edit/EditKNN";
 import AssociationEdit from "./components/edit/EditAssosciation";
@@ -14,6 +15,7 @@ import DTree from "./components/DTree";
 import KNN from "./components/KNN";
 import Association from "./components/Association";
 import Regression from "./components/Regression";
+import Anomaly from "./components/Anomaly";
 import Intro from "./components/learn/Intro";
 import * as serviceWorker from "./serviceWorker";
 import { BrowserRouter, Route } from "react-router-dom";
@@ -43,9 +45,12 @@ const webroutes = (
         <Route exact path="/K-NearestNeighborsPlay" component={KNN} />
         <Route exact path="/ClusteringPlay" component={Clustering} />
         <Route exact path="/AssociationPlay" component={Association} />
+        <Route exact path="/RegressionPlay" component={Regression} />
+        <Route exact path="/AnomalyPlay" component={Anomaly} />
         <Route exact path="/DecisionTreeEdit" component={DTreeEdit} />
         <Route exact path="/K-NearestNeighborsEdit" component={KNNEdit} />
         <Route exact path="/AssociationEdit" component={AssociationEdit} />
+        <Route exact path="/AnomalyLearn" component={AnomalyLearn} />
         <Route exact path="/RegressionLearn" component={RegressionLearn} />
         <Route exact path="/DecisionTreeLearn" component={DTreeLearn} />
         <Route exact path="/K-NearestNeighborsLearn" component={KNNLearn} />
