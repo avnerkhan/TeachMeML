@@ -12,8 +12,10 @@ class AnomalyLearn extends React.Component {
   render() {
     return (
       <div className="App">
-        <div className="App-header">Anomaly Learn</div>
-        {showBasicBackNavBar()}
+        <div className="App-header">
+          {showBasicBackNavBar()}
+          Anomaly Learn
+        </div>
       </div>
     );
   }
