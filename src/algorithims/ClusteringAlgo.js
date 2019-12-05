@@ -188,3 +188,34 @@ export function smallClusterDrop(
     return newData;
   }
 }
+
+export function deployRandomClusters(
+  randomClusterNumber,
+  runningCentroidState,
+  runningKMeans,
+  factor,
+  numberPoints,
+  newData
+) {
+  let unlabeledData = [];
+  const max = 100;
+
+  for (let i = 0; i < randomClusterNumber; i++) {
+    const randomX = Math.floor(Math.random() * max);
+    const randomY = Math.floor(Math.random() * max);
+    const clusterDrop = smallClusterDrop(
+      randomX,
+      randomY,
+      runningCentroidState,
+      runningKMeans,
+      factor,
+      numberPoints,
+      newData
+    );
+    debugger;
+
+    unlabeledData = unlabeledData.concat(clusterDrop);
+  }
+
+  return unlabeledData;
+}

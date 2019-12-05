@@ -17,6 +17,7 @@ import Reset from "../Images/reset.png";
 import Check from "../Images/check.png";
 import Eraser from "../Images/eraser.png";
 import Forward from "../Images/forward.png";
+import Shuffle from "../Images/shuffle.png";
 import Add from "../Images/add.png";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
@@ -27,7 +28,8 @@ import {
   unclusterData,
   pushIntoCentroid,
   smallClusterDrop,
-  runIteration
+  runIteration,
+  deployRandomClusters
 } from "../algorithims/ClusteringAlgo";
 import { arrayRange, displayInfoButton } from "../Utility";
 import "../css_files/App.css";
@@ -73,7 +75,9 @@ class Clustering extends React.Component {
       // Current data that has already been cluster
       clusteredData: generateEmptyCluster(),
       // Current centroid datapoints
-      centroidData: []
+      centroidData: [],
+      // Range for random clusters,
+      randomClustersNumber: 1
     };
   }
 
@@ -341,7 +345,6 @@ class Clustering extends React.Component {
           onClick={() => {
             const xCoord = this.refs["xCoord"].value;
             const yCoord = this.refs["yCoord"].value;
-            debugger;
             if (
               !isNaN(xCoord) &&
               !isNaN(yCoord) &&
@@ -374,6 +377,62 @@ class Clustering extends React.Component {
     ) : null;
   }
 
+  showRandomClusterDeploymentButton() {
+    return !this.state.choosingCentroidState &&
+      !this.state.runningKMeans &&
+      !this.state.runningDBScan ? (
+      <OverlayTrigger
+        trigger="hover"
+        placement="bottom"
+        overlay={<Tooltip>Generate random clusters</Tooltip>}
+      >
+        <Nav.Link
+          onClick={() => {
+            const randomData = deployRandomClusters(
+              this.state.randomClustersNumber,
+              this.state.choosingCentroidState,
+              this.state.runningKMeans,
+              this.state.spacing,
+              this.state.pointNum,
+              this.state.unlabeledData
+            );
+
+            this.setState({
+              unlabeledData: randomData,
+              readyToStartState: true
+            });
+          }}
+        >
+          <Image src={Shuffle} className="small-photo" />
+        </Nav.Link>
+      </OverlayTrigger>
+    ) : null;
+  }
+
+  showRandomClusterChoosing() {
+    return !this.state.choosingCentroidState &&
+      !this.state.runningKMeans &&
+      !this.state.runningDBScan ? (
+      <Nav.Link>
+        <Form>
+          <Form.Group>
+            <Form.Label>Select amount of random clusters</Form.Label>
+            <Form.Control
+              as="select"
+              onChange={e =>
+                this.setState({ randomClustersNumber: e.target.value })
+              }
+            >
+              {arrayRange(1, 10).map(num => {
+                return <option value={num}>{num}</option>;
+              })}
+            </Form.Control>
+          </Form.Group>
+        </Form>
+      </Nav.Link>
+    ) : null;
+  }
+
   showClusteringNavBar() {
     return (
       <Navbar fixed="top" bg="dark" variant="dark">
@@ -385,6 +444,8 @@ class Clustering extends React.Component {
         {this.showRunDBScanAgainBar()}
         {this.showXAndYInputBar()}
         {this.showAddButton()}
+        {this.showRandomClusterDeploymentButton()}
+        {this.showRandomClusterChoosing()}
         {this.showResetClusterBar()}
       </Navbar>
     );
