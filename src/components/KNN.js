@@ -17,20 +17,18 @@ import Image from "react-bootstrap/Image";
 import Navbar from "react-bootstrap/Navbar";
 import Shuffle from "../Images/shuffle.png";
 import Add from "../Images/add.png";
-import {
-  Nav,
-  FormControl,
-  InputGroup,
-  Form,
-  OverlayTrigger,
-  Tooltip
-} from "react-bootstrap";
+import { Nav, Form, OverlayTrigger, Tooltip } from "react-bootstrap";
 import {
   generateRandomData,
   getAllData,
   relabelData
 } from "../algorithims/KNNAlgo";
-import { euclidFunction, comparator, arrayRange } from "../Utility";
+import {
+  euclidFunction,
+  comparator,
+  arrayRange,
+  showXandYInput
+} from "../Utility";
 import "../css_files/App.css";
 import { showBackToAlgorithimPage, displayInfoButton } from "../Utility";
 import { connect } from "react-redux";
@@ -63,7 +61,12 @@ class KNN extends React.Component {
     xCoord = parseInt(xCoord);
     yCoord = parseInt(yCoord);
 
-    if (!isNaN(xCoord) && !isNaN(yCoord)) {
+    if (
+      !isNaN(xCoord) &&
+      !isNaN(yCoord) &&
+      xCoord.length > 0 &&
+      yCoord.length > 0
+    ) {
       let updatedDataUndetermined = this.state.undeterminedData;
       updatedDataUndetermined.push({ x: xCoord, y: yCoord });
 
@@ -76,18 +79,6 @@ class KNN extends React.Component {
 
     this.refs["xCoord"].value = "";
     this.refs["yCoord"].value = "";
-  }
-
-  // Returns JSX for showing the input for x and y
-  showXandYInput() {
-    return (
-      <Nav.Link>
-        <InputGroup>
-          <FormControl ref="xCoord" placeholder="Enter X Coordinate" />
-          <FormControl ref="yCoord" placeholder="Enter Y Coordinate" />
-        </InputGroup>
-      </Nav.Link>
-    );
   }
 
   // Shows selectable values for K
@@ -218,7 +209,7 @@ class KNN extends React.Component {
   // Shows X and Y input bar for entry of point
   showXandYInputBar() {
     return Object.keys(this.state.labeledData).length > 0
-      ? this.showXandYInput()
+      ? showXandYInput()
       : null;
   }
 

@@ -152,7 +152,8 @@ export function pushIntoCentroid(newCentroidState, datapoint) {
 
 // Allows user to add a small cluster unlabeled points for later labeling
 export function smallClusterDrop(
-  e,
+  xCoord,
+  yCoord,
   choosingCentroidState,
   runningKMeans,
   factor,
@@ -160,9 +161,8 @@ export function smallClusterDrop(
   newData
 ) {
   if (!choosingCentroidState && !runningKMeans) {
-    const xCoord = Math.floor((e.pageX - 260) / 5.5);
-    const yCoord = Math.floor(100 - (e.pageY - 170) / 5.5);
-
+    xCoord = parseInt(xCoord);
+    yCoord = parseInt(yCoord);
     if (newData[0].x === 0 && newData[0].y === 0) newData.shift();
 
     const cardinal = [

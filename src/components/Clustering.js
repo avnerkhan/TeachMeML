@@ -9,7 +9,7 @@ import {
   HorizontalGridLines,
   MarkSeries
 } from "react-vis";
-import { showBackToAlgorithimPage } from "../Utility";
+import { showBackToAlgorithimPage, showXandYInput } from "../Utility";
 import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 import Image from "react-bootstrap/Image";
@@ -17,6 +17,7 @@ import Reset from "../Images/reset.png";
 import Check from "../Images/check.png";
 import Eraser from "../Images/eraser.png";
 import Forward from "../Images/forward.png";
+import Add from "../Images/add.png";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import {
@@ -319,6 +320,60 @@ class Clustering extends React.Component {
     ) : null;
   }
 
+  showXAndYInputBar() {
+    return !this.state.choosingCentroidState &&
+      !this.state.runningKMeans &&
+      !this.state.runningDBScan
+      ? showXandYInput()
+      : null;
+  }
+
+  showAddButton() {
+    return !this.state.choosingCentroidState &&
+      !this.state.runningKMeans &&
+      !this.state.runningDBScan ? (
+      <OverlayTrigger
+        trigger="hover"
+        placement="bottom"
+        overlay={<Tooltip>Add a Cluster Drop</Tooltip>}
+      >
+        <Nav.Link
+          onClick={() => {
+            const xCoord = this.refs["xCoord"].value;
+            const yCoord = this.refs["yCoord"].value;
+            debugger;
+            if (
+              !isNaN(xCoord) &&
+              !isNaN(yCoord) &&
+              xCoord.length > 0 &&
+              yCoord.length > 0
+            ) {
+              const newData = smallClusterDrop(
+                xCoord,
+                yCoord,
+                this.state.choosingCentroidState,
+                this.state.runningKMeans,
+                this.state.spacing,
+                this.state.pointNum,
+                this.state.unlabeledData
+              );
+              if (newData != undefined) {
+                this.setState({
+                  unlabeledData: newData,
+                  readyToStartState: true
+                });
+              }
+            } else {
+              alert("Please enter valid coordinates");
+            }
+          }}
+        >
+          <Image src={Add} className="small-photo" />
+        </Nav.Link>
+      </OverlayTrigger>
+    ) : null;
+  }
+
   showClusteringNavBar() {
     return (
       <Navbar fixed="top" bg="dark" variant="dark">
@@ -328,34 +383,15 @@ class Clustering extends React.Component {
         {this.showRunNextIterationBar()}
         {this.showClearSlateBar()}
         {this.showRunDBScanAgainBar()}
+        {this.showXAndYInputBar()}
+        {this.showAddButton()}
         {this.showResetClusterBar()}
       </Navbar>
     );
   }
   displayClusterDeploymentArea() {
     return (
-      <XYPlot
-        width={550}
-        height={550}
-        onClick={e => {
-          const newData = smallClusterDrop(
-            e,
-            this.state.choosingCentroidState,
-            this.state.runningKMeans,
-            this.state.spacing,
-            this.state.pointNum,
-            this.state.unlabeledData
-          );
-          if (newData != undefined) {
-            this.setState({
-              unlabeledData: newData,
-              readyToStartState: true
-            });
-          }
-        }}
-        xDomain={[0, 100]}
-        yDomain={[0, 100]}
-      >
+      <XYPlot width={550} height={550} xDomain={[0, 100]} yDomain={[0, 100]}>
         <VerticalGridLines />
         <HorizontalGridLines />
         <XAxis />
