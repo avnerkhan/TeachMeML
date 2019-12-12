@@ -58,27 +58,11 @@ class KNN extends React.Component {
 
   // Adds an undetermined point to the grid
   addPoint(xCoord, yCoord) {
-    xCoord = parseInt(xCoord);
-    yCoord = parseInt(yCoord);
-
-    if (
-      !isNaN(xCoord) &&
-      !isNaN(yCoord) &&
-      xCoord.length > 0 &&
-      yCoord.length > 0
-    ) {
-      let updatedDataUndetermined = this.state.undeterminedData;
-      updatedDataUndetermined.push({ x: xCoord, y: yCoord });
-
-      this.setState({
-        undeterminedData: updatedDataUndetermined
-      });
-    } else {
-      alert("Please enter valid coordinates");
-    }
-
-    this.refs["xCoord"].value = "";
-    this.refs["yCoord"].value = "";
+    let updatedDataUndetermined = this.state.undeterminedData;
+    updatedDataUndetermined.push({ x: xCoord, y: yCoord });
+    this.setState({
+      undeterminedData: updatedDataUndetermined
+    });
   }
 
   // Shows selectable values for K
@@ -196,9 +180,26 @@ class KNN extends React.Component {
         overlay={<Tooltip>Add a point</Tooltip>}
       >
         <Nav.Link
-          onClick={() =>
-            this.addPoint(this.refs["xCoord"].value, this.refs["yCoord"].value)
-          }
+          onClick={() => {
+            let xCoord = this.refs["xCoord"].value;
+            let yCoord = this.refs["yCoord"].value;
+            xCoord = parseInt(xCoord);
+            yCoord = parseInt(yCoord);
+
+            if (
+              !isNaN(xCoord) &&
+              !isNaN(yCoord) &&
+              xCoord.length > 0 &&
+              yCoord.length > 0
+            ) {
+              this.addPoint(xCoord, yCoord);
+            } else {
+              alert("Please enter valid coordinates");
+            }
+
+            this.refs["xCoord"].value = "";
+            this.refs["yCoord"].value = "";
+          }}
         >
           <Image src={Add} className="small-photo" />
         </Nav.Link>
