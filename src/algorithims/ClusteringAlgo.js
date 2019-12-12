@@ -150,10 +150,20 @@ export function pushIntoCentroid(newCentroidState, datapoint) {
   return newCentroidState;
 }
 
+// get coordinate based on click and bounds
+function calculateScale(coordClick, bound, scale) {
+  const offset = coordClick - bound;
+  return (offset / scale) * 100;
+}
+
 // Allows user to add a small cluster unlabeled points for later labeling
 export function smallClusterDrop(
-  xCoord,
-  yCoord,
+  xClick,
+  yClick,
+  xBound,
+  yBound,
+  width,
+  height,
   choosingCentroidState,
   runningKMeans,
   factor,
@@ -161,8 +171,8 @@ export function smallClusterDrop(
   newData
 ) {
   if (!choosingCentroidState && !runningKMeans) {
-    xCoord = parseInt(xCoord);
-    yCoord = parseInt(yCoord);
+    const xCoord = calculateScale(xClick, xBound, width);
+    const yCoord = 120 - calculateScale(yClick, yBound, height);
     if (newData[0].x === 0 && newData[0].y === 0) newData.shift();
 
     const cardinal = [

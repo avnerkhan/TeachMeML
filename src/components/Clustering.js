@@ -1,6 +1,7 @@
 /* eslint-disable */
 
 import React from "react";
+import ReactDOM from "react-dom";
 import {
   XYPlot,
   XAxis,
@@ -324,59 +325,6 @@ class Clustering extends React.Component {
     ) : null;
   }
 
-  showXAndYInputBar() {
-    return !this.state.choosingCentroidState &&
-      !this.state.runningKMeans &&
-      !this.state.runningDBScan
-      ? showXandYInput()
-      : null;
-  }
-
-  showAddButton() {
-    return !this.state.choosingCentroidState &&
-      !this.state.runningKMeans &&
-      !this.state.runningDBScan ? (
-      <OverlayTrigger
-        trigger="hover"
-        placement="bottom"
-        overlay={<Tooltip>Add a Cluster Drop</Tooltip>}
-      >
-        <Nav.Link
-          onClick={() => {
-            const xCoord = this.refs["xCoord"].value;
-            const yCoord = this.refs["yCoord"].value;
-            if (
-              !isNaN(xCoord) &&
-              !isNaN(yCoord) &&
-              xCoord.length > 0 &&
-              yCoord.length > 0
-            ) {
-              const newData = smallClusterDrop(
-                xCoord,
-                yCoord,
-                this.state.choosingCentroidState,
-                this.state.runningKMeans,
-                this.state.spacing,
-                this.state.pointNum,
-                this.state.unlabeledData
-              );
-              if (newData != undefined) {
-                this.setState({
-                  unlabeledData: newData,
-                  readyToStartState: true
-                });
-              }
-            } else {
-              alert("Please enter valid coordinates");
-            }
-          }}
-        >
-          <Image src={Add} className="small-photo" />
-        </Nav.Link>
-      </OverlayTrigger>
-    ) : null;
-  }
-
   showRandomClusterDeploymentButton() {
     return !this.state.choosingCentroidState &&
       !this.state.runningKMeans &&
@@ -442,8 +390,6 @@ class Clustering extends React.Component {
         {this.showRunNextIterationBar()}
         {this.showClearSlateBar()}
         {this.showRunDBScanAgainBar()}
-        {this.showXAndYInputBar()}
-        {this.showAddButton()}
         {this.showRandomClusterDeploymentButton()}
         {this.showRandomClusterChoosing()}
         {this.showResetClusterBar()}
@@ -452,7 +398,37 @@ class Clustering extends React.Component {
   }
   displayClusterDeploymentArea() {
     return (
-      <XYPlot width={550} height={550} xDomain={[0, 100]} yDomain={[0, 100]}>
+      <XYPlot
+        width={550}
+        height={550}
+        xDomain={[0, 100]}
+        yDomain={[0, 100]}
+        ref="plotGraph"
+        onClick={e => {
+          const boundRect = ReactDOM.findDOMNode(
+            this.refs.plotGraph
+          ).getBoundingClientRect();
+          const newData = smallClusterDrop(
+            e.screenX,
+            e.screenY,
+            boundRect.x,
+            boundRect.y,
+            boundRect.width,
+            boundRect.height,
+            this.state.choosingCentroidState,
+            this.state.runningKMeans,
+            this.state.spacing,
+            this.state.pointNum,
+            this.state.unlabeledData
+          );
+          if (newData != undefined) {
+            this.setState({
+              unlabeledData: newData,
+              readyToStartState: true
+            });
+          }
+        }}
+      >
         <VerticalGridLines />
         <HorizontalGridLines />
         <XAxis />
