@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { euclidFunction, comparator } from "../Utility";
+import { euclidFunction, comparator, calculateScale } from "../Utility";
 
 export function generateEmptyCluster() {
   let emptyClusterHolder = [];
@@ -148,12 +148,6 @@ export function runIteration(centroidData, clusterData, unlabeledData) {
 export function pushIntoCentroid(newCentroidState, datapoint) {
   newCentroidState.push(datapoint);
   return newCentroidState;
-}
-
-// get coordinate based on click and bounds
-function calculateScale(coordClick, bound, scale) {
-  const offset = coordClick - bound;
-  return (offset / scale) * 100;
 }
 
 // Allows user to add a small cluster unlabeled points for later labeling

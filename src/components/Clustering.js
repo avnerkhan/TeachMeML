@@ -10,7 +10,7 @@ import {
   HorizontalGridLines,
   MarkSeries
 } from "react-vis";
-import { showBackToAlgorithimPage, showXandYInput } from "../Utility";
+import { showBackToAlgorithimPage } from "../Utility";
 import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 import Image from "react-bootstrap/Image";
@@ -19,7 +19,6 @@ import Check from "../Images/check.png";
 import Eraser from "../Images/eraser.png";
 import Forward from "../Images/forward.png";
 import Shuffle from "../Images/shuffle.png";
-import Add from "../Images/add.png";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import {

@@ -3,15 +3,7 @@
 */
 
 import React from "react";
-import {
-  Popover,
-  OverlayTrigger,
-  Image,
-  Nav,
-  Navbar,
-  InputGroup,
-  FormControl
-} from "react-bootstrap";
+import { Popover, OverlayTrigger, Image, Nav, Navbar } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import Back from "./Images/back.png";
 import Icon from "./Images/icon.png";
@@ -90,14 +82,8 @@ export function showBasicBackNavBar() {
   );
 }
 
-// Returns JSX for showing the input for x and y
-export function showXandYInput() {
-  return (
-    <Nav.Link>
-      <InputGroup>
-        <FormControl ref="xCoord" placeholder="Enter X Coordinate" />
-        <FormControl ref="yCoord" placeholder="Enter Y Coordinate" />
-      </InputGroup>
-    </Nav.Link>
-  );
+// get coordinate based on click and bounds
+export function calculateScale(coordClick, bound, scale) {
+  const offset = coordClick - bound;
+  return (offset / scale) * 100;
 }

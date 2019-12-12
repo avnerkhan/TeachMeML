@@ -5,6 +5,7 @@
 */
 
 import React from "react";
+import ReactDOM from "react-dom";
 import {
   XYPlot,
   XAxis,
@@ -16,21 +17,19 @@ import {
 import Image from "react-bootstrap/Image";
 import Navbar from "react-bootstrap/Navbar";
 import Shuffle from "../Images/shuffle.png";
-import Add from "../Images/add.png";
 import { Nav, Form, OverlayTrigger, Tooltip } from "react-bootstrap";
 import {
   generateRandomData,
   getAllData,
   relabelData
 } from "../algorithims/KNNAlgo";
-import {
-  euclidFunction,
-  comparator,
-  arrayRange,
-  showXandYInput
-} from "../Utility";
+import { euclidFunction, comparator, arrayRange } from "../Utility";
 import "../css_files/App.css";
-import { showBackToAlgorithimPage, displayInfoButton } from "../Utility";
+import {
+  showBackToAlgorithimPage,
+  displayInfoButton,
+  calculateScale
+} from "../Utility";
 import { connect } from "react-redux";
 
 class KNN extends React.Component {
@@ -171,49 +170,6 @@ class KNN extends React.Component {
     );
   }
 
-  // Shows add button
-  showAddButton() {
-    return Object.keys(this.state.labeledData).length > 0 ? (
-      <OverlayTrigger
-        trigger="hover"
-        placement="bottom"
-        overlay={<Tooltip>Add a point</Tooltip>}
-      >
-        <Nav.Link
-          onClick={() => {
-            let xCoord = this.refs["xCoord"].value;
-            let yCoord = this.refs["yCoord"].value;
-            xCoord = parseInt(xCoord);
-            yCoord = parseInt(yCoord);
-
-            if (
-              !isNaN(xCoord) &&
-              !isNaN(yCoord) &&
-              xCoord.length > 0 &&
-              yCoord.length > 0
-            ) {
-              this.addPoint(xCoord, yCoord);
-            } else {
-              alert("Please enter valid coordinates");
-            }
-
-            this.refs["xCoord"].value = "";
-            this.refs["yCoord"].value = "";
-          }}
-        >
-          <Image src={Add} className="small-photo" />
-        </Nav.Link>
-      </OverlayTrigger>
-    ) : null;
-  }
-
-  // Shows X and Y input bar for entry of point
-  showXandYInputBar() {
-    return Object.keys(this.state.labeledData).length > 0
-      ? showXandYInput()
-      : null;
-  }
-
   // Shows dropdown selection for K
   showKSelection() {
     return this.state.undeterminedData.length > 0 ? this.showKSelect() : null;
@@ -224,10 +180,8 @@ class KNN extends React.Component {
     return (
       <Navbar fixed="top" bg="dark" variant="dark">
         {showBackToAlgorithimPage()}
-        {this.showAddButton()}
         {this.showRandomizeUndeterminedDataButton()}
         {this.showRandomizeDataButton()}
-        {this.showXandYInputBar()}
         {this.showKSelection()}
       </Navbar>
     );
@@ -287,7 +241,23 @@ class KNN extends React.Component {
           "Use the bar above to add your own coordinates to the grid. All undetermined datapoints are black, and there are only two classes. The first shuffle button randomizes determined data, while the second shuffle button places random undetermined points. Hover your mouse over an undetermined point to see which points that it will use nearby to determine, and press on the point to determine.",
           "left"
         )}
-        <XYPlot width={600} height={600}>
+        <XYPlot
+          width={600}
+          height={600}
+          ref="plotGraph"
+          onClick={e => {
+            const isNotOnHighlight =
+              this.state.currentHighlightData.length === 0;
+            if (isNotOnHighlight) {
+              const boundRect = ReactDOM.findDOMNode(
+                this.refs.plotGraph
+              ).getBoundingClientRect();
+              const xCoord = calculateScale(e.screenX, boundRect.x, 600);
+              const yCoord = 120 - calculateScale(e.screenY, boundRect.y, 600);
+              this.addPoint(xCoord, yCoord);
+            }
+          }}
+        >
           <VerticalGridLines />
           <HorizontalGridLines />
           <XAxis />
