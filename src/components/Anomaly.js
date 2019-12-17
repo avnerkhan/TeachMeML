@@ -1,7 +1,12 @@
 /* eslint-disable */
 
 import React from "react";
-import { showBackToAlgorithimPage } from "../Utility";
+import ReactDOM from "react-dom";
+import {
+  showBackToAlgorithimPage,
+  generateRandomUndetermined,
+  calculateScale
+} from "../Utility";
 import { Navbar, OverlayTrigger, Tooltip, Nav, Image } from "react-bootstrap";
 import Check from "../Images/check.png";
 import Shuffle from "../Images/shuffle.png";
@@ -36,7 +41,24 @@ class Anomaly extends React.Component {
         xDomain={[0, 100]}
         yDomain={[0, 100]}
         ref="plotGraph"
-        onClick={e => {}}
+        onClick={e => {
+          let currentUpdatedData = this.state.data;
+          const boundRect = ReactDOM.findDOMNode(
+            this.refs.plotGraph
+          ).getBoundingClientRect();
+          const xCoord = calculateScale(
+            e.screenX,
+            boundRect.x,
+            boundRect.width
+          );
+          const yCoord =
+            120 - calculateScale(e.screenY, boundRect.y, boundRect.height);
+
+          currentUpdatedData.push({ x: xCoord, y: yCoord });
+          this.setState({
+            data: currentUpdatedData
+          });
+        }}
       >
         <VerticalGridLines />
         <HorizontalGridLines />
@@ -46,6 +68,7 @@ class Anomaly extends React.Component {
           className="mark-series-example"
           strokeWidth={2}
           opacity="0.8"
+          color="#FFFFFF"
           sizeRange={[0, 100]}
           data={this.state.data}
         />
@@ -89,7 +112,13 @@ class Anomaly extends React.Component {
         placement="bottom"
         overlay={<Tooltip>Generate Random Datapoints</Tooltip>}
       >
-        <Nav.Link onClick={() => {}}>
+        <Nav.Link
+          onClick={() => {
+            this.setState({
+              data: generateRandomUndetermined()
+            });
+          }}
+        >
           <Image src={Shuffle} className="small-photo" />
         </Nav.Link>
       </OverlayTrigger>

@@ -23,7 +23,12 @@ import {
   getAllData,
   relabelData
 } from "../algorithims/KNNAlgo";
-import { euclidFunction, comparator, arrayRange } from "../Utility";
+import {
+  euclidFunction,
+  comparator,
+  arrayRange,
+  generateRandomUndetermined
+} from "../Utility";
 import "../css_files/App.css";
 import {
   showBackToAlgorithimPage,
@@ -53,15 +58,6 @@ class KNN extends React.Component {
       // Data on the plot that is highlighted (user is hovering over an undetermined, and highlights what our algorithim will pick)
       currentHighlightData: []
     };
-  }
-
-  // Adds an undetermined point to the grid
-  addPoint(xCoord, yCoord) {
-    let updatedDataUndetermined = this.state.undeterminedData;
-    updatedDataUndetermined.push({ x: xCoord, y: yCoord });
-    this.setState({
-      undeterminedData: updatedDataUndetermined
-    });
   }
 
   // Shows selectable values for K
@@ -125,15 +121,6 @@ class KNN extends React.Component {
     });
   }
 
-  // Generates random underterimend data and adds them to the plot
-  generateRandomUndetermined(length = 20, max = 100) {
-    for (let i = 0; i < length; i++) {
-      const randomX = Math.floor(Math.random() * max);
-      const randomY = Math.floor(Math.random() * max);
-      this.addPoint(randomX, randomY);
-    }
-  }
-
   // Shows the randomize undeterimened data button
   showRandomizeUndeterminedDataButton() {
     return Object.keys(this.state.labeledData).length > 0 ? (
@@ -142,7 +129,13 @@ class KNN extends React.Component {
         placement="bottom"
         overlay={<Tooltip>Generate random undetermined points</Tooltip>}
       >
-        <Nav.Link onClick={() => this.generateRandomUndetermined()}>
+        <Nav.Link
+          onClick={() => {
+            this.setState({
+              undeterminedData: generateRandomUndetermined()
+            });
+          }}
+        >
           <Image src={Shuffle} className="small-photo" />
         </Nav.Link>
       </OverlayTrigger>
@@ -248,13 +241,22 @@ class KNN extends React.Component {
           onClick={e => {
             const isNotOnHighlight =
               this.state.currentHighlightData.length === 0;
+            let updatedDataUndetermined = this.state.undeterminedData;
             if (isNotOnHighlight) {
               const boundRect = ReactDOM.findDOMNode(
                 this.refs.plotGraph
               ).getBoundingClientRect();
-              const xCoord = calculateScale(e.screenX, boundRect.x, 600);
-              const yCoord = 120 - calculateScale(e.screenY, boundRect.y, 600);
-              this.addPoint(xCoord, yCoord);
+              const xCoord = calculateScale(
+                e.screenX,
+                boundRect.x,
+                boundRect.width
+              );
+              const yCoord =
+                120 - calculateScale(e.screenY, boundRect.y, boundRect.height);
+              updatedDataUndetermined.push({ x: xCoord, y: yCoord });
+              this.setState({
+                undeterminedData: updatedDataUndetermined
+              });
             }
           }}
         >

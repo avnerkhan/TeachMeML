@@ -18,6 +18,17 @@ export function euclidFunction(pointOne, pointTwo) {
   return { orginalPoint: pointOne, distance: totalDistance };
 }
 
+// Generates random underterimend data and adds them to the plot
+export function generateRandomUndetermined(length = 20, max = 100) {
+  let toReturn = [];
+  for (let i = 0; i < length; i++) {
+    const randomX = Math.floor(Math.random() * max);
+    const randomY = Math.floor(Math.random() * max);
+    toReturn.push({ x: randomX, y: randomY });
+  }
+  return toReturn;
+}
+
 // Comparator function for KNN and Clustering
 export function comparator(entryOne, entryTwo) {
   if (entryOne.distance < entryTwo.distance) {
