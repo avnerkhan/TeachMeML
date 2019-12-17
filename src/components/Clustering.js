@@ -48,9 +48,6 @@ class Clustering extends React.Component {
       DBSCAN: 1,
       OUTLIER: 0
     };
-
-    this.XYPlotRef = null;
-
     this.state = {
       // Currently selected algorithim
       algorithim: this.stateEnum.KMEANS,
@@ -335,7 +332,14 @@ class Clustering extends React.Component {
       >
         <Nav.Link
           onClick={() => {
+            const boundRect = ReactDOM.findDOMNode(
+              this.refs.plotGraph
+            ).getBoundingClientRect();
             const randomData = deployRandomClusters(
+              boundRect.x,
+              boundRect.y,
+              boundRect.width,
+              boundRect.height,
               this.state.randomClustersNumber,
               this.state.choosingCentroidState,
               this.state.runningKMeans,

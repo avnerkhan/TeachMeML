@@ -194,6 +194,10 @@ export function smallClusterDrop(
 }
 
 export function deployRandomClusters(
+  xBound,
+  yBound,
+  width,
+  height,
   randomClusterNumber,
   runningCentroidState,
   runningKMeans,
@@ -202,21 +206,22 @@ export function deployRandomClusters(
   newData
 ) {
   let unlabeledData = [];
-  const max = 100;
-
   for (let i = 0; i < randomClusterNumber; i++) {
-    const randomX = Math.floor(Math.random() * max);
-    const randomY = Math.floor(Math.random() * max);
+    const randomX = Math.floor(Math.random() * width) + xBound;
+    const randomY = Math.floor(Math.random() * height) + yBound;
     const clusterDrop = smallClusterDrop(
       randomX,
       randomY,
+      xBound,
+      yBound,
+      width,
+      height,
       runningCentroidState,
       runningKMeans,
       factor,
       numberPoints,
       newData
     );
-    debugger;
 
     unlabeledData = unlabeledData.concat(clusterDrop);
   }
