@@ -16,7 +16,8 @@ import {
   YAxis,
   VerticalGridLines,
   HorizontalGridLines,
-  MarkSeries
+  MarkSeries,
+  LineSeries
 } from "react-vis";
 import "../css_files/App.css";
 
@@ -27,7 +28,12 @@ class Anomaly extends React.Component {
       // List of Data Points
       data: [{ x: 0, y: 0 }],
       // Outlier lines
-      lines: [],
+      lines: [
+        { x: 10, y: 30 },
+        { x: 20, y: 50 },
+        { x: 30, y: 75 },
+        { x: 42, y: 82 }
+      ],
       // Isolation or proximity based approach
       isIso: true
     };
@@ -36,10 +42,12 @@ class Anomaly extends React.Component {
   displayGraph() {
     return (
       <XYPlot
+        id="plotGraphOne"
         width={550}
         height={550}
         xDomain={[0, 100]}
         yDomain={[0, 100]}
+        style={{ zIndex: 0 }}
         ref="plotGraph"
         onClick={e => {
           let currentUpdatedData = this.state.data;
@@ -71,6 +79,50 @@ class Anomaly extends React.Component {
           color="#FFFFFF"
           sizeRange={[0, 100]}
           data={this.state.data}
+        />
+        <LineSeries
+          className="mark-series-example"
+          strokeWidth={2}
+          opacity="0.8"
+          color="#FFFFFF"
+          sizeRange={[0, 100]}
+          data={[
+            { x: 0, y: 50 },
+            { x: 100, y: 50 }
+          ]}
+        />
+        <LineSeries
+          className="mark-series-example"
+          strokeWidth={2}
+          opacity="0.8"
+          color="#FFFFFF"
+          sizeRange={[0, 100]}
+          data={[
+            { x: 0, y: 70 },
+            { x: 100, y: 70 }
+          ]}
+        />
+        <LineSeries
+          className="mark-series-example"
+          strokeWidth={2}
+          opacity="0.8"
+          color="#FFFFFF"
+          sizeRange={[0, 100]}
+          data={[
+            { x: 50, y: 0 },
+            { x: 50, y: 100 }
+          ]}
+        />
+        <LineSeries
+          className="mark-series-example"
+          strokeWidth={2}
+          opacity="0.8"
+          color="#FFFFFF"
+          sizeRange={[0, 100]}
+          data={[
+            { x: 60, y: 0 },
+            { x: 60, y: 100 }
+          ]}
         />
       </XYPlot>
     );
@@ -139,6 +191,7 @@ class Anomaly extends React.Component {
   render() {
     return (
       <div className="App">
+        x
         <div className="App-header">
           {this.showAnomalyNavBar()}
           {this.displayGraph()}
