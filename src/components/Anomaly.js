@@ -28,7 +28,7 @@ class Anomaly extends React.Component {
       // List of Data Points
       data: [{ x: 0, y: 0 }],
       // Outlier lines
-      lines: [{ x: 10 }, { y: 50 }, { y: 75 }, { x: 42 }],
+      lines: [],
       // Isolation or proximity based approach
       isIso: true
     };
@@ -134,17 +134,28 @@ class Anomaly extends React.Component {
   }
 
   showRunAlgorithimButton() {
-    return (
+    const isValidState = this.state.data.length > 1;
+    return isValidState ? (
       <OverlayTrigger
         trigger="hover"
         placement="bottom"
         overlay={<Tooltip>Run Anomaly Algorithim</Tooltip>}
       >
-        <Nav.Link onClick={() => {}}>
+        <Nav.Link
+          onClick={() => {
+            let currentLines = this.state.lines;
+            const randomVal = Math.floor(Math.random() * 100);
+            const randomDir = Math.floor(Math.random() * 2);
+            const newVal =
+              randomDir === 0 ? { x: randomVal } : { y: randomVal };
+            currentLines.push(newVal);
+            this.setState({ lines: currentLines });
+          }}
+        >
           <Image src={Check} className="small-photo" />
         </Nav.Link>
       </OverlayTrigger>
-    );
+    ) : null;
   }
 
   showShuffleButton() {
