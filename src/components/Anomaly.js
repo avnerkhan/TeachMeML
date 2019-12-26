@@ -28,15 +28,48 @@ class Anomaly extends React.Component {
       // List of Data Points
       data: [{ x: 0, y: 0 }],
       // Outlier lines
-      lines: [
-        { x: 10, y: 30 },
-        { x: 20, y: 50 },
-        { x: 30, y: 75 },
-        { x: 42, y: 82 }
-      ],
+      lines: [{ x: 10 }, { y: 50 }, { y: 75 }, { x: 42 }],
       // Isolation or proximity based approach
       isIso: true
     };
+  }
+
+  displayLines() {
+    return this.state.lines.map(coord => {
+      return this.giveLine(coord);
+    });
+  }
+
+  giveLine(coords) {
+    const isVertical = coords.y === undefined;
+    return (
+      <LineSeries
+        className="mark-series-example"
+        strokeWidth={2}
+        opacity="0.8"
+        color="#FFFFFF"
+        sizeRange={[0, 100]}
+        data={
+          isVertical
+            ? this.giveVerticalLine(coords.x)
+            : this.giveHorizontalLine(coords.y)
+        }
+      />
+    );
+  }
+
+  giveVerticalLine(x) {
+    return [
+      { x, y: 0 },
+      { x, y: 100 }
+    ];
+  }
+
+  giveHorizontalLine(y) {
+    return [
+      { x: 0, y },
+      { x: 100, y }
+    ];
   }
 
   displayGraph() {
@@ -80,50 +113,7 @@ class Anomaly extends React.Component {
           sizeRange={[0, 100]}
           data={this.state.data}
         />
-        <LineSeries
-          className="mark-series-example"
-          strokeWidth={2}
-          opacity="0.8"
-          color="#FFFFFF"
-          sizeRange={[0, 100]}
-          data={[
-            { x: 0, y: 50 },
-            { x: 100, y: 50 }
-          ]}
-        />
-        <LineSeries
-          className="mark-series-example"
-          strokeWidth={2}
-          opacity="0.8"
-          color="#FFFFFF"
-          sizeRange={[0, 100]}
-          data={[
-            { x: 0, y: 70 },
-            { x: 100, y: 70 }
-          ]}
-        />
-        <LineSeries
-          className="mark-series-example"
-          strokeWidth={2}
-          opacity="0.8"
-          color="#FFFFFF"
-          sizeRange={[0, 100]}
-          data={[
-            { x: 50, y: 0 },
-            { x: 50, y: 100 }
-          ]}
-        />
-        <LineSeries
-          className="mark-series-example"
-          strokeWidth={2}
-          opacity="0.8"
-          color="#FFFFFF"
-          sizeRange={[0, 100]}
-          data={[
-            { x: 60, y: 0 },
-            { x: 60, y: 100 }
-          ]}
-        />
+        {this.displayLines()}
       </XYPlot>
     );
   }
