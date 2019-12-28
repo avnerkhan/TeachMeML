@@ -3,7 +3,14 @@
 */
 
 import React from "react";
-import { Popover, OverlayTrigger, Image, Nav, Navbar } from "react-bootstrap";
+import {
+  Popover,
+  OverlayTrigger,
+  Image,
+  Nav,
+  Navbar,
+  Tooltip
+} from "react-bootstrap";
 import { Link } from "react-router-dom";
 import Back from "./Images/back.png";
 import Icon from "./Images/icon.png";
@@ -97,4 +104,31 @@ export function showBasicBackNavBar() {
 export function calculateScale(coordClick, bound, scale) {
   const offset = coordClick - bound;
   return (offset / scale) * 100;
+}
+
+export function showPictureWithOverlay(
+  condition,
+  overlayText,
+  callback,
+  image
+) {
+  return condition ? (
+    <OverlayTrigger
+      trigger="hover"
+      placement="bottom"
+      overlay={<Tooltip>{overlayText}</Tooltip>}
+    >
+      <Nav.Link onClick={callback}>
+        <Image src={image} className="small-photo" />
+      </Nav.Link>
+    </OverlayTrigger>
+  ) : null;
+}
+
+export function showNavBar(functionList) {
+  return (
+    <Navbar fixed="top" bg="dark" variant="dark">
+      {[...functionList]}
+    </Navbar>
+  );
 }

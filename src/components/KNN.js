@@ -14,8 +14,6 @@ import {
   HorizontalGridLines,
   MarkSeries
 } from "react-vis";
-import Image from "react-bootstrap/Image";
-import Navbar from "react-bootstrap/Navbar";
 import Shuffle from "../Images/shuffle.png";
 import { Nav, Form, OverlayTrigger, Tooltip } from "react-bootstrap";
 import {
@@ -33,7 +31,9 @@ import "../css_files/App.css";
 import {
   showBackToAlgorithimPage,
   displayInfoButton,
-  calculateScale
+  calculateScale,
+  showPictureWithOverlay,
+  showNavBar
 } from "../Utility";
 import { connect } from "react-redux";
 
@@ -123,61 +123,34 @@ class KNN extends React.Component {
 
   // Shows the randomize undeterimened data button
   showRandomizeUndeterminedDataButton() {
-    return Object.keys(this.state.labeledData).length > 0 ? (
-      <OverlayTrigger
-        trigger="hover"
-        placement="bottom"
-        overlay={<Tooltip>Generate random undetermined points</Tooltip>}
-      >
-        <Nav.Link
-          onClick={() => {
-            this.setState({
-              undeterminedData: generateRandomUndetermined()
-            });
-          }}
-        >
-          <Image src={Shuffle} className="small-photo" />
-        </Nav.Link>
-      </OverlayTrigger>
-    ) : null;
+    return showPictureWithOverlay(
+      Object.keys(this.state.labeledData).length > 0,
+      "Generate random undetermined points",
+      () => {
+        this.setState({
+          undeterminedData: generateRandomUndetermined()
+        });
+      },
+      Shuffle
+    );
   }
 
   // Shows the randomize data button (labeled data)
   showRandomizeDataButton() {
-    return (
-      <OverlayTrigger
-        trigger="hover"
-        placement="bottom"
-        overlay={<Tooltip>Generate random labeled data</Tooltip>}
-      >
-        <Nav.Link
-          onClick={() =>
-            this.setState({
-              labeledData: generateRandomData(30, 100, this.props.labels)
-            })
-          }
-        >
-          <Image src={Shuffle} className="small-photo" />
-        </Nav.Link>
-      </OverlayTrigger>
+    return showPictureWithOverlay(
+      true,
+      "Generate random labeled data",
+      () =>
+        this.setState({
+          labeledData: generateRandomData(30, 100, this.props.labels)
+        }),
+      Shuffle
     );
   }
 
   // Shows dropdown selection for K
   showKSelection() {
     return this.state.undeterminedData.length > 0 ? this.showKSelect() : null;
-  }
-
-  // Shows nav bar for this component
-  showKNNNavBar() {
-    return (
-      <Navbar fixed="top" bg="dark" variant="dark">
-        {showBackToAlgorithimPage()}
-        {this.showRandomizeUndeterminedDataButton()}
-        {this.showRandomizeDataButton()}
-        {this.showKSelection()}
-      </Navbar>
-    );
   }
 
   // Shows the points on the plot that are labeled
@@ -276,7 +249,12 @@ class KNN extends React.Component {
     return (
       <div className="App">
         <div className="App-header">
-          {this.showKNNNavBar()}
+          {showNavBar([
+            showBackToAlgorithimPage(),
+            this.showRandomizeUndeterminedDataButton(),
+            this.showRandomizeDataButton(),
+            this.showKSelection()
+          ])}
           {this.displayKNNExperiement()}
         </div>
       </div>

@@ -34,7 +34,9 @@ import { connect } from "react-redux";
 import {
   displayInfoButton,
   showBackToAlgorithimPage,
-  roundToTwoDecimalPlaces
+  roundToTwoDecimalPlaces,
+  showNavBar,
+  showPictureWithOverlay
 } from "../Utility";
 
 class DTree extends React.Component {
@@ -273,88 +275,63 @@ class DTree extends React.Component {
 
   // The generate tree button on the nav bar
   showDisplayButton() {
-    return this.state.showFirstPage ? (
-      <OverlayTrigger
-        trigger="hover"
-        placement="bottom"
-        overlay={<Tooltip>Generate Tree</Tooltip>}
-      >
-        <Nav.Link
-          onClick={() => {
-            this.setState({
-              renderTree: true,
-              showFirstPage: false
-            });
-            this.showTree();
-          }}
-        >
-          <Image src={SomeTree} className="small-photo" />
-        </Nav.Link>
-      </OverlayTrigger>
-    ) : null;
+    return showPictureWithOverlay(
+      this.state.showFirstPage,
+      "Generate Tree",
+      () => {
+        this.setState({
+          renderTree: true,
+          showFirstPage: false
+        });
+        this.showTree();
+      },
+      SomeTree
+    );
   }
 
   // The add row button on the nav bar
   showAddRowButton() {
-    return this.state.showFirstPage && !this.state.showLearnMode ? (
-      <OverlayTrigger
-        trigger="hover"
-        placement="bottom"
-        overlay={<Tooltip>Add a data row</Tooltip>}
-      >
-        <Nav.Link
-          onClick={() =>
-            this.setState({
-              data: addRow(this.state.data)
-            })
-          }
-        >
-          <Image src={Add} className="small-photo" />
-        </Nav.Link>
-      </OverlayTrigger>
-    ) : null;
+    return showPictureWithOverlay(
+      this.state.showFirstPage && !this.state.showLearnMode,
+      "Add a data row",
+      () =>
+        this.setState({
+          data: addRow(this.state.data)
+        }),
+      Add
+    );
   }
 
   // The randomize data button on the nav bar
   showRandomizeDataButton() {
-    return this.state.showFirstPage && !this.state.showLearnMode ? (
-      <OverlayTrigger
-        trigger="hover"
-        placement="bottom"
-        overlay={<Tooltip>Generate Random Data</Tooltip>}
-      >
-        <Nav.Link
-          onClick={() =>
-            this.setState({
-              data: generateRandomDataState(
-                this.props.featureClasses,
-                this.props.continousClasses,
-                this.props.labelClasses,
-                this.props.label
-              )
-            })
-          }
-        >
-          <Image src={Shuffle} className="small-photo" />
-        </Nav.Link>
-      </OverlayTrigger>
-    ) : null;
+    return showPictureWithOverlay(
+      this.state.showFirstPage && !this.state.showLearnMode,
+      "Generate Random Data",
+      () =>
+        this.setState({
+          data: generateRandomDataState(
+            this.props.featureClasses,
+            this.props.continousClasses,
+            this.props.labelClasses,
+            this.props.label
+          )
+        }),
+      Shuffle
+    );
   }
 
   // The back to data button on the nav bar
   showBackToDataButton() {
-    return this.state.renderTree ? (
-      <Nav.Link
-        onClick={() =>
-          this.setState({
-            renderTree: false,
-            showFirstPage: true
-          })
-        }
-      >
-        <Image src={Back} className="small-photo" />
-      </Nav.Link>
-    ) : null;
+    return showPictureWithOverlay(
+      this.state.renderTree,
+      "Back",
+      () =>
+        this.setState({
+          renderTree: false,
+          showFirstPage: true
+        }),
+      Back
+    );
   }
 
   // A custom back to algorithim page
@@ -377,20 +354,6 @@ class DTree extends React.Component {
     ) : null;
   }
 
-  // Shows overall nav bar for devision tree
-  showDecisionTreeNavBar() {
-    return (
-      <Navbar fixed="top" bg="dark" variant="dark">
-        {this.showBackToAlgorithimPageCustom()}
-        {this.showBackToDataButton()}
-        {this.showDisplayButton()}
-        {this.showAddRowButton()}
-        {this.showRandomizeDataButton()}
-        {this.showEntropyOrGiniSelection()}
-      </Navbar>
-    );
-  }
-
   // Shows first page before decision tree
   showFirstPage() {
     return this.state.showFirstPage ? (
@@ -409,7 +372,14 @@ class DTree extends React.Component {
     return (
       <div className="App">
         <div className="App-header">
-          {this.showDecisionTreeNavBar()}
+          {showNavBar([
+            this.showBackToAlgorithimPageCustom(),
+            this.showBackToDataButton(),
+            this.showDisplayButton(),
+            this.showAddRowButton(),
+            this.showRandomizeDataButton(),
+            this.showEntropyOrGiniSelection()
+          ])}
           <Row>
             {this.showFirstPage()}
             <Col>{this.displayTreeInformation()}</Col>
