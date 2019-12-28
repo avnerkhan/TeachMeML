@@ -12,7 +12,12 @@ import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import SomeTree from "../Images/SomeTree.png";
 import { arrayRange } from "../Utility";
-import { showBackToAlgorithimPage, displayInfoButton } from "../Utility";
+import {
+  showBackToAlgorithimPage,
+  displayInfoButton,
+  showNavBar,
+  showPictureWithOverlay
+} from "../Utility";
 import {
   generateRandomTransaction,
   changeTransactionState,

@@ -31,7 +31,12 @@ import {
   runIteration,
   deployRandomClusters
 } from "../algorithims/ClusteringAlgo";
-import { arrayRange, displayInfoButton } from "../Utility";
+import {
+  arrayRange,
+  displayInfoButton,
+  showNavBar,
+  showPictureWithOverlay
+} from "../Utility";
 import "../css_files/App.css";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 
@@ -225,11 +230,12 @@ class Clustering extends React.Component {
   }
 
   showStartAlgorithimBar() {
-    return this.state.readyToStartState ? (
-      <Nav.Link onClick={() => this.startRespectiveAlgorithim()}>
-        Start Algorithim
-      </Nav.Link>
-    ) : null;
+    return showPictureWithOverlay(
+      this.state.readyToStartState,
+      "Start Algorithim",
+      () => this.startRespectiveAlgorithim(),
+      Check
+    );
   }
 
   showStartChoosingCentroidBar() {
@@ -247,117 +253,91 @@ class Clustering extends React.Component {
   }
 
   showRunNextIterationBar() {
-    return this.state.runningKMeans ? (
-      <OverlayTrigger
-        trigger="hover"
-        placement="bottom"
-        overlay={<Tooltip>Run next iteration</Tooltip>}
-      >
-        <Nav.Link
-          onClick={() => {
-            const [unlabeledData, clusteredData, centroidData] = runIteration(
-              this.state.centroidData,
-              this.state.clusteredData,
-              this.state.unlabeledData
-            );
-            this.setState({
-              centroidData: centroidData,
-              unlabeledData: unlabeledData,
-              clusteredData: clusteredData
-            });
-          }}
-        >
-          <Image src={Forward} className="small-photo" />
-        </Nav.Link>
-      </OverlayTrigger>
-    ) : null;
+    return showPictureWithOverlay(
+      this.state.runningKMeans,
+      "Run next iteration",
+      () => {
+        const [unlabeledData, clusteredData, centroidData] = runIteration(
+          this.state.centroidData,
+          this.state.clusteredData,
+          this.state.unlabeledData
+        );
+        this.setState({
+          centroidData: centroidData,
+          unlabeledData: unlabeledData,
+          clusteredData: clusteredData
+        });
+      },
+      Forward
+    );
   }
 
   showClearSlateBar() {
-    return this.state.runningKMeans || this.state.runningDBScan ? (
-      <OverlayTrigger
-        trigger="hover"
-        placement="bottom"
-        overlay={<Tooltip>Start from beginning</Tooltip>}
-      >
-        <Nav.Link onClick={() => this.clearSlate()}>
-          <Image src={Eraser} className="small-photo" />
-        </Nav.Link>
-      </OverlayTrigger>
-    ) : null;
+    return showPictureWithOverlay(
+      this.state.runningKMeans || this.state.runningDBScan,
+      "Start from beginning",
+      () => this.clearSlate(),
+      Eraser
+    );
   }
 
   showResetClusterBar() {
-    return this.state.runningDBScan ? (
-      <OverlayTrigger
-        trigger="hover"
-        placement="bottom"
-        overlay={<Tooltip>Reset this DBSCAN</Tooltip>}
-      >
-        <Nav.Link
-          onClick={() =>
-            this.setState({
-              centroidData: [],
-              clusteredData: generateEmptyCluster(),
-              unlabeledData: unclusterData(
-                this.state.unlabeledData,
-                this.state.centroidData,
-                this.state.clusteredData
-              )
-            })
-          }
-        >
-          <Image src={Reset} className="small-photo" />
-        </Nav.Link>
-      </OverlayTrigger>
-    ) : null;
+    return showPictureWithOverlay(
+      this.state.runningDBScan,
+      "Reset this DBSCAN",
+      () =>
+        this.setState({
+          centroidData: [],
+          clusteredData: generateEmptyCluster(),
+          unlabeledData: unclusterData(
+            this.state.unlabeledData,
+            this.state.centroidData,
+            this.state.clusteredData
+          )
+        }),
+      Reset
+    );
   }
 
   showRunDBScanAgainBar() {
-    return this.state.runningDBScan ? (
-      <Nav.Link onClick={() => this.startRespectiveAlgorithim()}>
-        <Image src={Check} className="small-photo" />
-      </Nav.Link>
-    ) : null;
+    return showPictureWithOverlay(
+      this.state.runningDBScan,
+      "Start Algorithim",
+      () => this.startRespectiveAlgorithim(),
+      Check
+    );
   }
 
   showRandomClusterDeploymentButton() {
-    return !this.state.choosingCentroidState &&
-      !this.state.runningKMeans &&
-      !this.state.runningDBScan ? (
-      <OverlayTrigger
-        trigger="hover"
-        placement="bottom"
-        overlay={<Tooltip>Generate random clusters</Tooltip>}
-      >
-        <Nav.Link
-          onClick={() => {
-            const boundRect = ReactDOM.findDOMNode(
-              this.refs.plotGraph
-            ).getBoundingClientRect();
-            const randomData = deployRandomClusters(
-              boundRect.x,
-              boundRect.y,
-              boundRect.width,
-              boundRect.height,
-              this.state.randomClustersNumber,
-              this.state.choosingCentroidState,
-              this.state.runningKMeans,
-              this.state.spacing,
-              this.state.pointNum,
-              this.state.unlabeledData
-            );
+    return showPictureWithOverlay(
+      !this.state.choosingCentroidState &&
+        !this.state.runningKMeans &&
+        !this.state.runningDBScan,
+      "Generate random clusters",
+      () => {
+        const boundRect = ReactDOM.findDOMNode(
+          this.refs.plotGraph
+        ).getBoundingClientRect();
+        const randomData = deployRandomClusters(
+          boundRect.x,
+          boundRect.y,
+          boundRect.width,
+          boundRect.height,
+          this.state.randomClustersNumber,
+          this.state.choosingCentroidState,
+          this.state.runningKMeans,
+          this.state.spacing,
+          this.state.pointNum,
+          this.state.unlabeledData
+        );
 
-            this.setState({
-              unlabeledData: randomData,
-              readyToStartState: true
-            });
-          }}
-        >
-          <Image src={Shuffle} className="small-photo" />
-        </Nav.Link>
-      </OverlayTrigger>
-    ) : null;
+        this.setState({
+          unlabeledData: randomData,
+          readyToStartState: true
+        });
+      },
+      Shuffle
+    );
   }
 
   showRandomClusterChoosing() {
@@ -384,21 +364,6 @@ class Clustering extends React.Component {
     ) : null;
   }
 
-  showClusteringNavBar() {
-    return (
-      <Navbar fixed="top" bg="dark" variant="dark">
-        {showBackToAlgorithimPage()}
-        {this.showStartAlgorithimBar()}
-        {this.showStartChoosingCentroidBar()}
-        {this.showRunNextIterationBar()}
-        {this.showClearSlateBar()}
-        {this.showRunDBScanAgainBar()}
-        {this.showRandomClusterDeploymentButton()}
-        {this.showRandomClusterChoosing()}
-        {this.showResetClusterBar()}
-      </Navbar>
-    );
-  }
   displayClusterDeploymentArea() {
     return (
       <XYPlot
@@ -477,7 +442,17 @@ class Clustering extends React.Component {
     return (
       <div className="App">
         <div className="App-header">
-          {this.showClusteringNavBar()}
+          {showNavBar([
+            showBackToAlgorithimPage(),
+            this.showStartAlgorithimBar(),
+            this.showStartChoosingCentroidBar(),
+            this.showRunNextIterationBar(),
+            this.showClearSlateBar(),
+            this.showRunDBScanAgainBar(),
+            this.showRandomClusterDeploymentButton(),
+            this.showRandomClusterChoosing(),
+            this.showResetClusterBar()
+          ])}
           {displayInfoButton(
             "Clustering Algorithims",
             "Start pressing on the grid anywhere to start adding points to the grid. Once the algorithim starts running, press the check mark to finish choosing centroids (If KMeans). The right arrow runs an iteration of Kmeans, and the eraser resets the board. If you choose DBScan, simply run the algorithim and watch the board populate with the coloring based on the configurations you chose.",
