@@ -10,16 +10,7 @@ import Back from "../Images/back.png";
 import Add from "../Images/add.png";
 import SomeTree from "../Images/SomeTree.png";
 import Trash from "../Images/trash.png";
-import {
-  Image,
-  Navbar,
-  Nav,
-  Table,
-  Row,
-  Col,
-  OverlayTrigger,
-  Tooltip
-} from "react-bootstrap";
+import { Image, Table, Row, Col } from "react-bootstrap";
 import {
   determineClassLabel,
   buildTree,

@@ -5,7 +5,9 @@ import ReactDOM from "react-dom";
 import {
   showBackToAlgorithimPage,
   generateRandomUndetermined,
-  calculateScale
+  calculateScale,
+  showNavBar,
+  showPictureWithOverlay
 } from "../Utility";
 import { Navbar, OverlayTrigger, Tooltip, Nav, Image } from "react-bootstrap";
 import Check from "../Images/check.png";
@@ -134,67 +136,43 @@ class Anomaly extends React.Component {
   }
 
   showRunAlgorithimButton() {
-    const isValidState = this.state.data.length > 1;
-    return isValidState ? (
-      <OverlayTrigger
-        trigger="hover"
-        placement="bottom"
-        overlay={<Tooltip>Run Anomaly Algorithim</Tooltip>}
-      >
-        <Nav.Link
-          onClick={() => {
-            let currentLines = this.state.lines;
-            const randomVal = Math.floor(Math.random() * 100);
-            const randomDir = Math.floor(Math.random() * 2);
-            const newVal =
-              randomDir === 0 ? { x: randomVal } : { y: randomVal };
-            currentLines.push(newVal);
-            this.setState({ lines: currentLines });
-          }}
-        >
-          <Image src={Check} className="small-photo" />
-        </Nav.Link>
-      </OverlayTrigger>
-    ) : null;
+    return showPictureWithOverlay(
+      this.state.data.length > 1,
+      "Run Anomaly Algorithim",
+      () => {
+        let currentLines = this.state.lines;
+        const randomVal = Math.floor(Math.random() * 100);
+        const randomDir = Math.floor(Math.random() * 2);
+        const newVal = randomDir === 0 ? { x: randomVal } : { y: randomVal };
+        currentLines.push(newVal);
+        this.setState({ lines: currentLines });
+      },
+      Check
+    );
   }
 
   showShuffleButton() {
-    return (
-      <OverlayTrigger
-        trigger="hover"
-        placement="bottom"
-        overlay={<Tooltip>Generate Random Datapoints</Tooltip>}
-      >
-        <Nav.Link
-          onClick={() => {
-            this.setState({
-              data: generateRandomUndetermined()
-            });
-          }}
-        >
-          <Image src={Shuffle} className="small-photo" />
-        </Nav.Link>
-      </OverlayTrigger>
+    return showPictureWithOverlay(
+      true,
+      "Generate Random Datapoints",
+      () => {
+        this.setState({
+          data: generateRandomUndetermined()
+        });
+      },
+      Shuffle
     );
   }
-
-  showAnomalyNavBar() {
-    return (
-      <Navbar fixed="top" bg="dark" variant="dark">
-        {showBackToAlgorithimPage()}
-        {this.showAnomalyAlgorithimSelection()}
-        {this.showShuffleButton()}
-        {this.showRunAlgorithimButton()}
-      </Navbar>
-    );
-  }
-
   render() {
     return (
       <div className="App">
-        x
         <div className="App-header">
-          {this.showAnomalyNavBar()}
+          {showNavBar([
+            showBackToAlgorithimPage(),
+            this.showAnomalyAlgorithimSelection(),
+            this.showShuffleButton(),
+            this.showRunAlgorithimButton()
+          ])}
           {this.displayGraph()}
         </div>
       </div>

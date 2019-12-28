@@ -2,8 +2,6 @@
 
 import React from "react";
 import Table from "react-bootstrap/Table";
-import Navbar from "react-bootstrap/Navbar";
-import Nav from "react-bootstrap/Nav";
 import Forward from "../Images/forward.png";
 import Image from "react-bootstrap/Image";
 import Tree from "react-tree-graph";
@@ -33,7 +31,6 @@ import Shuffle from "../Images/shuffle.png";
 import Reset from "../Images/reset.png";
 import "../css_files/App.css";
 import "react-table/react-table.css";
-import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { connect } from "react-redux";
 
 class Association extends React.Component {
@@ -260,103 +257,81 @@ class Association extends React.Component {
   }
 
   showStartAlgorithimBar() {
-    return !this.state.isApriori && !this.state.renderTree ? (
-      <OverlayTrigger
-        trigger="hover"
-        placement="bottom"
-        overlay={<Tooltip>Run FP Tree Algorithim</Tooltip>}
-      >
-        <Nav.Link
-          onClick={() => {
-            const [
-              treeState,
-              formattedSets,
-              strongRules,
-              reorderedDB
-            ] = runFPTreeAlgorithim(
-              this.state.transactions,
-              this.props.transactionItems,
-              this.state.minSup,
-              this.state.minConf
-            );
-            this.setState({
-              isFPTree: true,
-              treeState: treeState,
-              renderTree: true,
-              frequentItemSet: formattedSets,
-              strongRules: strongRules,
-              reorderedDB: reorderedDB
-            });
-          }}
-        >
-          <Image src={SomeTree} className="small-photo" />
-        </Nav.Link>
-      </OverlayTrigger>
-    ) : null;
+    return showPictureWithOverlay(
+      !this.state.isApriori && !this.state.renderTree,
+      "Run FP Tree Algorithim",
+      () => {
+        const [
+          treeState,
+          formattedSets,
+          strongRules,
+          reorderedDB
+        ] = runFPTreeAlgorithim(
+          this.state.transactions,
+          this.props.transactionItems,
+          this.state.minSup,
+          this.state.minConf
+        );
+        this.setState({
+          isFPTree: true,
+          treeState: treeState,
+          renderTree: true,
+          frequentItemSet: formattedSets,
+          strongRules: strongRules,
+          reorderedDB: reorderedDB
+        });
+      },
+      SomeTree
+    );
   }
 
   showRunNextIterationBar() {
-    return !this.state.isFPTree && !this.state.isDoneApriori ? (
-      <OverlayTrigger
-        trigger="hover"
-        placement="bottom"
-        overlay={<Tooltip>Run next Apriori iteration</Tooltip>}
-      >
-        <Nav.Link
-          onClick={() => {
-            const [
-              frequentItemSet,
-              isApriori,
-              isDoneApriori,
-              currentMinSupPruned,
-              currentAprioriPruned,
-              strongRules
-            ] = runAprioriAlgorithim(
-              this.state.frequentItemSet,
-              this.props.transactionItems,
-              this.state.transactions,
-              this.state.minSup,
-              this.state.minConf,
-              this.state.minSupPruned,
-              this.state.aprioriPruned
-            );
-            this.setState({
-              frequentItemSet: frequentItemSet,
-              isApriori: isApriori,
-              isDoneApriori: isDoneApriori,
-              minSupPruned: currentMinSupPruned,
-              aprioriPruned: currentAprioriPruned,
-              strongRules: strongRules
-            });
-          }}
-        >
-          <Image src={Forward} className="small-photo" />
-        </Nav.Link>
-      </OverlayTrigger>
-    ) : null;
+    return showPictureWithOverlay(
+      !this.state.isFPTree && !this.state.isDoneApriori,
+      "Run next Apriori iteration",
+      () => {
+        const [
+          frequentItemSet,
+          isApriori,
+          isDoneApriori,
+          currentMinSupPruned,
+          currentAprioriPruned,
+          strongRules
+        ] = runAprioriAlgorithim(
+          this.state.frequentItemSet,
+          this.props.transactionItems,
+          this.state.transactions,
+          this.state.minSup,
+          this.state.minConf,
+          this.state.minSupPruned,
+          this.state.aprioriPruned
+        );
+        this.setState({
+          frequentItemSet: frequentItemSet,
+          isApriori: isApriori,
+          isDoneApriori: isDoneApriori,
+          minSupPruned: currentMinSupPruned,
+          aprioriPruned: currentAprioriPruned,
+          strongRules: strongRules
+        });
+      },
+      Forward
+    );
   }
 
   showShuffleDataBar() {
-    return !this.state.isFPTree && !this.state.isApriori ? (
-      <OverlayTrigger
-        trigger="hover"
-        placement="bottom"
-        overlay={<Tooltip>Shuffle Transaction Data</Tooltip>}
-      >
-        <Nav.Link
-          onClick={() =>
-            this.setState({
-              transactions: generateRandomTransaction(
-                this.props.transactionItems,
-                this.state.transactions.length
-              )
-            })
-          }
-        >
-          <Image src={Shuffle} className="small-photo" />
-        </Nav.Link>
-      </OverlayTrigger>
-    ) : null;
+    return showPictureWithOverlay(
+      !this.state.isFPTree && !this.state.isApriori,
+      "Shuffle Transaction Data",
+      () =>
+        this.setState({
+          transactions: generateRandomTransaction(
+            this.props.transactionItems,
+            this.state.transactions.length
+          )
+        }),
+      Shuffle
+    );
   }
 
   showMinConfSelection() {
@@ -378,45 +353,23 @@ class Association extends React.Component {
   }
 
   showResetBar() {
-    return this.state.frequentItemSet.length > 0 ? (
-      <OverlayTrigger
-        trigger="hover"
-        placement="bottom"
-        overlay={<Tooltip>Reset State</Tooltip>}
-      >
-        <Nav.Link
-          onClick={() =>
-            this.setState({
-              treeState: {},
-              renderTree: false,
-              isApriori: false,
-              isDoneApriori: false,
-              isFPTree: false,
-              frequentItemSet: [],
-              minSupPruned: new Set(),
-              aprioriPruned: new Set(),
-              strongRules: [],
-              reorderedDB: []
-            })
-          }
-        >
-          <Image src={Reset} className="small-photo" />
-        </Nav.Link>
-      </OverlayTrigger>
-    ) : null;
-  }
-
-  showAprioriNavBar() {
-    return (
-      <Navbar fixed="top" bg="dark" variant="dark">
-        {showBackToAlgorithimPage()}
-        {this.showStartAlgorithimBar()}
-        {this.showRunNextIterationBar()}
-        {this.showShuffleDataBar()}
-        {this.showResetBar()}
-        {this.showMinSupSelection()}
-        {this.showMinConfSelection()}
-      </Navbar>
+    return showPictureWithOverlay(
+      this.state.frequentItemSet.length > 0,
+      "Reset State",
+      () =>
+        this.setState({
+          treeState: {},
+          renderTree: false,
+          isApriori: false,
+          isDoneApriori: false,
+          isFPTree: false,
+          frequentItemSet: [],
+          minSupPruned: new Set(),
+          aprioriPruned: new Set(),
+          strongRules: [],
+          reorderedDB: []
+        }),
+      Reset
     );
   }
 
@@ -453,7 +406,15 @@ class Association extends React.Component {
     return (
       <div className="App">
         <header className="App-header">
-          {this.showAprioriNavBar()}
+          {showNavBar(
+            showBackToAlgorithimPage(),
+            this.showStartAlgorithimBar(),
+            this.showRunNextIterationBar(),
+            this.showShuffleDataBar(),
+            this.showResetBar(),
+            this.showMinSupSelection(),
+            this.showMinConfSelection()
+          )}
           {this.displaySlowWarning()}
           {this.showDataTable()}
           {this.state.reorderedDB.length > 0 ? <h1>Reordered DB</h1> : null}

@@ -15,7 +15,7 @@ import {
   MarkSeries
 } from "react-vis";
 import Shuffle from "../Images/shuffle.png";
-import { Nav, Form, OverlayTrigger, Tooltip } from "react-bootstrap";
+import { Nav, Form } from "react-bootstrap";
 import {
   generateRandomData,
   getAllData,

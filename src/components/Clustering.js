@@ -11,7 +11,6 @@ import {
   MarkSeries
 } from "react-vis";
 import { showBackToAlgorithimPage } from "../Utility";
-import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 import Image from "react-bootstrap/Image";
 import Reset from "../Images/reset.png";
