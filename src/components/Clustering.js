@@ -7,8 +7,7 @@ import {
   XAxis,
   YAxis,
   VerticalGridLines,
-  HorizontalGridLines,
-  MarkSeries
+  HorizontalGridLines
 } from "react-vis";
 import { showBackToAlgorithimPage } from "../Utility";
 import Nav from "react-bootstrap/Nav";
@@ -34,7 +33,8 @@ import {
   arrayRange,
   displayInfoButton,
   showNavBar,
-  showPictureWithOverlay
+  showPictureWithOverlay,
+  showMarkSeries
 } from "../Utility";
 import "../css_files/App.css";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
@@ -400,39 +400,18 @@ class Clustering extends React.Component {
         <HorizontalGridLines />
         <XAxis />
         <YAxis />
-        <MarkSeries
-          className="mark-series-example"
-          strokeWidth={2}
-          opacity="0.8"
-          sizeRange={[0, 100]}
-          color={this.stateEnum.UNLABELED}
-          data={this.state.unlabeledData}
-          onValueClick={datapoint => this.makeCentroid(datapoint)}
-        />
-        <MarkSeries
-          className="mark-series-example"
-          strokeWidth={2}
-          opacity="0.8"
-          sizeRange={[0, 100]}
-          color={this.stateEnum.CENTROID}
-          data={this.state.centroidData}
-        />
-        {this.state.clusteredData.map(cluster => {
-          return (
-            <MarkSeries
-              className="mark-series-example"
-              strokeWidth={2}
-              opacity="0.8"
-              sizeRange={[0, 100]}
-              color={
-                this.stateEnum.CLUSTER[
-                  this.state.clusteredData.indexOf(cluster)
-                ]
-              }
-              data={cluster}
-            />
-          );
-        })}
+        {showMarkSeries(
+          this.stateEnum.UNLABELED,
+          this.state.unlabeledData,
+          datapoint => this.makeCentroid(datapoint)
+        )}
+        {showMarkSeries(this.stateEnum.CENTROID, this.state.centroidData)}
+        {this.state.clusteredData.map(cluster =>
+          showMarkSeries(
+            this.stateEnum.CLUSTER[this.state.clusteredData.indexOf(cluster)],
+            cluster
+          )
+        )}
       </XYPlot>
     );
   }

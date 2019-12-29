@@ -11,8 +11,7 @@ import {
   XAxis,
   YAxis,
   VerticalGridLines,
-  HorizontalGridLines,
-  MarkSeries
+  HorizontalGridLines
 } from "react-vis";
 import Shuffle from "../Images/shuffle.png";
 import { Nav, Form } from "react-bootstrap";
@@ -33,7 +32,8 @@ import {
   displayInfoButton,
   calculateScale,
   showPictureWithOverlay,
-  showNavBar
+  showNavBar,
+  showMarkSeries
 } from "../Utility";
 import { connect } from "react-redux";
 
@@ -155,46 +155,25 @@ class KNN extends React.Component {
 
   // Shows the points on the plot that are labeled
   showLabeledMarkSeries() {
-    return Object.keys(this.state.labeledData).map(color => {
-      return (
-        <MarkSeries
-          className="mark-series-example"
-          strokeWidth={2}
-          opacity="0.8"
-          sizeRange={[0, 100]}
-          color={color}
-          data={this.state.labeledData[color]}
-        />
-      );
-    });
+    return Object.keys(this.state.labeledData).map(color =>
+      showMarkSeries(color, this.state.labeledData[color])
+    );
   }
 
   showUnlabeledMarkSeries() {
-    return (
-      <MarkSeries
-        className="mark-series-example"
-        strokeWidth={2}
-        opacity="0.8"
-        sizeRange={[0, 100]}
-        onValueMouseOut={() => this.setState({ currentHighlightData: [] })}
-        onValueMouseOver={datapoint => this.highlightK(datapoint, false)}
-        onValueClick={datapoint => this.highlightK(datapoint, true)}
-        color={this.stateEnum.UNLABELED}
-        data={this.state.undeterminedData}
-      />
+    return showMarkSeries(
+      this.stateEnum.UNLABELED,
+      this.state.undeterminedData,
+      datapoint => this.highlightK(datapoint, true),
+      () => this.setState({ currentHighlightData: [] }),
+      datapoint => this.highlightK(datapoint, false)
     );
   }
 
   showHighlightedMarkSeries() {
-    return (
-      <MarkSeries
-        className="mark-series-example"
-        strokeWidth={2}
-        opacity="0.8"
-        sizeRange={[0, 100]}
-        color={this.stateEnum.HIGHLIGHT}
-        data={this.state.currentHighlightData}
-      />
+    return showMarkSeries(
+      this.stateEnum.HIGHLIGHT,
+      this.state.currentHighlightData
     );
   }
 

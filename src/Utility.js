@@ -14,6 +14,7 @@ import {
 import { Link } from "react-router-dom";
 import Back from "./Images/back.png";
 import Icon from "./Images/icon.png";
+import { MarkSeries } from "react-vis";
 
 // Euclidean distance function that returns orginal point and distance
 export function euclidFunction(pointOne, pointTwo) {
@@ -130,5 +131,27 @@ export function showNavBar(functionList) {
     <Navbar fixed="top" bg="dark" variant="dark">
       {[...functionList]}
     </Navbar>
+  );
+}
+
+export function showMarkSeries(
+  color,
+  data,
+  callbackClick = () => {},
+  callbackOut = () => {},
+  callbackOver = () => {}
+) {
+  return (
+    <MarkSeries
+      className="mark-series-example"
+      strokeWidth={2}
+      opacity="0.8"
+      sizeRange={[0, 100]}
+      color={color}
+      data={data}
+      onValueClick={callbackClick}
+      onValueMouseOut={callbackOut}
+      onValueMouseOver={callbackOver}
+    />
   );
 }

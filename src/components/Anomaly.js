@@ -7,9 +7,9 @@ import {
   generateRandomUndetermined,
   calculateScale,
   showNavBar,
-  showPictureWithOverlay
+  showPictureWithOverlay,
+  showMarkSeries
 } from "../Utility";
-import { Navbar, OverlayTrigger, Tooltip, Nav, Image } from "react-bootstrap";
 import Check from "../Images/check.png";
 import Shuffle from "../Images/shuffle.png";
 import {
@@ -18,7 +18,6 @@ import {
   YAxis,
   VerticalGridLines,
   HorizontalGridLines,
-  MarkSeries,
   LineSeries
 } from "react-vis";
 import "../css_files/App.css";
@@ -27,6 +26,8 @@ class Anomaly extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      //List of outlier points
+      outlierData: [],
       // List of Data Points
       data: [{ x: 0, y: 0 }],
       // Outlier lines
@@ -77,7 +78,6 @@ class Anomaly extends React.Component {
   displayGraph() {
     return (
       <XYPlot
-        id="plotGraphOne"
         width={550}
         height={550}
         xDomain={[0, 100]}
@@ -107,14 +107,8 @@ class Anomaly extends React.Component {
         <HorizontalGridLines />
         <XAxis />
         <YAxis />
-        <MarkSeries
-          className="mark-series-example"
-          strokeWidth={2}
-          opacity="0.8"
-          color="#FFFFFF"
-          sizeRange={[0, 100]}
-          data={this.state.data}
-        />
+        {showMarkSeries("#FFFFFF", this.state.data)}
+        {showMarkSeries("#000000", this.state.outlierData)}
         {this.displayLines()}
       </XYPlot>
     );
