@@ -25,7 +25,26 @@ import "../css_files/App.css";
 class Anomaly extends React.Component {
   constructor(props) {
     super(props);
+
+    //Partition Structure
+    /*
+     {
+       data: [{x, y}],
+       afterX: 0
+       afterY: 0
+       beforeX: 100
+       beforeY: 100
+     }
+
+     Whenever we add a new line, we look at our current partitons and deterime if this new
+     line affects the given partition. If it does, then we make this into two new partions and remove the current partitions
+     otherwise we just leave it the same
+    
+    */
+
     this.state = {
+      //Partitions of data made by our lines. List of Partition objects
+      partitions: [],
       //List of outlier points
       outlierData: [],
       // List of Data Points
