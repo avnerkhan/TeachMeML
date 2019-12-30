@@ -70,3 +70,9 @@ export function getPartitions(partitions, newLine, data) {
   }
   return newPartitions;
 }
+
+export function getOutliers(partitions) {
+  return partitions
+    .filter(partition => partition.data.length === 1)
+    .map(partition => partition.data[0]);
+}

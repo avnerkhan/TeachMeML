@@ -20,7 +20,7 @@ import {
   HorizontalGridLines,
   LineSeries
 } from "react-vis";
-import { getPartitions } from "../algorithims/AnomalyAlgo";
+import { getPartitions, getOutliers } from "../algorithims/AnomalyAlgo";
 import "../css_files/App.css";
 
 class Anomaly extends React.Component {
@@ -164,8 +164,13 @@ class Anomaly extends React.Component {
           newVal,
           this.state.data
         );
-        console.log(partitionData);
-        this.setState({ lines: currentLines, partitions: partitionData });
+        const newOutliers = getOutliers(partitionData);
+        console.log(newOutliers);
+        this.setState({
+          lines: currentLines,
+          partitions: partitionData,
+          outlierData: newOutliers
+        });
       },
       Check
     );
