@@ -20,6 +20,7 @@ import {
   HorizontalGridLines,
   LineSeries
 } from "react-vis";
+import { getPartitions } from "../algorithims/AnomalyAlgo";
 import "../css_files/App.css";
 
 class Anomaly extends React.Component {
@@ -158,7 +159,13 @@ class Anomaly extends React.Component {
         const randomDir = Math.floor(Math.random() * 2);
         const newVal = randomDir === 0 ? { x: randomVal } : { y: randomVal };
         currentLines.push(newVal);
-        this.setState({ lines: currentLines });
+        const partitionData = getPartitions(
+          this.state.partitions,
+          newVal,
+          this.state.data
+        );
+        console.log(partitionData);
+        this.setState({ lines: currentLines, partitions: partitionData });
       },
       Check
     );
@@ -169,8 +176,10 @@ class Anomaly extends React.Component {
       true,
       "Generate Random Datapoints",
       () => {
+        const randomData = generateRandomUndetermined();
         this.setState({
-          data: generateRandomUndetermined()
+          data: randomData,
+          partitions: getPartitions(this.state.partitions, {}, randomData)
         });
       },
       Shuffle
