@@ -27,23 +27,10 @@ class Anomaly extends React.Component {
   constructor(props) {
     super(props);
 
-    //Partition Structure
-    /*
-     {
-       data: [{x, y}],
-       afterX: 0
-       afterY: 0
-       beforeX: 100
-       beforeY: 100
-     }
-
-     Whenever we add a new line, we look at our current partitons and deterime if this new
-     line affects the given partition. If it does, then we make this into two new partions and remove the current partitions
-     otherwise we just leave it the same
-    
-    */
-
     this.state = {
+      xDisplay: 0,
+      yDisplay: 0,
+      isoCount: 0,
       //Partitions of data made by our lines. List of Partition objects
       partitions: [],
       //List of outlier points
@@ -104,31 +91,19 @@ class Anomaly extends React.Component {
         yDomain={[0, 100]}
         style={{ zIndex: 0 }}
         ref="plotGraph"
-        onClick={e => {
-          let currentUpdatedData = this.state.data;
-          const boundRect = ReactDOM.findDOMNode(
-            this.refs.plotGraph
-          ).getBoundingClientRect();
-          const xCoord = calculateScale(
-            e.screenX,
-            boundRect.x,
-            boundRect.width
-          );
-          const yCoord =
-            120 - calculateScale(e.screenY, boundRect.y, boundRect.height);
-
-          currentUpdatedData.push({ x: xCoord, y: yCoord });
-          this.setState({
-            data: currentUpdatedData
-          });
-        }}
       >
         <VerticalGridLines />
         <HorizontalGridLines />
         <XAxis />
         <YAxis />
         {showMarkSeries("#FFFFFF", this.state.data)}
-        {showMarkSeries("#000000", this.state.outlierData)}
+        {showMarkSeries("#000000", this.state.outlierData, point => {
+          this.setState({
+            xDisplay: point.x,
+            yDisplay: point.y,
+            isoCount: point.iterCount
+          });
+        })}
         {this.displayLines()}
       </XYPlot>
     );
@@ -164,8 +139,11 @@ class Anomaly extends React.Component {
           newVal,
           this.state.data
         );
-        const newOutliers = getOutliers(partitionData);
-        console.log(newOutliers);
+        const newOutliers = getOutliers(
+          partitionData,
+          currentLines.length,
+          this.state.outlierData
+        );
         this.setState({
           lines: currentLines,
           partitions: partitionData,
@@ -190,6 +168,17 @@ class Anomaly extends React.Component {
       Shuffle
     );
   }
+
+  displayIsolationInfo() {
+    return (
+      <div>
+        <h1>X: {this.state.xDisplay}</h1>
+        <h1>Y: {this.state.yDisplay}</h1>
+        <h1>Iso Count: {this.state.isoCount}</h1>
+      </div>
+    );
+  }
+
   render() {
     return (
       <div className="App">
@@ -201,6 +190,7 @@ class Anomaly extends React.Component {
             this.showRunAlgorithimButton()
           ])}
           {this.displayGraph()}
+          {this.displayIsolationInfo()}
         </div>
       </div>
     );
