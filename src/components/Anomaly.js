@@ -1,11 +1,9 @@
 /* eslint-disable */
 
 import React from "react";
-import ReactDOM from "react-dom";
 import {
   showBackToAlgorithimPage,
   generateRandomUndetermined,
-  calculateScale,
   showNavBar,
   showPictureWithOverlay,
   showMarkSeries
@@ -38,9 +36,7 @@ class Anomaly extends React.Component {
       // List of Data Points
       data: [{ x: 0, y: 0 }],
       // Outlier lines
-      lines: [],
-      // Isolation or proximity based approach
-      isIso: true
+      lines: []
     };
   }
 
@@ -109,21 +105,6 @@ class Anomaly extends React.Component {
     );
   }
 
-  // Entropy or gini selection on nav bar
-  showAnomalyAlgorithimSelection() {
-    return (
-      <div>
-        <select
-          value={this.state.isIso ? "iso" : "prox"}
-          onChange={e => this.setState({ isIso: e.target.value === "iso" })}
-        >
-          <option value="iso">Isolation</option>
-          <option value="prox">Proximity</option>
-        </select>
-      </div>
-    );
-  }
-
   showRunAlgorithimButton() {
     return showPictureWithOverlay(
       this.state.data.length > 1,
@@ -185,7 +166,6 @@ class Anomaly extends React.Component {
         <div className="App-header">
           {showNavBar([
             showBackToAlgorithimPage(),
-            this.showAnomalyAlgorithimSelection(),
             this.showShuffleButton(),
             this.showRunAlgorithimButton()
           ])}

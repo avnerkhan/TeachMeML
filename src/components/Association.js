@@ -406,7 +406,7 @@ class Association extends React.Component {
     return (
       <div className="App">
         <header className="App-header">
-          {showNavBar(
+          {showNavBar([
             showBackToAlgorithimPage(),
             this.showStartAlgorithimBar(),
             this.showRunNextIterationBar(),
@@ -414,7 +414,7 @@ class Association extends React.Component {
             this.showResetBar(),
             this.showMinSupSelection(),
             this.showMinConfSelection()
-          )}
+          ])}
           {this.displaySlowWarning()}
           {this.showDataTable()}
           {this.state.reorderedDB.length > 0 ? <h1>Reordered DB</h1> : null}

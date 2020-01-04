@@ -16,7 +16,6 @@ class Pick extends React.Component {
         "K-Nearest Neighbors",
         "Clustering",
         "Association",
-        "Regression",
         "Anomaly"
       ]
     };
@@ -46,10 +45,9 @@ class Pick extends React.Component {
         <Dropdown.Menu>
           {this.state.algorithims.map(algo => {
             return !(
-              (algo === "Clustering" ||
-                algo === "Anomaly" ||
-                algo === "Regression") &&
-              type === "Edit"
+              ((algo === "Clustering" || algo === "Anomaly") &&
+                type === "Edit") ||
+              (algo === "Anomaly" && type === "Learn")
             ) ? (
               <Dropdown.Item
                 onClick={() =>
